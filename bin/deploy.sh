@@ -28,7 +28,7 @@ if [[ $1 == 'tear_down' ]]; then
   fi
 
   $kd --delete -f kube/configmaps/configmap.yml -f kube/hof-rds-api
-  $kd --delete -f kube/redis -f kube/app -f kube/file-vault
+  $kd --delete -f kube/redis -f kube/app -f kube/file-vault -f kube/html-pdf
   echo "Torn Down Branch - $APP_NAME-$DRONE_SOURCE_BRANCH.internal.branch.sas-notprod.homeoffice.gov.uk"
   exit 0
 fi
@@ -46,25 +46,25 @@ fi
 
 if [[ ${KUBE_NAMESPACE} == ${BRANCH_ENV} ]]; then
   $kd -f kube/configmaps -f kube/certs
-  $kd -f $redis_runtime_files -f kube/hof-rds-api -f kube/file-vault
+  $kd -f $redis_runtime_files -f kube/hof-rds-api -f kube/html-pdf -f kube/file-vault
   $kd -f kube/app
 elif [[ ${KUBE_NAMESPACE} == ${UAT_ENV} ]]; then
   $kd -f kube/configmaps/configmap.yml
-  $kd -f $redis_runtime_files -f kube/hof-rds-api 
+  $kd -f $redis_runtime_files -f kube/hof-rds-api -f kube/html-pdf
   $kd -f kube/file-vault/file-vault-service.yml -f kube/file-vault/file-vault-ingress.yml
   $kd -f kube/file-vault/file-vault-deployment.yml -f kube/file-vault/file-vault-network-policy.yml
   $kd -f kube/app
 elif [[ ${KUBE_NAMESPACE} == ${STG_ENV} ]]; then
   $kd -f kube/configmaps/configmap.yml
   $kd -f $redis_storage_files
-  $kd -f $redis_runtime_files -f kube/hof-rds-api
+  $kd -f $redis_runtime_files -f kube/hof-rds-api -f kube/html-pdf
   $kd -f kube/file-vault/file-vault-service.yml -f kube/file-vault/file-vault-ingress.yml
   $kd -f kube/file-vault/file-vault-deployment.yml -f kube/file-vault/file-vault-network-policy.yml
   $kd -f kube/app
 elif [[ ${KUBE_NAMESPACE} == ${PROD_ENV} ]]; then
   $kd -f kube/configmaps/configmap.yml
   $kd -f $redis_storage_files
-  $kd -f $redis_runtime_files -f kube/hof-rds-api
+  $kd -f $redis_runtime_files -f kube/hof-rds-api -f kube/html-pdf
   $kd -f kube/file-vault/file-vault-service.yml -f kube/file-vault/file-vault-ingress.yml
   $kd -f kube/file-vault/file-vault-deployment.yml -f kube/file-vault/file-vault-network-policy.yml
   $kd -f kube/app/service.yml -f kube/app/ingress-external.yml
