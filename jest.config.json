@@ -1,0 +1,20 @@
+{
+  "verbose": true,
+  "clearMocks": true,
+  "collectCoverage": true,
+  "testMatch": ["<rootDir>/test/_unit/**/*.spec.js"],
+  "collectCoverageFrom": [
+    "**/*.js",
+    "!**/node_modules/**",
+    "!**/coverage/**",
+    "!config.js",
+    "!**/public/js/*.js",
+    "!apps/**/fields/*.js",
+    "!apps/**/index.js",
+    "!apps/**/sections/summary-data-sections.js",
+    "!test/**/*.js",
+    "!server.js"
+  ],
+  "coverageReporters": ["text", "lcov", "clover"],
+  "setupFiles": ["<rootDir>/jest.env.js"]
+}
