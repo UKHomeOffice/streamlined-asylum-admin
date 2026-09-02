@@ -1,0 +1,73 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  {{ if eq .KUBE_NAMESPACE .BRANCH_ENV }}
+  name: redis-{{ .DRONE_SOURCE_BRANCH }}
+  {{ else }}
+  name: redis
+  {{ end }}
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      {{ if eq .KUBE_NAMESPACE .BRANCH_ENV }}
+      app: redis-{{ .DRONE_SOURCE_BRANCH }}
+      {{ else }}
+      app: redis
+      {{ end }}
+  template:
+    metadata:
+      labels:
+        {{ if eq .KUBE_NAMESPACE .BRANCH_ENV }}
+        name: redis-{{ .DRONE_SOURCE_BRANCH }}
+        service: redis-{{ .DRONE_SOURCE_BRANCH }}
+        app: redis-{{ .DRONE_SOURCE_BRANCH }}
+        {{ else }}
+        name: redis
+        service: redis
+        app: redis
+        {{ end }}
+    spec:
+      securityContext:
+        fsGroup: 999
+      containers:
+        - name: redis
+          image: quay.io/ukhomeofficedigital/hof-docker-redis:8.4.2@sha256:e0ae9e895f3f5b5b1b42fd311f07c4ec4b6a09b760ed129593cad8bc3c681202
+          args:
+            - redis-server
+            - --appendonly
+            - "yes"
+            - --dir
+            - /data
+            - --protected-mode
+            - "no"
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - mountPath: /data
+              name: data
+          securityContext:
+            runAsNonRoot: true
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "100Mi"
+            limits:
+              cpu: "100m"
+              memory: "200Mi"
+      volumes:
+        {{ if eq .REDIS_PERSISTENCE_ENABLED "true" }}
+        - name: data
+          persistentVolumeClaim:
+            {{ if eq .REDIS_PERSISTENCE_EXISTING_CLAIM "" }}
+            claimName: redis-pvc
+            {{ else }}
+            claimName: {{ .REDIS_PERSISTENCE_EXISTING_CLAIM }}
+            {{ end }}
+        {{ else }}
+        - name: data
+          emptyDir: {}
+        {{ end }}
