@@ -16,7 +16,6 @@ environment:
   HOF_CONFIG: hof-services-config/Streamlined_Asylum_Admin
   NON_PROD_AVAILABILITY: Mon-Fri 08:00-23:00 Europe/London
   READY_FOR_TEST_DELAY: 20s
-  NOTIFY_STUB: stub
   REDIS_PERSISTENCE_ENABLED: "true"
   REDIS_PERSISTENCE_ACCESS_MODES: ReadWriteOnce
   REDIS_PERSISTENCE_STORAGE_CLASS: gp2-encrypted-eu-west-2b
@@ -36,9 +35,11 @@ trigger:
   branch:
     <<: *include_default_and_feature_branches
 
+node_image_name: &node_image_name quay.io/ukhomeofficedigital/hof-nodejs:24.19.0-alpine3.24-v3@sha256:20887d4a5a15886deb9653e96dc4393b10ad9c70cd8d134a43da6cee7ddd45f3
+
 node_image: &node_image
   pull: if-not-exists
-  image: quay.io/ukhomeofficedigital/hof-nodejs:24.19.0-alpine3.24-v3@sha256:20887d4a5a15886deb9653e96dc4393b10ad9c70cd8d134a43da6cee7ddd45f3
+  image: *node_image_name
 
 linting: &linting
   <<: *node_image
@@ -47,8 +48,6 @@ linting: &linting
 
 unit_tests: &unit_tests
   <<: *node_image
-  environment:
-    NOTIFY_STUB: true
   commands:
     - yarn run test:unit
 
@@ -84,7 +83,7 @@ steps:
         cpu: 1000
         memory: 1024Mi
     environment:
-      IMAGE_NAME: quay.io/ukhomeofficedigital/hof-nodejs:24.19.0-alpine3.24-v3@sha256:20887d4a5a15886deb9653e96dc4393b10ad9c70cd8d134a43da6cee7ddd45f3
+      IMAGE_NAME: *node_image_name
       SERVICE_URL: https://acp-trivy-helm.acp-trivy.svc.cluster.local:443
       SEVERITY: MEDIUM,HIGH,CRITICAL  --dependency-tree
       FAIL_ON_DETECTION: false
@@ -100,8 +99,6 @@ steps:
 
   - name: setup
     <<: *node_image
-    environment:
-      NOTIFY_STUB: true
     commands:
       - yarn install --frozen-lockfile
       - yarn run postinstall
@@ -202,7 +199,6 @@ steps:
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/kd:v1.14.0
     environment:
-      # NOTIFY_STUB: stub
       KUBE_SERVER:
         from_secret: KUBE_SERVER_DEV
       KUBE_TOKEN:
@@ -418,7 +414,7 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/trivy/client:latest
     pull: always
     environment:
-        IMAGE_NAME: quay.io/ukhomeofficedigital/hof-nodejs:24.19.0-alpine3.24-v3@sha256:20887d4a5a15886deb9653e96dc4393b10ad9c70cd8d134a43da6cee7ddd45f3
+        IMAGE_NAME: *node_image_name
         SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL --dependency-tree
         FAIL_ON_DETECTION: true
         IGNORE_UNFIXED: false
