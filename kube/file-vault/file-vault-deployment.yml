@@ -76,36 +76,36 @@ spec:
               valueFrom:
                 secretKeyRef:
                   {{ if or (eq .KUBE_NAMESPACE .BRANCH_ENV) (eq .KUBE_NAMESPACE .UAT_ENV) (eq .KUBE_NAMESPACE .STG_ENV) }}
-                  name: coa-s3-bucket
+                  name: {{ .APP_NAME }}-s3-bucket
                   {{ else }}
-                  name: coa-s3-prod
+                  name: {{ .APP_NAME }}-s3-prod
                   {{ end }}
                   key: access_key_id
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   {{ if or (eq .KUBE_NAMESPACE .BRANCH_ENV) (eq .KUBE_NAMESPACE .UAT_ENV) (eq .KUBE_NAMESPACE .STG_ENV) }}
-                  name: coa-s3-bucket
+                  name: {{ .APP_NAME }}-s3-bucket
                   {{ else }}
-                  name: coa-s3-prod
+                  name: {{ .APP_NAME }}-s3-prod
                   {{ end }}
                   key: secret_access_key
             - name: AWS_KMS_KEY_ID
               valueFrom:
                 secretKeyRef:
                   {{ if or (eq .KUBE_NAMESPACE .BRANCH_ENV) (eq .KUBE_NAMESPACE .UAT_ENV) (eq .KUBE_NAMESPACE .STG_ENV) }}
-                  name: coa-s3-bucket
+                  name: {{ .APP_NAME }}-s3-bucket
                   {{ else }}
-                  name: coa-s3-prod
+                  name: {{ .APP_NAME }}-s3-prod
                   {{ end }}
                   key: kms_key_id
             - name: AWS_BUCKET
               valueFrom:
                 secretKeyRef:
                   {{ if or (eq .KUBE_NAMESPACE .BRANCH_ENV) (eq .KUBE_NAMESPACE .UAT_ENV) (eq .KUBE_NAMESPACE .STG_ENV) }}
-                  name: coa-s3-bucket
+                  name: {{ .APP_NAME }}-s3-bucket
                   {{ else }}
-                  name: coa-s3-prod
+                  name: {{ .APP_NAME }}-s3-prod
                   {{ end }}
                   key: name
             - name: AWS_PASSWORD

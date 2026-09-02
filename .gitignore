@@ -1,0 +1,16 @@
+.DS_Store
+node_modules
+public
+.idea
+coverage
+*.env
+output/
+*.iml
+.nyc_output
+.vscode
+.vscode-server
+dump.rdb
+yarn-error.log
+.nyc_output
+.devcontainer/*.env
+.cache
