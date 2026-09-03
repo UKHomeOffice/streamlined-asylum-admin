@@ -48,6 +48,7 @@ linting: &linting
 
 unit_tests: &unit_tests
   <<: *node_image
+  environment:
   commands:
     - yarn run test:unit
 
@@ -83,9 +84,9 @@ steps:
         cpu: 1000
         memory: 1024Mi
     environment:
-      IMAGE_NAME: *node_image_name
+      IMAGE_NAME: quay.io/ukhomeofficedigital/hof-nodejs:24.19.0-alpine3.24-v3@sha256:20887d4a5a15886deb9653e96dc4393b10ad9c70cd8d134a43da6cee7ddd45f3
       SERVICE_URL: https://acp-trivy-helm.acp-trivy.svc.cluster.local:443
-      SEVERITY: MEDIUM,HIGH,CRITICAL  --dependency-tree
+      SEVERITY: MEDIUM,HIGH,CRITICAL --vuln-type os,library --dependency-tree
       FAIL_ON_DETECTION: false
       IGNORE_UNFIXED: false
       ALLOW_CVE_LIST_FILE: hof-services-config/infrastructure/trivy/.trivyignore.yaml
@@ -99,6 +100,7 @@ steps:
 
   - name: setup
     <<: *node_image
+    environment:
     commands:
       - yarn install --frozen-lockfile
       - yarn run postinstall
@@ -182,7 +184,7 @@ steps:
         memory: 1024Mi
     environment:
       IMAGE_NAME: sas/saa:${DRONE_COMMIT_SHA}
-      SEVERITY: MEDIUM,HIGH,CRITICAL  --dependency-tree --format table
+      SEVERITY: MEDIUM,HIGH,CRITICAL --vuln-type os,library --dependency-tree
       FAIL_ON_DETECTION: false
       IGNORE_UNFIXED: false
       ALLOW_CVE_LIST_FILE: hof-services-config/infrastructure/trivy/.trivyignore.yaml
@@ -397,7 +399,7 @@ steps:
     environment:
         IMAGE_NAME: sas/saa:${DRONE_COMMIT_SHA}
         SERVICE_URL: https://acp-trivy-helm.acp-trivy.svc.cluster.local:443
-        SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL --dependency-tree
+        SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL --vuln-type os,library --dependency-tree
         FAIL_ON_DETECTION: true
         IGNORE_UNFIXED: false
         ALLOW_CVE_LIST_FILE: hof-services-config/infrastructure/trivy/.trivyignore.yaml
@@ -414,8 +416,8 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/trivy/client:latest
     pull: always
     environment:
-        IMAGE_NAME: *node_image_name
-        SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL --dependency-tree
+        IMAGE_NAME: quay.io/ukhomeofficedigital/hof-nodejs:24.19.0-alpine3.24-v3@sha256:20887d4a5a15886deb9653e96dc4393b10ad9c70cd8d134a43da6cee7ddd45f3
+        SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL --vuln-type os,library --dependency-tree
         FAIL_ON_DETECTION: true
         IGNORE_UNFIXED: false
         ALLOW_CVE_LIST_FILE: hof-services-config/infrastructure/trivy/.trivyignore.yaml
