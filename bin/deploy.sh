@@ -111,7 +111,8 @@ export REDIS_PERSISTENCE_ANNOTATIONS_FILE=${REDIS_PERSISTENCE_ANNOTATIONS_FILE:-
 
 if [[ $1 == 'tear_down' ]]; then
   export KUBE_NAMESPACE=$BRANCH_ENV
-  export DRONE_SOURCE_BRANCH=$(cat /root/.dockersock/branch_name.txt)
+  export BRANCH_SLUG_MAX_LENGTH=$(compute_branch_slug_max_length)
+  export DRONE_SOURCE_BRANCH=$(sanitize_branch_name "$(cat /root/.dockersock/branch_name.txt)" "${BRANCH_SLUG_MAX_LENGTH}")
 
   if [[ -z "${REDIS_PERSISTENCE_SIZE}" ]]; then
     export REDIS_PERSISTENCE_SIZE=1Gi
@@ -124,7 +125,8 @@ if [[ $1 == 'tear_down' ]]; then
 fi
 
 export KUBE_NAMESPACE=$1
-export DRONE_SOURCE_BRANCH=$(echo $DRONE_SOURCE_BRANCH | tr '[:upper:]' '[:lower:]' | tr '/' '-')
+export BRANCH_SLUG_MAX_LENGTH=$(compute_branch_slug_max_length)
+export DRONE_SOURCE_BRANCH=$(sanitize_branch_name "${DRONE_SOURCE_BRANCH}" "${BRANCH_SLUG_MAX_LENGTH}")
 
 if [[ -z "${REDIS_PERSISTENCE_SIZE}" ]]; then
   if [[ ${KUBE_NAMESPACE} == ${PROD_ENV} ]]; then
