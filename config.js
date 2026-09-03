@@ -8,5 +8,6 @@ module.exports = {
     port: process.env.REDIS_PORT || '6379',
     host: process.env.REDIS_HOST || '127.0.0.1'
   },
-  feedbackUrl: process.env.FEEDBACK_URL
+  feedbackUrl: process.env.FEEDBACK_URL,
+  disallowIndexing: process.env.DISALLOW_INDEXING === 'true'
 };

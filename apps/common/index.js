@@ -1,10 +1,16 @@
+const { disallowIndexing } = require('../../config');
 const steps = {
-  '/start': {}
+  '/': {
+    template: 'start'
+  }
 };
 const pages = {
   '/accessibility': 'static/accessibility'
 };
 
+if (disallowIndexing) {
+  pages['/robots.txt'] = 'static/robots';
+}
 module.exports = {
   name: 'common',
   baseUrl: '/',
