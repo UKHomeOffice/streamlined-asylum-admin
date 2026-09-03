@@ -1,0 +1,281 @@
+@use "autocomplete";
+@use "file-upload";
+
+@import "hof/frontend/themes/gov-uk/styles/govuk";
+
+h2 {
+  @extend .govuk-heading-m;
+  margin-top: 20px;
+}
+
+h3 {
+  @extend .govuk-heading-s;
+  margin-top: 20px;
+}
+
+ul {
+  @extend .govuk-list, .govuk-list--bullet;
+}
+
+p {
+  @extend .govuk-body;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.list-link {
+  @extend .govuk-link;
+}
+
+p a[href] {
+  @extend .govuk-link;
+}
+
+.govuk-label-wrapper {
+  margin-bottom: 15px;
+}
+
+span.form-hint {
+  padding-top: 0;
+  margin-bottom: 0;
+}
+
+.phase-banner {
+  @include phase-banner(beta);
+}
+
+.checkbox-hint {
+  padding-left: 50px;
+  margin-top: -25px;
+}
+.bullet-list {
+  list-style: disc;
+  margin-left: 20px;
+}
+textarea {
+  font-size: 19px !important;
+}
+
+.validation-error-override {
+  box-sizing: border-box;
+  padding-left: 12px;
+  border-left: 4px solid #b10e1e;
+}
+
+.error-message-override {
+  display: block !important;
+}
+
+.alert-complete {
+  background-color: #00703c;
+  border-color: #00703c;
+  padding: 40px !important;
+}
+
+.ref-number-heading {
+  margin-top: 0px !important;
+  margin-bottom: 10px !important;
+  color: #fff;
+}
+
+.ref-number {
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  padding-bottom: 10px;
+  color: #fff;
+}
+
+.section-header {
+  margin-top: 40px !important;
+}
+
+.section-fields {
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+}
+
+.table-spacing {
+  margin-top: 60px !important;
+}
+
+.confirm-message {
+  text-align: justify;
+  margin-top: 50px !important;
+}
+
+.govuk-button--secondary {
+  background-color: #f3f2f1;
+  box-shadow: 0 2px 0 #929191;
+}
+.govuk-button--secondary:hover {
+  background-color: #dbdad9;
+}
+.govuk-button--secondary,
+.govuk-button--secondary:link,
+.govuk-button--secondary:visited,
+.govuk-button--secondary:active,
+.govuk-button--secondary:hover {
+  color: #0b0c0c;
+}
+
+.secondary-link {
+  margin-top: 9px;
+  display: inline-block;
+  padding: 0px 1em;
+}
+
+.govuk-table__cell {
+  .govuk-button {
+    margin-bottom: 0;
+  }
+}
+
+//Cookie banner styling
+#cookie-banner {
+  #cookie-banner-actions {
+    font-size: 65% !important;
+    width: 66.667% !important;
+  }
+}
+
+.govuk-summary-list__value {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.list-bullet {
+  list-style-type: disc;
+  color: #6f777b;
+  margin-left: 2rem;
+  padding-bottom: 1rem;
+}
+
+.govuk-button {
+  margin-right: 0.5rem;
+  margin-top: 30px;
+}
+
+.govuk-hint {
+  margin-top: 1rem;
+}
+
+.govuk-caption-l {
+  margin-bottom: 0.5rem;
+}
+
+pre.looped-records {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+.govuk-link:hover {
+  color: #003078;
+}
+
+.govuk-link--no-underline:focus {
+  outline: 3px solid #0000;
+  background-color: #fd0;
+  box-shadow:
+    0 -2px #fd0,
+    0 4px #0b0c0c;
+  text-decoration: none;
+}
+
+.govuk-link--no-visited-state:hover {
+  color: #003078;
+}
+
+.govuk-link--no-visited-state:focus {
+  outline: 3px solid #0000;
+  background-color: #fd0;
+  box-shadow:
+    0 -2px #fd0,
+    0 4px #0b0c0c;
+  text-decoration: none;
+}
+
+.link-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 45px;
+  margin-bottom: 40px;
+}
+
+.govuk-table {
+  margin-bottom: 15px;
+}
+
+.panel-indent {
+  margin: 20px 15px 20px 20px;
+  padding: 10px 0 10px 30px;
+}
+
+.spinner-loader {
+  border: 5px solid #dee0e2;
+  border-radius: 50%;
+  border-top-color: #005ea5;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+}
+
+.spinner-container {
+  display: none;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.spinner-message {
+  margin-left: 10px;
+}
+
+#report-submit {
+  display: inline-block;
+}
+
+.ho-logo {
+  margin-top: 30px;
+}
+
+.pdf-body {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.pdf-summary-key {
+  font-weight: normal;
+}
+
+.pdf-summary-value {
+  white-space: normal;
+}
+
+#declaration-check-group {
+  margin-top: 40px;
+}
+
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.govuk-summary-card__title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0 !important;
+}

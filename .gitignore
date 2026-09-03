@@ -6,11 +6,15 @@ coverage
 *.env
 output/
 *.iml
+anchore-reports
 .nyc_output
 .vscode
 .vscode-server
 dump.rdb
 yarn-error.log
-.nyc_output
-.devcontainer/*.env
+apps/**/translations/**/*
+!apps/**/translations/src/
+!apps/**/translations/src/**/*
+test/_accessibility/tmp/*
+test/data/test_*
 .cache
