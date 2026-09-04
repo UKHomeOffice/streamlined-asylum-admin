@@ -39,6 +39,8 @@ UNSIGNED_TOKEN="${HEADER_B64}.${PAYLOAD_B64}"
 SIGNATURE_B64=$(printf "%s" "${UNSIGNED_TOKEN}" | openssl dgst -binary -sha256 -sign /tmp/github_app_private_key.pem | b64url)
 JWT="${UNSIGNED_TOKEN}.${SIGNATURE_B64}"
 TOKEN_RESPONSE=$(curl -sS -X POST \
+  --connect-timeout 10 \
+  --max-time 30 \
   -H "Authorization: Bearer ${JWT}" \
   -H "Accept: application/vnd.github+json" \
   "https://api.github.com/app/installations/${INSTALLATION_ID}/access_tokens")
