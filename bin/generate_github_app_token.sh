@@ -31,9 +31,10 @@ if ! [[ "${INSTALLATION_ID}" =~ ^[0-9]+$ ]]; then
 fi
 
 NOW=$(date +%s)
+ISSUED_AT=$((NOW - 60))
 EXP=$((NOW + 540))
 HEADER_B64=$(printf "{\"alg\":\"RS256\",\"typ\":\"JWT\"}" | b64url)
-PAYLOAD_B64=$(printf "{\"iat\":%s,\"exp\":%s,\"iss\":\"%s\"}" "${NOW}" "${EXP}" "${APP_ID}" | b64url)
+PAYLOAD_B64=$(printf "{\"iat\":%s,\"exp\":%s,\"iss\":\"%s\"}" "${ISSUED_AT}" "${EXP}" "${APP_ID}" | b64url)
 UNSIGNED_TOKEN="${HEADER_B64}.${PAYLOAD_B64}"
 SIGNATURE_B64=$(printf "%s" "${UNSIGNED_TOKEN}" | openssl dgst -binary -sha256 -sign /tmp/github_app_private_key.pem | b64url)
 JWT="${UNSIGNED_TOKEN}.${SIGNATURE_B64}"
