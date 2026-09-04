@@ -51,4 +51,4 @@ test -n "${TOKEN}" || (echo "Failed to create GitHub App installation token" && 
 
 mkdir -p "$(dirname "${OUTPUT_TOKEN_FILE}")"
 printf "%s" "${TOKEN}" > "${OUTPUT_TOKEN_FILE}"
-chmod 600 "${OUTPUT_TOKEN_FILE}"  
+chmod 600 "${OUTPUT_TOKEN_FILE}"
