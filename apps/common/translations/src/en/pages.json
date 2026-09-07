@@ -2,5 +2,23 @@
   "start": {
     "title": "Start",
     "header": "Send information for your asylum claim"
+  },
+  "before-you-start": {
+    "header": "What you need before you start"
+  },
+  "claimant-details": {
+    "header": "About the person who made the claim"
+  },
+  "claim-decided": {
+    "header": "Has there been a decision on the asylum claim?"
+  },
+  "cannot-use-form": {
+    "header": "You cannot use this form"
+  },
+  "email-address": {
+    "header": "What is your email address?"
+  },
+  "check-your-email": {
+    "header": "Check your email"
   }
 }

@@ -1,0 +1,239 @@
+{
+  "continue-to-form": {
+    "header": "Continue to your form"
+  },
+  "which-form": {
+    "header": "Which form do you need to continue?"
+  },
+  "information-given": {
+    "header": "Information you have given us"
+  },
+  "person-completing-form": {
+    "header": "Person completing the form"
+  },
+  "who-are-you": {
+    "header": "Who are you?"
+  },
+  "update-personal-details": {
+    "header": "Update personal details"
+  },
+  "changes-to-contact-details": {
+    "header": "What details do you need to change?"
+  },
+  "do-you-need-to-change-your-name": {
+    "header": "Do you need to change your name?"
+  },
+  "reason-name-change": {
+    "header": "Why do you need to change the name?"
+  },
+  "new-name": {
+    "header": "Change your name"
+  },
+  "new-name-evidence": {
+    "header": "Upload evidence to support this change"
+  },
+  "check-your-answers-name": {
+    "header": "Check your answers"
+  },
+  "do-you-need-to-change-someone-elses-name": {
+    "header": "Do you need to change someone else’s name?"
+  },
+  "relationship-name-change": {
+    "header": "How are they related to you?"
+  },
+  "someone-else-new-name": {
+    "header": "Change someone else’s name"
+  },
+  "whose-date-of-birth": {
+    "header": "Do you need to change your date of birth?"
+  },
+  "correct-date-of-birth": {
+    "header": "What is your correct date of birth?"
+  },
+  "new-date-of-birth-evidence": {
+    "header": "Upload evidence to support this change"
+  },
+  "check-your-answers-date-of-birth": {
+    "header": "Check your answers"
+  },
+  "relationship-date-of-birth": {
+    "header": "How are they related to you?"
+  },
+  "someone-else-correct-date-of-birth": {
+    "header": "Change someone else’s date of birth"
+  },
+  "whose-nationality-to-change": {
+    "header": "Do you need to change your nationality?"
+  },
+  "correct-nationality": {
+    "header": "What is your country of nationality?"
+  },
+  "reason-nationality-change": {
+    "header": "Why are you changing the nationality?"
+  },
+  "upload-nationality-evidence": {
+    "header": "Upload evidence to support this change"
+  },
+  "check-your-answers-nationality": {
+    "header": "Check your answers"
+  },
+  "claimants-name": {
+    "header": "Claimant’s name"
+  },
+  "claimant-main-language": {
+    "header": "Claimant's main language"
+  },
+  "relationship-nationality-change": {
+    "header": "How are they related to you?"
+  },
+  "someone-else-correct-nationality": {
+    "header": "Change someone else’s nationality"
+  },
+  "provide-photo-update-contact": {
+    "header": "Provide a photo identity document to update your contact details"
+  },
+  "change-uk-address": {
+    "header": "Have you moved to a new address in the UK?"
+  },
+  "home-address": {
+    "header": "UK address where you live now"
+  },
+  "new-email-address": {
+    "header": "Change your email address"
+  },
+  "check-your-answers-email": {
+    "header": "Check your answers"
+  },
+  "your-phone-number": {
+    "header": "Is the new phone number your own?"
+  },
+  "new-phone-number": {
+    "header": "Change your phone number"
+  },
+  "declaration": {
+    "header": "Declaration"
+  },
+  "relationship-to-claimant": {
+    "header": "What is your relationship to the person claiming asylum?"
+  },
+  "helper-details": {
+    "header": "Your details"
+  },
+  "completing-for-someone-else": {
+    "header": "Completing the form for someone else"
+  },
+  "change-contact-address": {
+    "header": "Do you need to change the address we send your letters to?"
+  },
+  "reason-contact-address-change": {
+    "header": "Why do you need us to send letters to a different address?"
+  },
+  "contact-address": {
+    "header": "Where should we send letters?"
+  },
+  "how-you-are-helping": {
+    "header": "How are you helping them?"
+  },
+  "check-your-answers-address": {
+    "header": "Check your answers"
+  },
+  "do-you-need-add-remove-dependant": {
+    "header": "Do you need to add or remove a child or partner as a dependant?"
+  },
+  "add-remove-child-partner": {
+    "header": "Tell us if you want to add a dependent or remove a dependent"
+  },
+  "relationship-to-child-partner": {
+    "header": "How are they related to you?"
+  },
+  "child-partner-name": {
+    "header": "Their name"
+  },
+  "child-partner-date-of-birth": {
+    "header": "Their date of birth"
+  },
+  "child-partner-nationality": {
+    "header": "Their country of nationality"
+  },
+  "evidence-child-partner": {
+    "header": "Upload evidence to support this change"
+  },
+  "check-your-answers-add-child-partner": {
+    "header": "Check your answers"
+  },
+  "reason-for-removing-child-partner": {
+    "header": "Why are you removing a child, partner or dependent from your claim?"
+  },
+  "send-evidence-for-your-claim": {
+    "header": "Do you need to send evidence to help your claim?"
+  },
+  "prepare-your-evidence": {
+    "header": "Prepare your evidence"
+  },
+  "upload-supporting-evidence": {
+    "header": "Upload evidence to help your claim"
+  },
+  "violent-upsetting-images": {
+    "header": "Violent or upsetting images"
+  },
+  "check-your-answers-evidence": {
+    "header": "Check your answers"
+  },
+  "someone-on-claim-died": {
+    "header": "Do you need to tell us someone on your claim has died?"
+  },
+  "about-who-has-died": {
+    "header": "Tell us about the person who has died"
+  },
+  "main-claimant-died": {
+    "header": "Did they make the claim?"
+  },
+  "name-person-who-died": {
+    "header": "Their name"
+  },
+  "date-of-birth-person-who-died": {
+    "header": "Their date of birth"
+  },
+  "nationality-person-who-died": {
+    "header": "Their country of nationality"
+  },
+  "upload-death-certificate": {
+    "header": "Upload the death certificate"
+  },
+  "check-your-answers-death": {
+    "header": "Check your answers"
+  },
+  "confirm": {
+    "header": "Confirmation"
+  },
+  "something-else": {
+    "header": "Do you need to do something else?"
+  },
+  "contact-us-by-email": {
+    "header": "You should contact the Home Office a different way"
+  },
+  "not-selected-options": {
+    "header": "You have not selected any options"
+  },
+  "page-not-found": {
+    "header": "Page not found"
+  },
+  "service-unavailable": {
+    "header": "Sorry, the service is unavailable"
+  },
+  "problem-with-service": {
+    "header": "Sorry, there is a problem with the service"
+  },
+  "session-ended": {
+    "header": "Your session has ended"
+  },
+  "form-saved": {
+    "header": "Your form has been saved"
+  },
+  "cannot-use-form": {
+    "header": "You cannot use this form"
+  },
+  "expired-link": {
+    "header": "Your link has expired"
+  }
+}
