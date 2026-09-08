@@ -20,3 +20,7 @@ coverage
 sonar-project.properties
 pull-request-template.md
 hof-services-config
+.github
+README.md
+CONTRIBUTING.md
+LICENSE.md

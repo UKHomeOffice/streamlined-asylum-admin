@@ -99,16 +99,17 @@ spec:
                 secretKeyRef:
                   name: keycloak-client
                   key: id
-            - name: KEYCLOAK_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: keycloak-user
-                  key: username
-            - name: KEYCLOAK_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: keycloak-user
-                  key: password
+            # Temporarily excluded because Keycloak username and password are not required.
+            # - name: KEYCLOAK_USERNAME
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: keycloak-user
+            #       key: username
+            # - name: KEYCLOAK_PASSWORD
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: keycloak-user
+            #       key: password
             - name: SESSION_SECRET
               valueFrom:
                 secretKeyRef:
@@ -154,8 +155,8 @@ spec:
               name: public
 
         - name: nginx-proxy
-          # nginx-proxy-govuk:v4
-          image: quay.io/ukhomeofficedigital/nginx-proxy-govuk@sha256:4470064d0b1d20ae08c5fd85551576cb687f342a22d6cb456fda9b2c4ce8c8df
+          # hof-docker-nginx-proxy:0.0.11
+          image: quay.io/ukhomeofficedigital/hof-docker-nginx-proxy:0.0.11@sha256:ce9db21927242f6b41b62081e4e2a7effc669f8ba3505f7ed7b3a8cdd7ee80fb
           resources:
             requests:
               memory: 10Mi
