@@ -3,7 +3,6 @@
   "theme": "govUK",
   "behaviours": ["hof/components/clear-session"],
   "translations": "./apps/saa/translations",
-  "views": ["./apps/views"],
   "routes": ["./apps/common", "./apps/saa"],
   "session": {
     "name": "saa.hof.sid"
