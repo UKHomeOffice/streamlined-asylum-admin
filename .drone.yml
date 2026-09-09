@@ -302,8 +302,8 @@ steps:
       branch:
         <<: *include_default_and_feature_branches
       event: pull_request
-    depends_on:
-      - e2e_tests
+    # depends_on:
+    #   - e2e_tests
 
   # Commented out temporarily until tests are setup for the drone step to run successfully. remove this line once the e2e tests are ready to be executed.
   # Upload Playwright HTML report for PR and comment a download link
