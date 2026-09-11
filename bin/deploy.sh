@@ -166,8 +166,8 @@ fi
 sleep $READY_FOR_TEST_DELAY
 
 if [[ ${KUBE_NAMESPACE} == ${BRANCH_ENV} ]]; then
-  echo "Branch Internal - $APP_NAME-$DRONE_SOURCE_BRANCH.internal.$BRANCH_ENV.sas-notprod.homeoffice.gov.uk"
-  echo "Branch External - $APP_NAME-$DRONE_SOURCE_BRANCH.$BRANCH_ENV.sas-notprod.homeoffice.gov.uk"
+  echo "Branch Internal - $APP_NAME-$DRONE_SOURCE_BRANCH.internal.branch.sas-notprod.homeoffice.gov.uk"
+  echo "Branch External - $APP_NAME-$DRONE_SOURCE_BRANCH.branch.sas-notprod.homeoffice.gov.uk"
   echo "File Vault Branch - fv-$APP_NAME-$DRONE_SOURCE_BRANCH.branch.sas-notprod.homeoffice.gov.uk"
 elif [[ ${KUBE_NAMESPACE} == ${UAT_ENV} ]]; then
   echo "UAT Internal - $APP_NAME.internal.uat.sas-notprod.homeoffice.gov.uk"
