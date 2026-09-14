@@ -56,7 +56,7 @@ sonar_scanner: &sonar_scanner
   pull: always
   image: quay.io/ukhomeofficedigital/sonar-scanner:latest
   commands:
-    - sonar-scanner -Dproject.settings=./sonar-project.properties
+    - sonar-scanner -Dproject.settings=./sonar-project.properties -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=300
 
 github_app_token_step: &github_app_token_step
   pull: if-not-exists
@@ -182,6 +182,8 @@ steps:
       branch:
         <<: *include_default_and_feature_branches
       event: [push, pull_request]
+    depends_on:
+      - unit_tests
 
   - name: build_image_for_trivy
     pull: if-not-exists
@@ -200,6 +202,7 @@ steps:
     depends_on:
       - linting
       - unit_tests
+      - sonar_scanner
 
   - name: build_image_and_push_to_ecr
     pull: if-not-exists
