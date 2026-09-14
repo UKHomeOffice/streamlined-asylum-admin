@@ -1,0 +1,10 @@
+public
+config.js
+node_modules
+LICENSE
+README.md
+CONTRIBUTING.md
+coverage
+e2e-tests
+playwright-report
+bin/*
