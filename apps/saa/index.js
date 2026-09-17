@@ -81,7 +81,7 @@ const steps = {
     next: '/check-your-answers-nationality'
   },
   '/check-your-answers-nationality': {
-    next: '/claimants-name'
+    next: '/relationship-nationality-change'
   },
   '/relationship-nationality-change': {
     next: '/someone-else-correct-nationality'
@@ -165,7 +165,18 @@ const steps = {
     next: '/send-evidence-for-your-claim'
   },
   '/send-evidence-for-your-claim': {
-    next: '/prepare-your-evidence'
+    fields: ['send-evidence-for-your-claim'],
+    forks: [
+      {
+        target: '/prepare-your-evidence',
+        continueOnEdit: true,
+        condition: {
+          field: 'send-evidence-for-your-claim',
+          value: 'yes'
+        }
+      }
+    ],
+    next: '/someone-on-claim-died'
   },
   '/prepare-your-evidence': {
     next: '/upload-supporting-evidence'
