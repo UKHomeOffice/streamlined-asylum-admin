@@ -7,6 +7,8 @@
     "**/*.js",
     "!**/node_modules/**",
     "!**/coverage/**",
+    "!bin/**/*.js",
+    "!assets/js/index.js",
     "!config.js",
     "!**/public/js/*.js",
     "!apps/**/fields/*.js",

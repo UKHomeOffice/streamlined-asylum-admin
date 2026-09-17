@@ -15,7 +15,16 @@ describe('SAA utilities tests', () => {
     expect(sanitiseFilename('test*64_jdgfh')).toBe('test*64_jdgfh');
   });
 
+  test('should return the original filename when there are fewer than four characters before the extension', () => {
+    expect(sanitiseFilename('abc.pdf')).toBe('abc.pdf');
+  });
+
+  test('should return the original filename when the extension is empty', () => {
+    expect(sanitiseFilename('passport-scan.')).toBe('passport-scan.');
+  });
+
   test('should return undefined when no filename is provided', () => {
     expect(sanitiseFilename(undefined)).toBeUndefined();
+    expect(sanitiseFilename(null)).toBeUndefined();
   });
 });
