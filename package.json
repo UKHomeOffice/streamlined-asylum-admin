@@ -33,14 +33,11 @@
     "hof": "~24.5.0",
     "ioredis": "^6.0.0",
     "knex": "^3.3.0",
-    "notifications-node-client": "^8.4.0"
+    "notifications-node-client": "^8.5.0"
   },
   "devDependencies": {
     "eslint": "^8.53.0",
     "eslint-config-hof": "^1.3.4",
     "jest": "^30.5.1"
-  },
-  "resolutions": {
-    "qs": "^6.16.0"
   }
 }
