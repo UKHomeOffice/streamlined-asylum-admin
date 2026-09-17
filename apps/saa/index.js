@@ -179,7 +179,10 @@ const steps = {
     next: '/someone-on-claim-died'
   },
   '/prepare-your-evidence': {
-    next: '/upload-supporting-evidence'
+    next: '/upload-supporting-evidence',
+    locals: {
+      captionHeading: 'Send evidence for your claim'
+    }
   },
   '/upload-supporting-evidence': {
     next: '/violent-upsetting-images'
