@@ -191,7 +191,7 @@ spec:
               readOnly: true
 
         - name: nginx-proxy
-          image: quay.io/ukhomeofficedigital/hof-docker-nginx-proxy:v0.1.0@sha256:78f6f4f647d3b6444e03d1133cf98f96190fe1ee9d13a21339f9d805f827fb65 
+          image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/sas/hof-docker-nginx-proxy:v0.1.0@sha256:78f6f4f647d3b6444e03d1133cf98f96190fe1ee9d13a21339f9d805f827fb65
           resources:
             limits:
               memory: 1024Mi
