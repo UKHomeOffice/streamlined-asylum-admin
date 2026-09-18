@@ -5147,10 +5147,10 @@ normalize-path@^3.0.0, normalize-path@~3.0.0:
   resolved "https://registry.yarnpkg.com/normalize-path/-/normalize-path-3.0.0.tgz#0dcd69ff23a1c9b11fd0978316644a0388216a65"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
-notifications-node-client@^8.4.0:
-  version "8.4.0"
-  resolved "https://registry.yarnpkg.com/notifications-node-client/-/notifications-node-client-8.4.0.tgz#8b70275458ecacddb534bf3de929174ac813b58b"
-  integrity sha512-BzjnNvJ4ia6bU2UvFp3K4+/YQIvL4Uf+s7ReNWNdAYbmi4kZSdD0sK/oYG5ezeV9I3Fd/jTA8Pycfr+wiQ25pA==
+notifications-node-client@^8.4.0, notifications-node-client@^8.5.0:
+  version "8.5.0"
+  resolved "https://registry.yarnpkg.com/notifications-node-client/-/notifications-node-client-8.5.0.tgz#15650f120012f7dde449a4885704738e58f7a7d0"
+  integrity sha512-BLwK+9GDuBECVgGz6GoBxEGbVJYVn6JAsyTgEOQCIbBmd6+3RjnweqSqf5jJow9jxhCCy6u6BF9COwoGvxwt+A==
   dependencies:
     axios "^1.7.2"
     jsonwebtoken "^9.0.2"
