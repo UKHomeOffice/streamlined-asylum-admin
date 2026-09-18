@@ -1,3 +1,6 @@
+const hof = require('hof');
+const Summary = hof.components.summary;
+
 const steps = {
   '/continue-to-form': {
     next: '/which-form'
@@ -217,7 +220,10 @@ const steps = {
   '/check-your-answers-death': {
     next: '/confirm'
   },
-  '/confirm': {},
+  '/confirm': {
+    behaviours: [Summary],
+    sections: require('./sections/summary-data-sections')
+  },
   '/something-else': {
     next: '/contact-us-by-email'
   },
