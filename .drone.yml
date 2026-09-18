@@ -9,7 +9,7 @@ environment:
   STG_ENV: sas-saa-stg
   UAT_ENV: sas-saa-uat
   BRANCH_ENV: sas-saa-branch
-#  PRODUCTION_URL: tbc
+  PRODUCTION_URL: www.send-information-for-your-asylum-claim.homeoffice.gov.uk
   IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
   IMAGE_REPO: sas/saa
   GIT_REPO: UKHomeOffice/streamlined-asylum-admin
