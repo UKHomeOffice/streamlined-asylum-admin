@@ -165,7 +165,8 @@
     "header": "Why are you removing a child, partner or dependent from your claim?"
   },
   "prepare-your-evidence": {
-    "header": "Prepare your evidence"
+    "header": "Prepare your evidence",
+    "captionHeading": "Send evidence for your claim"
   },
   "upload-supporting-evidence": {
     "header": "Upload evidence to help your claim"

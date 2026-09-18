@@ -84,6 +84,9 @@ const steps = {
     next: '/check-your-answers-nationality'
   },
   '/check-your-answers-nationality': {
+    next: '/change-someone-else-nationality'
+  },
+  '/change-someone-else-nationality': {
     next: '/relationship-nationality-change'
   },
   '/relationship-nationality-change': {
@@ -182,10 +185,7 @@ const steps = {
     next: '/someone-on-claim-died'
   },
   '/prepare-your-evidence': {
-    next: '/upload-supporting-evidence',
-    locals: {
-      captionHeading: 'Send evidence for your claim'
-    }
+    next: '/upload-supporting-evidence'
   },
   '/upload-supporting-evidence': {
     next: '/violent-upsetting-images'
