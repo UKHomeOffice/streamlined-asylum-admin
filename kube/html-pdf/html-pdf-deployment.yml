@@ -45,7 +45,7 @@ spec:
         {{ else }}
         - name: html-pdf-converter
         {{ end }}
-          image: quay.io/ukhomeofficedigital/html-pdf-converter:3.1.1@sha256:ac87462085d39530158421d6c85111d18e4aa3df3ecf47368f589159da9277ad 
+          image: quay.io/ukhomeofficedigital/hof-docker-nginx-proxy:v0.1.0@sha256:78f6f4f647d3b6444e03d1133cf98f96190fe1ee9d13a21339f9d805f827fb65  
           imagePullPolicy: Always
           resources:
             requests:
