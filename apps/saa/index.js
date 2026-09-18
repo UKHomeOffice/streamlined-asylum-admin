@@ -1,3 +1,6 @@
+const hof = require('hof');
+const Summary = hof.components.summary;
+
 const steps = {
   '/continue-to-form': {
     next: '/which-form'
@@ -81,7 +84,10 @@ const steps = {
     next: '/check-your-answers-nationality'
   },
   '/check-your-answers-nationality': {
-    next: '/claimants-name'
+    next: '/change-someone-else-nationality'
+  },
+  '/change-someone-else-nationality': {
+    next: '/relationship-nationality-change'
   },
   '/relationship-nationality-change': {
     next: '/someone-else-correct-nationality'
@@ -165,7 +171,18 @@ const steps = {
     next: '/send-evidence-for-your-claim'
   },
   '/send-evidence-for-your-claim': {
-    next: '/prepare-your-evidence'
+    fields: ['send-evidence-for-your-claim'],
+    forks: [
+      {
+        target: '/prepare-your-evidence',
+        continueOnEdit: true,
+        condition: {
+          field: 'send-evidence-for-your-claim',
+          value: 'yes'
+        }
+      }
+    ],
+    next: '/someone-on-claim-died'
   },
   '/prepare-your-evidence': {
     next: '/upload-supporting-evidence'
@@ -203,7 +220,10 @@ const steps = {
   '/check-your-answers-death': {
     next: '/confirm'
   },
-  '/confirm': {},
+  '/confirm': {
+    behaviours: [Summary],
+    sections: require('./sections/summary-data-sections')
+  },
   '/something-else': {
     next: '/contact-us-by-email'
   },
@@ -220,7 +240,7 @@ const steps = {
 
 module.exports = {
   name: 'saa',
-  baseUrl: '/saa', // TODO not confirmed yet, may need to revisit and update
+  baseUrl: '/updates',
   params: '/:action?/:id?/:edit?',
   fields: 'apps/saa/fields',
   views: 'apps/saa/views',
