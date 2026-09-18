@@ -240,7 +240,7 @@ const steps = {
 
 module.exports = {
   name: 'saa',
-  baseUrl: '/saa', // TODO not confirmed yet, may need to revisit and update
+  baseUrl: '/updates',
   params: '/:action?/:id?/:edit?',
   fields: 'apps/saa/fields',
   views: 'apps/saa/views',
