@@ -164,11 +164,9 @@
   "reason-for-removing-child-partner": {
     "header": "Why are you removing a child, partner or dependent from your claim?"
   },
-  "send-evidence-for-your-claim": {
-    "header": "Do you need to send evidence to help your claim?"
-  },
   "prepare-your-evidence": {
-    "header": "Prepare your evidence"
+    "header": "Prepare your evidence",
+    "captionHeading": "Send evidence for your claim"
   },
   "upload-supporting-evidence": {
     "header": "Upload evidence to help your claim"
@@ -203,9 +201,6 @@
   "check-your-answers-death": {
     "header": "Check your answers"
   },
-  "confirm": {
-    "header": "Confirmation"
-  },
   "something-else": {
     "header": "Do you need to do something else?"
   },
@@ -235,5 +230,14 @@
   },
   "expired-link": {
     "header": "Your link has expired"
+  },
+  "confirm": {
+    "header": "Check your answers",
+    "sections": {
+      "evidences": {
+        "header": "Send evidence"
+      }
+    },
+    "fields": {}
   }
 }
