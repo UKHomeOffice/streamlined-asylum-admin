@@ -342,7 +342,7 @@ steps:
         from_secret: KUBE_TOKEN_DEV
       REDIS_PERSISTENCE_ENABLED: "false"
     commands:
-      - sh bin/deploy.sh $${UAT_ENV}
+      - bin/deploy.sh $${UAT_ENV}
     when:
       branch:
         <<: *include_default_branch
@@ -411,7 +411,6 @@ steps:
     depends_on:
       - clone_repos
       - build_image_and_push_to_ecr
-      - deploy_to_uat
 
   ## Checks that a build being promoted has passed and is on the default branch, indicating a healthy build
   - name: sanity_check_build_prod
