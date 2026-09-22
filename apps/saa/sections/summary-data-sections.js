@@ -1,4 +1,4 @@
-// TODO: Using default labels for now. Review and update when the final CYA design is available.
+// Using default labels for now. Review and update when the final CYA design is available.
 module.exports = {
   dependant: {
     steps: [
