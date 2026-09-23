@@ -12,6 +12,6 @@ module.exports = {
     className: ['govuk-radios--inline'],
     legend: {
       className: ['govuk-!-font-weight-bold']
-    },
+    }
   }
 };
