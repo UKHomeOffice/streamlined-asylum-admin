@@ -328,6 +328,7 @@ steps:
         <<: *include_default_and_feature_branches
       event: pull_request
     depends_on:
+      - e2e_tests
       - generate_github_app_token
 
   - name: deploy_to_uat
