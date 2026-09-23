@@ -146,10 +146,11 @@
     "captionHeading": "Add or remove a child or partner"
   },
   "child-partner-name": {
-    "header": "Their name"
+    "header": "Their name",
+    "captionHeading": "Add or remove a child or partner"
   },
   "child-partner-date-of-birth": {
-    "header": "Their date of birth"
+    "captionHeading": "Add or remove a child or partner"
   },
   "child-partner-nationality": {
     "header": "Their country of nationality"

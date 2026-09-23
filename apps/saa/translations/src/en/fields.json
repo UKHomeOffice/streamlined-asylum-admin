@@ -46,5 +46,15 @@
         "label": "No"
       }
     }
+  },
+  "child-partner-given-name": {
+    "label": "Given name"
+  },
+  "child-partner-family-name": {
+    "label": "Family name"
+  },
+  "child-partner-date-of-birth": {
+    "legend": "Their date of birth",
+    "hint": "For example, 27 3 2020"
   }
 }
