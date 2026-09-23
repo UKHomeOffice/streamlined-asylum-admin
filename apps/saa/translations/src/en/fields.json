@@ -1,4 +1,41 @@
 {
+  "add-remove-dependant": {
+    "legend": "Do you need to add or remove a child or partner as a dependant?",
+    "hint": "For example, if you have had a baby, got married or divorced",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
+  "add-remove-child-partner": {
+    "legend": "Tell us if you want to add a dependant or remove a dependant",
+    "options": {
+      "add-child-partner": {
+        "label": "Add a child or partner to your claim"
+      },
+      "remove-child-partner": {
+        "label": "Remove a child or partner from your claim"
+      }
+    }
+  },
+  "reason-removing-child-partner": {
+    "label": "Why are you removing a child, partner or dependant from your claim?"
+  },
+  "relationship-to-child-partner": {
+    "legend": "How are they related to you?",
+    "options": {
+      "my-child": {
+        "label": "My child"
+      },
+      "husband-wife-partner": {
+        "label": "My husband, wife, civil partner, or unmarried partner that I have lived with for 2 years or more"
+      }
+    }
+  },
   "send-evidence-for-your-claim": {
     "legend": "Do you need to send evidence to help your claim?",
     "options": {
