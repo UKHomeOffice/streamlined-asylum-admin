@@ -138,8 +138,8 @@
     "header": "Check your answers"
   },
   "add-remove-child-partner": {
-    "title": "Do you need to add a dependent or remove a dependent?",
-    "header": "Tell us if you want to add a dependent or remove a dependant",
+    "title": "Do you need to add a dependant or remove a dependant?",
+    "header": "Tell us if you want to add a dependant or remove a dependant",
     "captionHeading": "Add or remove a child or partner"
   },
   "relationship-to-child-partner": {

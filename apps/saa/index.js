@@ -164,7 +164,6 @@ const steps = {
     forks: [
       {
         target: '/relationship-to-child-partner',
-        continueOnEdit: true,
         condition: {
           field: 'add-remove-child-partner',
           value: 'add-child-partner'
