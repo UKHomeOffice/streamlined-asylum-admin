@@ -258,6 +258,9 @@ steps:
       KUBE_TOKEN:
         from_secret: KUBE_TOKEN_DEV
       REDIS_PERSISTENCE_ENABLED: "false"
+    volumes:
+      - name: dockersock
+        path: /root/.dockersock
     commands:
       - bin/deploy.sh $${BRANCH_ENV}
     when:
