@@ -172,7 +172,8 @@
     "header": "Upload evidence to help your claim"
   },
   "violent-upsetting-images": {
-    "header": "Violent or upsetting images"
+    "header": "Violent or upsetting images",
+    "captionHeading": "Send evidence for your claim"
   },
   "check-your-answers-evidence": {
     "header": "Check your answers"

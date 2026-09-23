@@ -1,0 +1,13 @@
+{{<partials-page}}
+    {{$page-content}}
+        {{#markdown}}violent-or-upsetting-images{{/markdown}}
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+            <span class="govuk-visually-hidden">Warning</span>
+            You must not upload anything sexually explicit. We will not accept it.</strong>
+        </div>
+        {{#renderField}}evidence-violent-or-upsetting{{/renderField}}
+        {{#input-submit}}continue{{/input-submit}}
+    {{/page-content}}
+{{/partials-page}}

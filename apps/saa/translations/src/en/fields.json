@@ -9,5 +9,16 @@
         "label": "No"
       }
     }
+  },
+  "evidence-violent-or-upsetting": {
+    "legend": "Does your evidence include violent or upsetting images?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
   }
 }

@@ -1,5 +1,8 @@
 {
   "send-evidence-for-your-claim": {
     "required": "Select if you need to send evidence to support your claim"
+  },
+  "evidence-violent-or-upsetting": {
+    "required": "Select if the evidence contains violent or upsetting images"
   }
 }

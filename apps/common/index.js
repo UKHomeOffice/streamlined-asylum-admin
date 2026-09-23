@@ -18,7 +18,9 @@ const steps = {
   '/cannot-use-form': {
     // end of user journey
   },
-  '/check-your-email': {}
+  '/check-your-email': {
+    next: '/violent-upsetting-images'
+  }
 };
 const pages = {
   '/accessibility': 'static/accessibility'
