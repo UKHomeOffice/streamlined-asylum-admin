@@ -1,4 +1,18 @@
 {
+  "add-remove-dependant": {
+    "required": "Select if you need to add or remove a child or partner as a dependant"
+  },
+  "add-remove-child-partner": {
+    "required": "Select if you need to add or remove a child or partner"
+  },
+  "reason-removing-child-partner": {
+    "required": "Enter why you need to remove a child or partner",
+    "maxlength": "Your answer must be 500 characters or less",
+    "notUrl": "Your reason why must not contain a URL"
+  },
+  "relationship-to-child-partner": {
+    "required": "Select how they are related to you"
+  },
   "send-evidence-for-your-claim": {
     "required": "Select if you need to send evidence to support your claim"
   }
