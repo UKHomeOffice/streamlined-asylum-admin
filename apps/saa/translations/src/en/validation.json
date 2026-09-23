@@ -1,6 +1,6 @@
 {
   "add-remove-dependant": {
-    "required": "Select if you need to add or remove a child or partner"
+    "required": "Select if you need to add or remove a child or partner as a dependant"
   },
   "add-remove-child-partner": {
     "required": "Select if you need to add or remove a child or partner"
