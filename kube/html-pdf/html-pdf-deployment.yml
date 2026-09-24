@@ -61,7 +61,7 @@ spec:
             runAsNonRoot: true
 
         - name: nginx-proxy
-          image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/sas/hof-docker-nginx-proxy:v0.1.0@sha256:78f6f4f647d3b6444e03d1133cf98f96190fe1ee9d13a21339f9d805f827fb65
+          image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/sas/hof-docker-nginx-proxy:v2.1.0@sha256:d0498e46e8eb8f743c6341f4b0d45c8064e1658cda2ae42b2b6c1c62c8b5a02e
           resources:
             requests:
               memory: 10Mi
