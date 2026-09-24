@@ -35,12 +35,12 @@ module.exports = {
   },
   'child-partner-given-name': {
     mixin: 'input-text',
-    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 250 }],
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
     labelClassName: 'govuk-label--m'
   },
   'child-partner-family-name': {
     mixin: 'input-text',
-    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 250 }],
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
     labelClassName: 'govuk-label--m'
   },
   'child-partner-date-of-birth': dateComponent('child-partner-date-of-birth', {
