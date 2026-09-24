@@ -1,5 +1,5 @@
 const { NO_DIGITS_REGEX } = require('../../../utils/constants');
-module.exports = superclass =>
+const customValidation = superclass =>
   class extends superclass {
     validateField(key, req) {
       const validationErrorFunc = (type, args) =>
@@ -26,3 +26,4 @@ module.exports = superclass =>
       return fieldError;
     }
   };
+module.exports = customValidation;
