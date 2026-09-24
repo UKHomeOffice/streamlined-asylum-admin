@@ -173,7 +173,8 @@
   },
   "violent-upsetting-images": {
     "header": "Violent or upsetting images",
-    "captionHeading": "Send evidence for your claim"
+    "captionHeading": "Send evidence for your claim",
+    "doNotUpload": "You must not upload anything sexually explicit. We will not accept it."
   },
   "check-your-answers-evidence": {
     "header": "Check your answers"
