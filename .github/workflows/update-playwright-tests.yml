@@ -1,0 +1,34 @@
+name: Update Playwright tests
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  update-playwright-tests:
+    if: ${{ github.actor != 'copilot-swe-agent[bot]' }}
+
+    uses: UKHomeOffice/hof-ai-workflows/.github/workflows/update-playwright-tests.yml@main
+
+    with:
+      base-ref: main
+      skill-ref: main
+      target-sha: ${{ github.sha }}
+      diff-base-sha: ${{ github.event.before }}
+      create-pull-request: true
+
+    secrets:
+      # Still required for Copilot agent task creation.
+      # This cannot be a normal GitHub App installation token.
+      COPILOT_AGENT_TOKEN: ${{ secrets.COPILOT_AGENT_TOKEN }}
+
+      # GitHub App credentials used by the reusable workflow to generate
+      # a short-lived installation token for checking out hof-ai-workflows.
+      HOF_AI_WORKFLOWS_APP_ID: ${{ secrets.HOF_AI_WORKFLOWS_APP_ID }}
+      HOF_AI_WORKFLOWS_APP_PRIVATE_KEY: ${{ secrets.HOF_AI_WORKFLOWS_APP_PRIVATE_KEY }}
+      HOF_AI_WORKFLOWS_APP_INSTALLATION_ID: ${{ secrets.HOF_AI_WORKFLOWS_APP_INSTALLATION_ID }}
