@@ -1,5 +1,7 @@
 const hof = require('hof');
 const Summary = hof.components.summary;
+const MultiSelectFollowUps = require('./behaviours/multi-select-follow-ups');
+const multiSelectFollowUps = require('./config/multi-select-follow-ups');
 
 const steps = {
   '/continue-to-form': {
@@ -27,7 +29,10 @@ const steps = {
     next: '/changes-to-contact-details'
   },
   '/changes-to-contact-details': {
-    next: '/do-you-need-to-change-your-name'
+    fields: ['changes-to-contact-details'],
+    behaviours: [MultiSelectFollowUps],
+    multiSelectFollowUps,
+    next: '/do-you-need-add-remove-dependant'
   },
   '/do-you-need-to-change-your-name': {
     next: '/reason-name-change'
@@ -260,6 +265,14 @@ const steps = {
   '/cannot-use-form': {},
   '/expired-link': {}
 };
+
+multiSelectFollowUps.options
+  .reduce((routes, option) => routes.concat(option.routes || option.steps || []), [])
+  .filter((route, index, routes) => routes.indexOf(route) === index)
+  .forEach(route => {
+    steps[route].behaviours = [].concat(steps[route].behaviours || [], MultiSelectFollowUps);
+    steps[route].multiSelectFollowUps = multiSelectFollowUps;
+  });
 
 module.exports = {
   name: 'saa',
