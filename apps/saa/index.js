@@ -267,7 +267,7 @@ const steps = {
 };
 
 multiSelectFollowUps.options
-  .reduce((routes, option) => routes.concat(option.routes || option.steps || []), [])
+  .reduce((routes, option) => routes.concat((option.sections || []).map(section => section.completeOn)), [])
   .filter((route, index, routes) => routes.indexOf(route) === index)
   .forEach(route => {
     steps[route].behaviours = [].concat(steps[route].behaviours || [], MultiSelectFollowUps);

@@ -17,7 +17,23 @@ const sortByOrder = items => items.slice().sort((left, right) => {
   return leftOrder - rightOrder;
 });
 
-const getRoutesForOption = option => option.routes || option.steps || [];
+const getRoutesForSection = section => section.routes || section.steps || [];
+
+const getSectionsForOption = option => {
+  const sections = option.sections || [{
+    id: option.value,
+    order: option.order,
+    start: (option.routes || option.steps || [])[0],
+    completeOn: (option.routes || option.steps || []).slice(-1)[0],
+    routes: option.routes || option.steps || [],
+    fieldsToUnset: option.fieldsToUnset
+  }];
+
+  return sections.map(section => Object.assign({
+    order: typeof section.order === 'number' ? section.order : option.order,
+    value: option.value
+  }, section));
+};
 
 const normaliseConfig = config => Object.assign({
   stateKey: `${config.field}-follow-ups`,
@@ -30,17 +46,25 @@ const getSelectedOptions = (config, selections) => {
   return sortByOrder(config.options.filter(option => selectedValues.includes(option.value)));
 };
 
-const getActiveRoutes = (config, selections) => unique(getSelectedOptions(config, selections)
-  .reduce((routes, option) => routes.concat(getRoutesForOption(option)), []));
+const getActiveSections = (config, selections) => {
+  const sections = getSelectedOptions(config, selections)
+    .reduce((allSections, option) => allSections.concat(getSectionsForOption(option)), []);
 
-const getFieldsToUnset = (config, inactiveRoutes, removedSelections) => unique(config.options.reduce(
+  return sortByOrder(sections).filter((section, index, allSections) =>
+    allSections.findIndex(item => item.id === section.id) === index);
+};
+
+const getActiveRoutes = (config, selections) => unique(getActiveSections(config, selections)
+  .reduce((routes, section) => routes.concat(getRoutesForSection(section)), []));
+
+const getFieldsToUnset = (config, inactiveSections, removedSelections) => unique(config.options.reduce(
   (fields, option) => {
-    const optionRoutes = getRoutesForOption(option);
+    const sections = getSectionsForOption(option);
     const optionRemoved = removedSelections.includes(option.value);
-    const optionInactive = optionRoutes.some(route => inactiveRoutes.includes(route));
+    const sectionInactive = sections.some(section => inactiveSections.includes(section.id));
 
-    if (optionRemoved || optionInactive) {
-      return fields.concat(option.fieldsToUnset || []);
+    if (optionRemoved || sectionInactive) {
+      return fields.concat(option.fieldsToUnset || [], ...sections.map(section => section.fieldsToUnset || []));
     }
 
     return fields;
@@ -48,23 +72,32 @@ const getFieldsToUnset = (config, inactiveRoutes, removedSelections) => unique(c
 
 const createState = (config, previousState, selections) => {
   const previousSelections = asArray(previousState.selections);
-  const previousRoutes = asArray(previousState.activeRoutes);
+  const previousSections = asArray(previousState.activeSections);
+  const activeSections = getActiveSections(config, selections);
+  const activeSectionIds = activeSections.map(section => section.id);
   const activeRoutes = getActiveRoutes(config, selections);
   const removedSelections = previousSelections.filter(value => !asArray(selections).includes(value));
-  const addedRoutes = activeRoutes.filter(route => !previousRoutes.includes(route));
-  const inactiveRoutes = previousRoutes.filter(route => !activeRoutes.includes(route));
+  const addedSections = activeSectionIds.filter(section => !previousSections.includes(section));
+  const inactiveSections = previousSections.filter(section => !activeSectionIds.includes(section));
 
   return {
     selections: asArray(selections),
+    activeSections: activeSectionIds,
     activeRoutes,
-    completedRoutes: asArray(previousState.completedRoutes).filter(route => activeRoutes.includes(route)),
-    addedRoutes,
-    inactiveRoutes,
-    fieldsToUnset: getFieldsToUnset(config, inactiveRoutes, removedSelections)
+    completedSections: asArray(previousState.completedSections).filter(section =>
+      activeSectionIds.includes(section)),
+    addedSections,
+    inactiveSections,
+    fieldsToUnset: getFieldsToUnset(config, inactiveSections, removedSelections)
   };
 };
 
-const nextIncompleteRoute = state => state?.activeRoutes?.find(route => !state.completedRoutes.includes(route));
+const getSectionById = (sections, sectionId) => sections.find(section => section.id === sectionId);
+
+const nextIncompleteSection = (sections, state) => sections.find(section =>
+  !asArray(state.completedSections).includes(section.id));
+
+const getCompletingSections = (sections, route) => sections.filter(section => section.completeOn === route);
 
 const withBaseUrl = (req, route) => req.baseUrl === '/' ? route : req.baseUrl + route;
 
@@ -101,9 +134,13 @@ module.exports = SuperClass => class MultiSelectFollowUps extends SuperClass {
         if (state.fieldsToUnset.length) {
           req.sessionModel.unset(state.fieldsToUnset);
         }
-      } else if (asArray(previousState.activeRoutes).includes(this.options.route)) {
+      } else {
+        const activeSections = getActiveSections(config, previousState.selections);
+        const completingSections = getCompletingSections(activeSections, this.options.route);
+
         state = Object.assign({}, previousState, {
-          completedRoutes: unique(asArray(previousState.completedRoutes).concat(this.options.route))
+          completedSections: unique(asArray(previousState.completedSections)
+            .concat(completingSections.map(section => section.id)))
         });
       }
 
@@ -120,12 +157,18 @@ module.exports = SuperClass => class MultiSelectFollowUps extends SuperClass {
     }
 
     const state = req.sessionModel.get(config.stateKey) || {};
+    const activeSections = getActiveSections(config, state.selections);
     let nextRoute;
 
     if (this.options.route === config.entryPoint) {
-      nextRoute = asArray(state.addedRoutes)[0] || nextIncompleteRoute(state) || config.exitPoint;
-    } else if (asArray(state.activeRoutes).includes(this.options.route)) {
-      nextRoute = nextIncompleteRoute(state) || config.exitPoint;
+      const addedSection = asArray(state.addedSections)
+        .map(section => getSectionById(activeSections, section))
+        .find(Boolean);
+      const incompleteSection = nextIncompleteSection(activeSections, state);
+
+      nextRoute = (addedSection || incompleteSection || {}).start || config.exitPoint;
+    } else if (getCompletingSections(activeSections, this.options.route).length) {
+      nextRoute = (nextIncompleteSection(activeSections, state) || {}).start || config.exitPoint;
     }
 
     if (!nextRoute) {
@@ -137,5 +180,6 @@ module.exports = SuperClass => class MultiSelectFollowUps extends SuperClass {
 };
 
 module.exports.createState = createState;
+module.exports.getActiveSections = getActiveSections;
 module.exports.getActiveRoutes = getActiveRoutes;
 module.exports.asArray = asArray;
