@@ -1,7 +1,6 @@
 const { disallowIndexing } = require('../../config');
 const steps = {
-  '/': {
-    template: 'start'
+  '/send-information-for-your-asylum-claim': {
   },
   '/before-you-start': {
     next: '/claimant-details'
