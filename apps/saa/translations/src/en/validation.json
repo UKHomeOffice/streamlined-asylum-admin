@@ -13,9 +13,6 @@
   "relationship-to-child-partner": {
     "required": "Select how they are related to you"
   },
-  "send-evidence-for-your-claim": {
-    "required": "Select if you need to send evidence to support your claim"
-  },
   "child-partner-given-name": {
     "required": "Enter their given name",
     "notUrl": "Given name must not contain a url",
@@ -33,5 +30,11 @@
     "date": "Enter a real date of birth",
     "before": "Enter a date in the past",
     "after": "Enter a date after 01 01 1900"
+  },
+  "send-evidence-for-your-claim": {
+    "required": "Select if you need to send evidence to support your claim"
+  },
+  "evidence-violent-or-upsetting": {
+    "required": "Select if the evidence contains violent or upsetting images"
   }
 }

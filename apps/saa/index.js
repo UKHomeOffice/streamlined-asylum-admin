@@ -219,6 +219,7 @@ const steps = {
     next: '/violent-upsetting-images'
   },
   '/violent-upsetting-images': {
+    fields: ['evidence-violent-or-upsetting'],
     next: '/check-your-answers-evidence'
   },
   '/check-your-answers-evidence': {
