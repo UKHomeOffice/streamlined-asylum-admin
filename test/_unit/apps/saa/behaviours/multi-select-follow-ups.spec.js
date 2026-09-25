@@ -17,7 +17,16 @@ const config = {
         {
           id: 'second',
           start: '/second-start',
-          completeOn: '/second-end',
+          completeOn: [
+            '/second-end',
+            {
+              route: '/second-question',
+              condition: {
+                field: 'second-question',
+                value: 'no'
+              }
+            }
+          ],
           routes: ['/second-start', '/second-middle', '/second-end'],
           fieldsToUnset: ['second-answer']
         }
@@ -89,6 +98,11 @@ describe('multi-select follow-ups behaviour', () => {
       'second'
     ]);
 
+    expect(getActiveSections(config, 'second, first').map(section => section.id)).toEqual([
+      'first',
+      'second'
+    ]);
+
     expect(getActiveRoutes(config, ['second', 'first'])).toEqual([
       '/first-start',
       '/first-middle',
@@ -155,6 +169,25 @@ describe('multi-select follow-ups behaviour', () => {
     });
   });
 
+  test('entry route joins base URL without duplicating slashes', done => {
+    const controller = buildController('/changes');
+    const req = {
+      baseUrl: '/updates/',
+      params: {},
+      form: {
+        options: { exitPoint: '/exit' },
+        values: { changes: ['first'] }
+      },
+      sessionModel: buildSessionModel({})
+    };
+
+    controller.saveValues(req, {}, err => {
+      expect(err).toBeUndefined();
+      expect(controller.getNextStep(req, {})).toBe('/updates/first-start');
+      done();
+    });
+  });
+
   test('completed follow-up section advances to next incomplete section', done => {
     const controller = buildController('/first-end');
     const req = {
@@ -185,6 +218,33 @@ describe('multi-select follow-ups behaviour', () => {
       expect(err).toBeUndefined();
       expect(req.sessionModel.get('changes-follow-ups').completedSections).toEqual(['first']);
       expect(controller.getNextStep(req, {})).toBe('/updates/second-start');
+      done();
+    });
+  });
+
+  test('conditional completion route only completes section when condition is met', done => {
+    const controller = buildController('/second-question');
+    const req = {
+      baseUrl: '/updates',
+      params: {},
+      form: {
+        options: { exitPoint: '/exit' },
+        values: { 'second-question': 'no' }
+      },
+      sessionModel: buildSessionModel({
+        'changes-follow-ups': {
+          selections: ['second'],
+          activeSections: ['second'],
+          activeRoutes: ['/second-start', '/second-middle', '/second-end'],
+          completedSections: []
+        }
+      })
+    };
+
+    controller.saveValues(req, {}, err => {
+      expect(err).toBeUndefined();
+      expect(req.sessionModel.get('changes-follow-ups').completedSections).toEqual(['second']);
+      expect(controller.getNextStep(req, {})).toBe('/updates/exit');
       done();
     });
   });

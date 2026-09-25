@@ -2,7 +2,15 @@ const hof = require('hof');
 const Summary = hof.components.summary;
 const MultiSelectFollowUps = require('./behaviours/multi-select-follow-ups');
 const multiSelectFollowUps = require('./config/multi-select-follow-ups');
+const baseUrl = '/updates';
 
+/*
+ * The multi-select follow-up behaviour is intentionally used as a thin wrapper
+ * around normal HOF routes. It only decides which selected section starts next
+ * after `/changes-to-contact-details`, and which section starts after a section
+ * completion page posts. Individual pages below still use their existing `next`
+ * and `forks` settings.
+ */
 const steps = {
   '/continue-to-form': {
     next: '/which-form'
@@ -30,12 +38,14 @@ const steps = {
   },
   '/changes-to-contact-details': {
     fields: ['changes-to-contact-details'],
+    // Entry point: calculate active follow-up sections from the checkbox field.
     behaviours: [MultiSelectFollowUps],
     multiSelectFollowUps,
     next: '/do-you-need-add-remove-dependant'
   },
   '/do-you-need-to-change-your-name': {
-    next: '/reason-name-change'
+    next: '/reason-name-change',
+    backLink: '/updates/changes-to-contact-details'
   },
   '/reason-name-change': {
     next: '/new-name'
@@ -266,17 +276,42 @@ const steps = {
   '/expired-link': {}
 };
 
+/*
+ * Attach the behaviour only to configured section completion pages. This is the
+ * key design choice: the behaviour should not run every page in a selected flow,
+ * because section internals can include HOF forks, aggregate loops and local CYA
+ * journeys. Completion pages are the hand-off points back to the common
+ * orchestrator.
+ */
 multiSelectFollowUps.options
-  .reduce((routes, option) => routes.concat((option.sections || []).map(section => section.completeOn)), [])
+  .reduce((routes, option) => routes.concat((option.sections || [])
+    .reduce((sectionRoutes, section) => sectionRoutes.concat(MultiSelectFollowUps.asArray(section.completeOn)
+      .map(completion => MultiSelectFollowUps.getCompletionRoute(completion))), [])), [])
   .filter((route, index, routes) => routes.indexOf(route) === index)
   .forEach(route => {
+    if (!steps[route]) {
+      return;
+    }
+
     steps[route].behaviours = [].concat(steps[route].behaviours || [], MultiSelectFollowUps);
     steps[route].multiSelectFollowUps = multiSelectFollowUps;
   });
 
+multiSelectFollowUps.options
+  .reduce((routes, option) => routes.concat((option.sections || []).map(section => section.start)), [])
+  .filter((route, index, routes) => routes.indexOf(route) === index)
+  .forEach(route => {
+    if (!steps[route]) {
+      return;
+    }
+
+    steps[route].prereqs = [].concat(steps[route].prereqs || [], multiSelectFollowUps.entryPoint);
+    steps[route].backLinks = [].concat(steps[route].backLinks || [], multiSelectFollowUps.entryPoint);
+  });
+
 module.exports = {
   name: 'saa',
-  baseUrl: '/updates',
+  baseUrl,
   params: '/:action?/:id?/:edit?',
   fields: 'apps/saa/fields',
   views: 'apps/saa/views',
