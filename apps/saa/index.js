@@ -144,12 +144,38 @@ const steps = {
     next: '/do-you-need-add-remove-dependant'
   },
   '/do-you-need-add-remove-dependant': {
-    next: '/add-remove-child-partner'
+    fields: ['add-remove-dependant'],
+    forks: [
+      {
+        target: '/add-remove-child-partner',
+        continueOnEdit: true,
+        condition: {
+          field: 'add-remove-dependant',
+          value: 'yes'
+        }
+      }
+    ],
+    next: '/send-evidence-for-your-claim'
   },
   '/add-remove-child-partner': {
+    fields: ['add-remove-child-partner'],
+    forks: [
+      {
+        target: '/relationship-to-child-partner',
+        condition: {
+          field: 'add-remove-child-partner',
+          value: 'add-child-partner'
+        }
+      }
+    ],
+    next: '/reason-for-removing-child-partner'
+  },
+  '/reason-for-removing-child-partner': {
+    fields: ['reason-removing-child-partner'],
     next: '/relationship-to-child-partner'
   },
   '/relationship-to-child-partner': {
+    fields: ['relationship-to-child-partner'],
     next: '/child-partner-name'
   },
   '/child-partner-name': {
@@ -166,9 +192,6 @@ const steps = {
   },
   '/check-your-answers-add-child-partner': {
     next: '/reason-for-removing-child-partner'
-  },
-  '/reason-for-removing-child-partner': {
-    next: '/send-evidence-for-your-claim'
   },
   '/send-evidence-for-your-claim': {
     fields: ['send-evidence-for-your-claim'],

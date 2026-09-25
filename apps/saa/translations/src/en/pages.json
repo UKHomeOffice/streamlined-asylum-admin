@@ -137,14 +137,13 @@
   "check-your-answers-address": {
     "header": "Check your answers"
   },
-  "do-you-need-add-remove-dependant": {
-    "header": "Do you need to add or remove a child or partner as a dependant?"
-  },
   "add-remove-child-partner": {
-    "header": "Tell us if you want to add a dependent or remove a dependent"
+    "title": "Do you need to add a dependant or remove a dependant?",
+    "header": "Tell us if you want to add a dependant or remove a dependant",
+    "captionHeading": "Add or remove a child or partner"
   },
   "relationship-to-child-partner": {
-    "header": "How are they related to you?"
+    "captionHeading": "Add or remove a child or partner"
   },
   "child-partner-name": {
     "header": "Their name"
@@ -162,7 +161,7 @@
     "header": "Check your answers"
   },
   "reason-for-removing-child-partner": {
-    "header": "Why are you removing a child, partner or dependent from your claim?"
+    "captionHeading": "Add or remove a child or partner"
   },
   "prepare-your-evidence": {
     "header": "Prepare your evidence",
@@ -238,6 +237,9 @@
     "sections": {
       "evidences": {
         "header": "Send evidence"
+      },
+      "dependant": {
+        "header": "Dependant"
       }
     },
     "fields": {}
