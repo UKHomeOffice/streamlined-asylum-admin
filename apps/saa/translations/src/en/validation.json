@@ -13,6 +13,24 @@
   "relationship-to-child-partner": {
     "required": "Select how they are related to you"
   },
+  "child-partner-given-name": {
+    "required": "Enter their given name",
+    "notUrl": "Given name must not contain a url",
+    "maxlength": "Given name must be between 1 and 255 characters",
+    "noDigits": "Given name must not contain numbers"
+  },
+  "child-partner-family-name": {
+    "required": "Enter their family name",
+    "notUrl": "Family name must not contain a url",
+    "maxlength": "Family name must be between 1 and 255 characters",
+    "noDigits": "Family name must not contain numbers"
+  },
+  "child-partner-date-of-birth": {
+    "required": "Enter their date of birth",
+    "date": "Enter a real date of birth",
+    "before": "Enter a date in the past",
+    "after": "Enter a date after 01 01 1900"
+  },
   "send-evidence-for-your-claim": {
     "required": "Select if you need to send evidence to support your claim"
   },
