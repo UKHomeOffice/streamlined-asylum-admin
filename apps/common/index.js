@@ -4,7 +4,8 @@ const steps = {
     template: 'start'
   },
   '/before-you-start': {
-    next: '/claimant-details'
+    next: '/claimant-details',
+    backLink: ' '
   },
   '/claimant-details': {
     next: '/claim-decided'
