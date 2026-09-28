@@ -4,7 +4,8 @@ const steps = {
     template: 'start'
   },
   '/before-you-start': {
-    next: '/claimant-details'
+    next: '/claimant-details',
+    backLink: ' ' // workaround to allow the back link to route to the root of the app
   },
   '/claimant-details': {
     next: '/claim-decided'
