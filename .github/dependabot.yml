@@ -11,6 +11,7 @@ updates:
     commit-message:
       prefix: deps
     pull-request-branch-name:
+      prefix: "deps"
       template: "{prefix}/{name}"
       separator: "-"
       word-separator: "-"
