@@ -1,13 +1,6 @@
 {
   "send-information-for-your-asylum-claim": {
-    "header": "Send information for your asylum claim",
-    "contents": "Contents",
-    "contentsSendEvidence": "Send evidence or update details",
-    "contentsSendForm": "What happens after you send the form",
-    "contentsNeedAdvice": "If you need advice",
-    "contentsOtherRequests": "For other requests about your asylum claim",
-    "contentsAsylumSupport": "If you get asylum support payments",
-    "contentsUnder18": "If you are a main claimant under 18 years of age"
+    "header": "Send information for your asylum claim"
   },
   "before-you-start": {
     "header": "What you need before you start"
