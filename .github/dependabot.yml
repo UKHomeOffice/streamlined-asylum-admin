@@ -7,23 +7,39 @@ updates:
       interval: daily
       time: "06:00"
       timezone: "Europe/London"
-    target-branch: "master"
     open-pull-requests-limit: 10
-    labels:
-      - dependencies
     commit-message:
       prefix: deps
     pull-request-branch-name:
+      template: "{prefix}/{name}"
       separator: "-"
-    rebase-strategy: auto
+      word-separator: "-"
+      branch-name-case: "lowercase"
+      max-length: 60
     groups:
       hof-dependency:
         applies-to: version-updates
         patterns:
           - "hof"
       patch-and-minor:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "hof"
         update-types:
           - patch
           - minor
-        exclude-patterns:
-          - "hof"
+
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: deps
+    pull-request-branch-name:
+      template: "{prefix}/{package_manager}/{dependency}-{version}"
+      separator: "-"
+      word-separator: "-"
+      branch-name-case: "lowercase"
+      max-length: 60
