@@ -39,6 +39,7 @@ updates:
     commit-message:
       prefix: deps
     pull-request-branch-name:
+      prefix: "deps"
       template: "{prefix}/{package_manager}/{dependency}-{version}"
       separator: "-"
       word-separator: "-"
