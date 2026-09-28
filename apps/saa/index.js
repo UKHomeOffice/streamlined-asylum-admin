@@ -1,6 +1,8 @@
 const hof = require('hof');
 const Summary = hof.components.summary;
 
+const CustomValidation = require('../common/behaviours/custom-validation');
+
 const steps = {
   '/continue-to-form': {
     next: '/which-form'
@@ -179,9 +181,12 @@ const steps = {
     next: '/child-partner-name'
   },
   '/child-partner-name': {
+    behaviours: [CustomValidation],
+    fields: ['child-partner-given-name', 'child-partner-family-name'],
     next: '/child-partner-date-of-birth'
   },
   '/child-partner-date-of-birth': {
+    fields: ['child-partner-date-of-birth'],
     next: '/child-partner-nationality'
   },
   '/child-partner-nationality': {
