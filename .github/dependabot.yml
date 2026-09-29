@@ -31,17 +31,3 @@ updates:
         update-types:
           - patch
           - minor
-
-  - package-ecosystem: docker
-    directory: "/"
-    schedule:
-      interval: weekly
-    commit-message:
-      prefix: deps
-    pull-request-branch-name:
-      prefix: "deps"
-      template: "{prefix}/{package_manager}/{dependency}-{version}"
-      separator: "-"
-      word-separator: "-"
-      branch-name-case: "lowercase"
-      max-length: 60
