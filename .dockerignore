@@ -24,3 +24,8 @@ hof-services-config
 README.md
 CONTRIBUTING.md
 LICENSE.md
+.droneignore
+.eslintignore
+.gitignore
+playwright.config.ts
+
