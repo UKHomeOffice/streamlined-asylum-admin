@@ -67,5 +67,16 @@
         "label": "No"
       }
     }
+  },
+  "someone-on-claim-died": {
+    "legend": "Do you need to tell us someone on your claim has died?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
   }
 }
