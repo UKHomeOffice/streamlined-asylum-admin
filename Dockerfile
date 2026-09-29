@@ -16,8 +16,7 @@ COPY --chown=999:998 . /app
 RUN yarn install --frozen-lockfile --production && \
     yarn run postinstall && \
     yarn cache clean && \
-    rm -rf /root/.cache/yarn && \
-    rm -rf /usr/local/share/.cache/yarn && \
+    rm -rf ~/.cache/yarn && \
     rm -rf node_modules/.cache && \
     rm -rf /tmp/*
 
