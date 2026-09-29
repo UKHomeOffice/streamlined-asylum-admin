@@ -6,10 +6,8 @@ FROM quay.io/ukhomeofficedigital/hof-nodejs:24.21.0-alpine3.24@sha256:80b294ce50
 USER root
 WORKDIR /app
 
-# Copy source code
 COPY . /app
 
-# Install only production deps + run postinstall
 RUN yarn install --frozen-lockfile --production && \
     yarn run postinstall
 
@@ -20,15 +18,14 @@ FROM quay.io/ukhomeofficedigital/hof-nodejs:24.21.0-alpine3.24@sha256:80b294ce50
 
 USER root
 
-# Setup nodejs group & nodejs user
 RUN addgroup --system nodejs --gid 998 && \
     adduser --system nodejs --uid 999 --home /app/ && \
     chown -R 999:998 /app/
 
 WORKDIR /app
 
-# Copy ONLY the final built artefacts from builder stage
-COPY --from=builder --chown=999:998 /app /app
+COPY --from=builder --chown=999:998 /app/node_modules /app/node_modules
+COPY --from=builder --chown=999:998 /app/. /app
 
 USER 999
 
