@@ -14,7 +14,12 @@ WORKDIR /app
 COPY --chown=999:998 . /app
 
 RUN yarn install --frozen-lockfile --production && \
-    yarn run postinstall
+    yarn run postinstall && \
+    yarn cache clean && \
+    rm -rf /root/.cache/yarn && \
+    rm -rf /usr/local/share/.cache/yarn && \
+    rm -rf node_modules/.cache && \
+    rm -rf /tmp/*
 
 HEALTHCHECK --interval=5m --timeout=3s \
  CMD curl --fail http://localhost:8080 || exit 1
