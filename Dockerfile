@@ -8,8 +8,7 @@ WORKDIR /app
 
 COPY . /app
 
-RUN yarn install --frozen-lockfile --production && \
-    yarn run postinstall
+RUN yarn install --frozen-lockfile --production
 
 # -----------------------------
 # Stage 2: Runtime
