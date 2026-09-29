@@ -7,18 +7,20 @@ RUN addgroup --system nodejs --gid 998 && \
     adduser --system nodejs --uid 999 --home /app/ && \
     chown -R 999:998 /app/
 
-USER 999
-
 WORKDIR /app
-
 COPY --chown=999:998 . /app
 
+# Run install + cleanup as root (so /tmp/* can be deleted)
 RUN yarn install --frozen-lockfile --production && \
     yarn run postinstall && \
     yarn cache clean && \
-    rm -rf ~/.cache/yarn && \
-    rm -rf node_modules/.cache && \
-    rm -rf /tmp/*
+    rm -rf /root/.cache/yarn || true && \
+    rm -rf /usr/local/share/.cache/yarn || true && \
+    rm -rf node_modules/.cache || true && \
+    rm -rf /tmp/* || true
+
+# Drop privileges AFTER cleanup
+USER 999
 
 HEALTHCHECK --interval=5m --timeout=3s \
  CMD curl --fail http://localhost:8080 || exit 1
