@@ -1,0 +1,18 @@
+{{^documents}}
+  <h2 class="govuk-heading-s">{{#t}}fields.file-upload.no-files-uploaded{{/t}}</h2>
+{{/documents}}
+
+{{#documents.length}}
+  <h2 class="govuk-heading-s">{{#t}}fields.file-upload.files-uploaded{{/t}}</h2>
+  <div id="uploaded-documents" class="govuk-width-container">
+    {{#documents}}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">{{name}}</div>
+        <div class="govuk-grid-column-one-quarter">
+          <a href="?delete={{id}}" class="govuk-link">{{#t}}buttons.remove{{/t}}</a>
+        </div>
+      </div>
+      <hr class="govuk-section-break govuk-section-break--m">
+    {{/documents}}
+  </div>
+{{/documents.length}}
