@@ -1,7 +1,13 @@
-<div class="govuk-form-group govuk-!-margin-top-6" id="hofFileUpload">
+<div class="govuk-form-group govuk-!-margin-top-6{{#fileUploadError}} govuk-form-group--error{{/fileUploadError}}" id="hofFileUpload">
   <label class="govuk-label govuk-label--m" for="file-upload">
     {{#t}}fields.file-upload.label{{/t}}
   </label>
+  {{#fileUploadError}}
+  <p id="file-upload-error" class="govuk-error-message">
+    <span class="govuk-visually-hidden">{{#t}}journey.error{{/t}}:</span>
+    {{message}}
+  </p>
+  {{/fileUploadError}}
   <p id="file-upload-error-maxFileSize" class="govuk-error-message govuk-!-display-none" role="alert">
     <span class="govuk-visually-hidden">{{#t}}journey.error{{/t}}:</span>
     {{#t}}validation.file-upload.maxFileSize{{/t}}
@@ -19,7 +25,7 @@
       {{#t}}validation.file-upload.fileType{{/t}}
     {{/documentCategory.customFileType}}
   </p>
-  <input class="govuk-file-upload" id="file-upload" name="file-upload" type="file" accept="{{documentCategory.acceptedFileExtensions}}" document-category="{{documentCategory.name}}">
+  <input class="govuk-file-upload" id="file-upload" name="file-upload" type="file" accept="{{documentCategory.acceptedFileExtensions}}" document-category="{{documentCategory.name}}"{{#fileUploadError}} aria-invalid="true" aria-describedby="file-upload-error"{{/fileUploadError}}>
   <div id="upload-page-loading-spinner" class="spinner-container">
     <div class="spinner-loader"></div>
     <span class="spinner-message">{{#t}}journey.uploading{{/t}}</span>

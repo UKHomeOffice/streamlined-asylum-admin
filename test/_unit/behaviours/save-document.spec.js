@@ -94,6 +94,13 @@ describe('save document behaviour', () => {
     });
   });
 
+  test('provides the upload field error to the view', () => {
+    const error = { key: 'file-upload', type: 'fileType', message: 'File must be a document' };
+    const req = createRequest({ form: { values: {}, errors: { 'file-upload': error } } });
+
+    expect(behaviour.locals(req, {}).fileUploadError).toBe(error);
+  });
+
   test('requires a file when there are no existing documents', () => {
     const req = createRequest();
 

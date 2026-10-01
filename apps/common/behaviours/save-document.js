@@ -17,6 +17,7 @@ module.exports = (documentCategory, fieldName) => superclass => class extends su
   locals(req, res) {
     const locals = super.locals(req, res);
     locals.documents = req.sessionModel.get(documentCategory) || [];
+    locals.fileUploadError = req.form.errors && req.form.errors[fieldName];
     return locals;
   }
 
