@@ -67,7 +67,7 @@ spec:
               value: https://fv-{{ .APP_NAME }}.sas.homeoffice.gov.uk
             {{ end }}
             - name: FILE_EXTENSION_WHITELIST
-              value: ".doc,.docx,.pdf,.rtf,.txt,.odt,.jpeg,.jpg,.png"
+              value: "doc,docx,pdf,rtf,txt,odt,jpeg,jpg,png"
             - name: PORT
               value: "3000"
             - name: CLAMAV_REST_URL
