@@ -42,7 +42,7 @@ const initFileUpload = () => {
     component: document.getElementById('hofFileUpload'),
     spinner: document.getElementById('upload-page-loading-spinner'),
     input,
-    continueButtons: document.getElementsByName('continueWithoutUpload'),
+    continueButtons: document.querySelectorAll('[data-upload-continue]'),
     removeLinks: document.querySelectorAll('#uploaded-documents a')
   };
 

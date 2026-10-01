@@ -94,11 +94,8 @@ describe('save document behaviour', () => {
     });
   });
 
-  test.each([
-    ['continueWithoutUpload'],
-    ['save-and-exit']
-  ])('requires a file when %s is submitted without existing documents', button => {
-    const req = createRequest({ body: { [button]: 'true' } });
+  test('requires a file when there are no existing documents', () => {
+    const req = createRequest();
 
     expect(behaviour.validateField('file-upload', req)).toMatchObject({
       key: 'file-upload',
@@ -106,12 +103,15 @@ describe('save document behaviour', () => {
     });
   });
 
-  test.each([
-    ['continueWithoutUpload'],
-    ['save-and-exit']
-  ])('validates the submitted file when %s is submitted without existing documents', button => {
+  test('allows continuing without a new file when documents already exist', () => {
+    const req = createRequest();
+    req.sessionModel.get.mockReturnValue([{ id: 'one', name: 'evidence.pdf' }]);
+
+    expect(behaviour.validateField('file-upload', req)).toBeUndefined();
+  });
+
+  test('validates the submitted file when there are no existing documents', () => {
     const req = createRequest({
-      body: { [button]: 'true' },
       files: {
         'file-upload': {
           name: 'evidence.pdf',

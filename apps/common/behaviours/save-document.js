@@ -25,7 +25,7 @@ module.exports = (documentCategory, fieldName) => superclass => class extends su
     const documents = req.sessionModel.get(documentCategory) || [];
     const validationError = (type, args) => new this.ValidationError(key, { type, arguments: [args] });
 
-    if ((req.body.continueWithoutUpload || req.body['save-and-exit']) && !file && documents.length === 0) {
+    if (!file && documents.length === 0) {
       return validationError('required');
     }
 

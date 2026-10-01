@@ -51,8 +51,9 @@ const createDocument = file => {
       'file-upload-error-maxFileSize': errorElements.maxFileSize,
       'file-upload-error-fileType': errorElements.fileType
     })[id]),
-    getElementsByName: jest.fn().mockReturnValue([continueButton]),
-    querySelectorAll: jest.fn().mockReturnValue([removeLink]),
+    querySelectorAll: jest.fn(selector => (
+      selector === '[data-upload-continue]' ? [continueButton] : [removeLink]
+    )),
     querySelector: jest.fn().mockReturnValue(form)
   };
 
