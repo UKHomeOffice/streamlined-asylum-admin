@@ -1,30 +1,17 @@
 
-<p class="govuk-body">Contents</p>
+<p class="govuk-list-label--content">Contents</p>
 
-<ul class="govuk-list">
-    <li>
-        – <a class="govuk-link" href="#send-evidence">Send evidence or update details</a>
-    </li>
-    <li>
-        – <a class="govuk-link" href="#send-form">What happens after you send the form</a>
-    </li>
-    <li>
-        – <a class="govuk-link" href="#need-advice">If you need advice</a>
-    </li>
-    <li>
-        – <a class="govuk-link" href="#other-requests">For other requests about your asylum claim</a>
-    </li>
-    <li>
-        – <a class="govuk-link" href="#asylum-support">If you get asylum support payments</a>
-    </li>
-    <li>
-        – <a class="govuk-link" href="#under-18">If you are a main claimant under 18 years of age</a>
-    </li>
-</ul>
+- [Send evidence or update details](#send-evidence-or-update-details)
+- [What happens after you send the form](#what-happens-after-you-send-the-form)
+- [If you need advice](#if-you-need-advice)
+- [For other requests about your asylum claim](#for-other-requests-about-your-asylum-claim)
+- [If you get asylum support payments](#if-you-get-asylum-support-payments)
+- [If you are a main claimant under 18 years of age](#if-you-are-a-main-claimant-under-18-years-of-age)
 
 <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
 
-<h2 id="send-evidence" class="govuk-heading-m">Send evidence or update details</h2>
+
+<h2 id="send-evidence-or-update-details">Send evidence or update details</h2>
 
 If you are claiming asylum, use this form to:
 
@@ -48,7 +35,7 @@ Do not use this form if you need to <a href="https://www.gov.uk/claim-asylum" re
     </svg>
 </a>
 
-<h2 id="send-form" class="govuk-heading-m">What happens after you send the form</h2>
+<h2 id="what-happens-after-you-send-the-form">What happens after you send the form</h2>
 
 You will get a copy of the information you have sent us by email.
 
@@ -56,7 +43,7 @@ Unless we need more information, we aim to reply within 2 weeks to confirm what 
 
 If we do not confirm within 2 weeks, you can <a href="https://www.gov.uk/guidance/how-to-email-the-asylum-central-communications-hub" rel="noopener" target="_blank">contact us by email</a>.
 
-<h2 id="need-advice" class="govuk-heading-m">If you need advice</h2>
+<h2 id="if-you-need-advice">If you need advice</h2>
 
 If you need to talk to someone about updating your claim, you can call Migrant Help for advice.
 
@@ -64,7 +51,7 @@ Telephone: 0808 801 0503
 
 The call is free.
 
-<h2 id="other-requests" class="govuk-heading-m">For other requests about your asylum claim</h2>
+<h2 id="for-other-requests-about-your-asylum-claim">For other requests about your asylum claim</h2>
 
 Contact the <a href="mailto:AHROcentralcommunicationshub@contactus.homeoffice.gov.uk">Asylum and Human Rights Operations Central Communications Hub</a> if you need to:
 
@@ -76,12 +63,12 @@ Contact the <a href="mailto:AHROcentralcommunicationshub@contactus.homeoffice.go
 - make corrections to an interview
 - send us information that could affect how quickly we look at your claim
 
-<h2 id="asylum-support" class="govuk-heading-m">If you get asylum support payments</h2>
+<h2 id="if-you-get-asylum-support-payments">If you get asylum support payments</h2>
 
 If you get asylum support payments and your contact details have changed, you also need to tell Migrant Help.
 
 They will update your asylum support application.
 
-<h2 id="under-18" class="govuk-heading-m">If you are a main claimant under 18 years of age</h2>
+<h2 id="if-you-are-a-main-claimant-under-18-years-of-age">If you are a main claimant under 18 years of age</h2>
 
 You must not use this form. Email <a href="mailto:liverpoolchildrensasylumadmin@homeoffice.gov.uk">liverpoolchildrensasylumadmin@homeoffice.gov.uk</a> with your information.
