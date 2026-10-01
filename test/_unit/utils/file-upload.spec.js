@@ -70,7 +70,7 @@ describe('file upload model', () => {
       headers: {
         'content-type': 'multipart/form-data; boundary=test'
       }
-    }));
+    }), expect.any(Function));
     expect(upload.get('url')).toBe(
       'https://file-vault.test/file/generate-link/document-id'
     );
@@ -99,13 +99,45 @@ describe('file upload model', () => {
     );
   });
 
-  test('wraps request failures with file-upload context', async () => {
+  test('preserves the cause of a connection failure', async () => {
     const upload = new FileUpload(document);
-    upload.request = jest.fn().mockRejectedValue(new Error('connection refused'));
+    upload.auth = jest.fn().mockResolvedValue({ bearer: 'token' });
+    upload._request = jest.fn().mockRejectedValue(new Error('connect ECONNREFUSED'));
 
-    await expect(upload.save()).rejects.toThrow(
-      'File upload failed: connection refused'
-    );
+    await expect(upload.save()).rejects.toThrow('File upload failed: connect ECONNREFUSED');
+  });
+
+  test('preserves the cause of an authentication failure', async () => {
+    const upload = new FileUpload(document);
+    upload.auth = jest.fn().mockRejectedValue(new Error('No access token in response'));
+
+    await expect(upload.save()).rejects.toThrow('File upload failed: No access token in response');
+  });
+
+  test('preserves the file-vault error code', async () => {
+    const upload = new FileUpload(document);
+    upload.auth = jest.fn().mockResolvedValue({ bearer: 'token' });
+    upload._request = jest.fn().mockResolvedValue({
+      status: 400,
+      data: { code: 'FileExtensionNotAllowed' }
+    });
+
+    await expect(upload.save()).rejects.toThrow('File upload failed: FileExtensionNotAllowed');
+  });
+
+  test('does not expose request details from the original error', async () => {
+    const upload = new FileUpload(document);
+    const requestError = Object.assign(new Error('Request failed with status code 500'), {
+      config: { headers: { Authorization: 'Bearer secret-token' } }
+    });
+    upload.auth = jest.fn().mockResolvedValue({ bearer: 'secret-token' });
+    upload._request = jest.fn().mockRejectedValue(requestError);
+
+    const error = await upload.save().catch(e => e);
+
+    expect(error.message).toBe('File upload failed: Request failed with status code 500');
+    expect(error.cause).toBeUndefined();
+    expect(error.config).toBeUndefined();
   });
 
   test('retrieves a file-vault token using client credentials', async () => {

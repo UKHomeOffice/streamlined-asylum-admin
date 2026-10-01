@@ -32,7 +32,12 @@ module.exports = class UploadModel extends Model {
     };
 
     try {
-      const response = await this.request(requestConfig);
+      // hof's Model.request returns errors instead of rejecting unless the callback throws
+      const response = await this.request(requestConfig, error => {
+        if (error) {
+          throw new Error(error.message || error.code || `status ${error.status}`);
+        }
+      });
 
       if (!response || typeof response !== 'object' || !response.url) {
         throw new Error('Did not receive a URL from file-vault');
