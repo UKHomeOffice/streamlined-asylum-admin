@@ -36,7 +36,7 @@ trigger:
   branch:
     <<: *include_default_and_feature_branches
 
-node_image_name: &node_image_name quay.io/ukhomeofficedigital/hof-nodejs:24.21.0-alpine3.24-v3@sha256:0db6a51fc5c32294de98ec928a933ddc194554041a878b5b6b4cc5bf5bf18a44
+node_image_name: &node_image_name quay.io/ukhomeofficedigital/hof-nodejs:24.21.0-alpine3.24-v4@sha256:c5d1333e7e965464258596faf4ac16a0eadd36029270ed0d8d94ec9003cae19d
 
 node_image: &node_image
   pull: if-not-exists
@@ -253,6 +253,10 @@ steps:
   - name: deploy_to_branch
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/kd:v1.14.0
+    resources:
+      limits:
+        cpu: 1000
+        memory: 1024Mi
     environment:
       KUBE_SERVER:
         from_secret: KUBE_SERVER_DEV
@@ -276,6 +280,10 @@ steps:
   - name: e2e_tests
     pull: if-not-exists
     image: mcr.microsoft.com/playwright:v1.63.0-noble
+    resources:
+      limits:
+        cpu: 1000
+        memory: 1024Mi
     environment:
       SAS_HOF_EMAIL:
         from_secret: SAS_HOF_EMAIL
