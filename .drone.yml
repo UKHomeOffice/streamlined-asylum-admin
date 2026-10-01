@@ -253,10 +253,6 @@ steps:
   - name: deploy_to_branch
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/kd:v1.14.0
-    resources:
-      limits:
-        cpu: 1000
-        memory: 1024Mi
     environment:
       KUBE_SERVER:
         from_secret: KUBE_SERVER_DEV
@@ -280,10 +276,6 @@ steps:
   - name: e2e_tests
     pull: if-not-exists
     image: mcr.microsoft.com/playwright:v1.63.0-noble
-    resources:
-      limits:
-        cpu: 1000
-        memory: 1024Mi
     environment:
       SAS_HOF_EMAIL:
         from_secret: SAS_HOF_EMAIL
