@@ -289,7 +289,7 @@ ul:not(p.govuk-list-label--content + ul) {
 }
 
 p.govuk-list-label--content + ul {
-  list-style-type: "– ";
+  list-style-type: none;
 
   a {
     @extend .govuk-link;
