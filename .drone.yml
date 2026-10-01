@@ -185,6 +185,7 @@ steps:
       event: [push, pull_request]
     depends_on:
       - unit_tests
+      - linting
 
   - name: build_image_for_trivy
     pull: if-not-exists

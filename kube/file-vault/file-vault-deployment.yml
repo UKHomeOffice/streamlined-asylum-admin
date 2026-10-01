@@ -66,10 +66,6 @@ spec:
             {{ else if eq .KUBE_NAMESPACE .PROD_ENV }}
               value: https://fv-{{ .APP_NAME }}.sas.homeoffice.gov.uk
             {{ end }}
-            {{ if ne .KUBE_NAMESPACE .PROD_ENV }}
-            - name: DEBUG
-              value: "*"
-            {{ end }}
             - name: FILE_EXTENSION_WHITELIST
               value: ".doc,.docx,.pdf,.rtf,.txt,.odt,.jpeg,.jpg,.png"
             - name: PORT

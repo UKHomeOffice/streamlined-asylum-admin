@@ -114,10 +114,6 @@ spec:
             {{ else if eq .KUBE_NAMESPACE .PROD_ENV }}
               value: https://fv-{{ .APP_NAME }}.sas.homeoffice.gov.uk
             {{ end }}
-            {{ if eq .KUBE_NAMESPACE .BRANCH_ENV }}
-            - name: DEBUG
-              value: "*"
-            {{ end }}
           {{ if not (eq .KUBE_NAMESPACE .BRANCH_ENV) }}
           livenessProbe:
             httpGet:
