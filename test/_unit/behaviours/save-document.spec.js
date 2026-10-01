@@ -106,6 +106,24 @@ describe('save document behaviour', () => {
     });
   });
 
+  test.each([
+    ['continueWithoutUpload'],
+    ['save-and-exit']
+  ])('validates the submitted file when %s is submitted without existing documents', button => {
+    const req = createRequest({
+      body: { [button]: 'true' },
+      files: {
+        'file-upload': {
+          name: 'evidence.pdf',
+          size: 100,
+          mimetype: 'application/pdf'
+        }
+      }
+    });
+
+    expect(behaviour.validateField('file-upload', req)).toBeUndefined();
+  });
+
   test('rejects files larger than 25MB', () => {
     const req = createRequest({
       files: {
@@ -161,6 +179,38 @@ describe('save document behaviour', () => {
     });
 
     expect(behaviour.validateField('file-upload', req).type).toBe('fileType');
+  });
+
+  test.each([
+    ['evidence.exe'],
+    ['evidence'],
+    ['evidence.pdf.exe']
+  ])('rejects %s with an allowed MIME type', name => {
+    const req = createRequest({
+      files: {
+        'file-upload': {
+          name,
+          size: 100,
+          mimetype: 'application/pdf'
+        }
+      }
+    });
+
+    expect(behaviour.validateField('file-upload', req).type).toBe('fileType');
+  });
+
+  test('accepts an allowed extension regardless of case', () => {
+    const req = createRequest({
+      files: {
+        'file-upload': {
+          name: 'EVIDENCE.PDF',
+          size: 100,
+          mimetype: 'application/pdf'
+        }
+      }
+    });
+
+    expect(behaviour.validateField('file-upload', req)).toBeUndefined();
   });
 
   test.each([

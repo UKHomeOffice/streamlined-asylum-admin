@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('node:path');
 const config = require('../../../config');
 const FileUpload = require('../../../utils/file-upload');
 const { sanitiseFilename } = require('../../../utils');
@@ -24,13 +25,16 @@ module.exports = (documentCategory, fieldName) => superclass => class extends su
     const documents = req.sessionModel.get(documentCategory) || [];
     const validationError = (type, args) => new this.ValidationError(key, { type, arguments: [args] });
 
-    if ((req.body.continueWithoutUpload || req.body['save-and-exit']) && documents.length === 0) {
+    if ((req.body.continueWithoutUpload || req.body['save-and-exit']) && !file && documents.length === 0) {
       return validationError('required');
     }
 
     if (file) {
       const categoryConfig = config.upload.documentCategories[documentCategory];
       const allowedMimeTypes = categoryConfig.allowedMimeTypes || config.upload.allowedMimeTypes;
+      const acceptedFileExtensions = (categoryConfig.acceptedFileExtensions || config.upload.acceptedFileExtensions)
+        .split(',');
+      const fileExtension = path.extname(file.name).toLowerCase();
 
       if (file.size === 0) {
         return validationError('emptyFile');
@@ -38,7 +42,7 @@ module.exports = (documentCategory, fieldName) => superclass => class extends su
       if (file.size > config.upload.maxFileSizeInBytes || file.truncated) {
         return validationError('maxFileSize');
       }
-      if (!allowedMimeTypes.includes(file.mimetype)) {
+      if (!allowedMimeTypes.includes(file.mimetype) || !acceptedFileExtensions.includes(fileExtension)) {
         return validationError('fileType');
       }
       if (documents.length >= categoryConfig.limit) {

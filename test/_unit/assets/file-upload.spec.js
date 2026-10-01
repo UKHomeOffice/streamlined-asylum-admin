@@ -33,7 +33,9 @@ const createDocument = file => {
         changeHandler = handler;
       }
     }),
-    getAttribute: jest.fn().mockReturnValue('supporting-evidence')
+    getAttribute: jest.fn().mockReturnValue('supporting-evidence'),
+    setAttribute: jest.fn(),
+    removeAttribute: jest.fn()
   };
   const spinner = { style: {} };
   const continueButton = { disabled: false, ariaDisabled: false };
@@ -81,9 +83,12 @@ describe('file upload client validation', () => {
   });
 
   test.each([
-    ['emptyFile', { size: 0, type: 'application/pdf' }],
-    ['maxFileSize', { size: uploadConfig.maxFileSizeInBytes + 1, type: 'application/pdf' }],
-    ['fileType', { size: 100, type: 'application/x-msdownload' }]
+    ['emptyFile', { name: 'evidence.pdf', size: 0, type: 'application/pdf' }],
+    ['maxFileSize', { name: 'evidence.pdf', size: uploadConfig.maxFileSizeInBytes + 1, type: 'application/pdf' }],
+    ['fileType', { name: 'evidence.exe', size: 100, type: 'application/x-msdownload' }],
+    ['fileType', { name: 'evidence.exe', size: 100, type: 'application/pdf' }],
+    ['fileType', { name: 'evidence.pdf', size: 100, type: 'application/x-msdownload' }],
+    ['fileType', { name: 'evidence', size: 100, type: 'application/pdf' }]
   ])('shows the %s error without submitting', (errorType, file) => {
     const fixture = createDocument(file);
     global.document = fixture.document;
@@ -94,11 +99,26 @@ describe('file upload client validation', () => {
     expect(fixture.component.classList.add).toHaveBeenCalledWith('govuk-form-group--error');
     expect(fixture.errorElements[errorType].classList.remove)
       .toHaveBeenCalledWith('govuk-!-display-none');
+    expect(fixture.input.setAttribute).toHaveBeenCalledWith('aria-invalid', 'true');
+    expect(fixture.input.setAttribute)
+      .toHaveBeenCalledWith('aria-describedby', `file-upload-error-${errorType}`);
     expect(fixture.form.submit).not.toHaveBeenCalled();
   });
 
+  test('clears the error state when a new file is selected', () => {
+    const fixture = createDocument({ name: 'evidence.pdf', size: 100, type: 'application/pdf' });
+    global.document = fixture.document;
+
+    initFileUpload();
+    fixture.dispatchChange();
+
+    expect(fixture.input.removeAttribute).toHaveBeenCalledWith('aria-invalid');
+    expect(fixture.input.removeAttribute).toHaveBeenCalledWith('aria-describedby');
+    expect(fixture.input.setAttribute).not.toHaveBeenCalled();
+  });
+
   test('submits a valid file and shows the uploading state', () => {
-    const fixture = createDocument({ size: 100, type: 'application/pdf' });
+    const fixture = createDocument({ name: 'evidence.pdf', size: 100, type: 'application/pdf' });
     global.document = fixture.document;
 
     initFileUpload();
@@ -109,5 +129,18 @@ describe('file upload client validation', () => {
     expect(fixture.input.disabled).toBe(true);
     expect(fixture.continueButton.disabled).toBe(true);
     expect(fixture.removeLink.classList.add).toHaveBeenCalledWith('disabled-link');
+  });
+
+  test.each([
+    ['EVIDENCE.PDF', 'application/pdf'],
+    ['evidence.odt', '']
+  ])('submits %s with MIME type "%s"', (name, type) => {
+    const fixture = createDocument({ name, size: 100, type });
+    global.document = fixture.document;
+
+    initFileUpload();
+    fixture.dispatchChange();
+
+    expect(fixture.form.submit).toHaveBeenCalledTimes(1);
   });
 });

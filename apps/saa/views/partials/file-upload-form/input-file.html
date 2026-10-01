@@ -2,15 +2,15 @@
   <label class="govuk-label govuk-label--m" for="file-upload">
     {{#t}}fields.file-upload.label{{/t}}
   </label>
-  <p id="file-upload-error-maxFileSize" class="govuk-error-message govuk-!-display-none">
+  <p id="file-upload-error-maxFileSize" class="govuk-error-message govuk-!-display-none" role="alert">
     <span class="govuk-visually-hidden">{{#t}}journey.error{{/t}}:</span>
     {{#t}}validation.file-upload.maxFileSize{{/t}}
   </p>
-  <p id="file-upload-error-emptyFile" class="govuk-error-message govuk-!-display-none">
+  <p id="file-upload-error-emptyFile" class="govuk-error-message govuk-!-display-none" role="alert">
     <span class="govuk-visually-hidden">{{#t}}journey.error{{/t}}:</span>
     {{#t}}validation.file-upload.emptyFile{{/t}}
   </p>
-  <p id="file-upload-error-fileType" class="govuk-error-message govuk-!-display-none">
+  <p id="file-upload-error-fileType" class="govuk-error-message govuk-!-display-none" role="alert">
     <span class="govuk-visually-hidden">{{#t}}journey.error{{/t}}:</span>
     {{#documentCategory.customFileType}}
       {{#t}}validation.file-upload.{{documentCategory.name}}.fileType{{/t}}
