@@ -65,9 +65,7 @@ describe('file upload model', () => {
       contentType: document.mimetype
     });
     expect(upload.request).toHaveBeenCalledWith(expect.objectContaining({
-      protocol: 'https:',
-      hostname: 'file-vault.test',
-      path: '/file',
+      url: 'https://file-vault.test/file',
       method: 'POST',
       headers: {
         'content-type': 'multipart/form-data; boundary=test'

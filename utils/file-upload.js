@@ -1,8 +1,6 @@
-/* eslint-disable node/no-deprecated-api */
 'use strict';
 
-const crypto = require('crypto');
-const url = require('url');
+const crypto = require('node:crypto');
 const FormData = require('form-data');
 const Model = require('hof').model;
 
@@ -26,10 +24,12 @@ module.exports = class UploadModel extends Model {
       contentType: this.get('mimetype')
     });
 
-    const requestConfig = url.parse(`${config.upload.hostname}/file`);
-    requestConfig.data = formData;
-    requestConfig.method = 'POST';
-    requestConfig.headers = formData.getHeaders();
+    const requestConfig = {
+      url: new URL(`${config.upload.hostname}/file`).href,
+      data: formData,
+      method: 'POST',
+      headers: formData.getHeaders()
+    };
 
     try {
       const response = await this.request(requestConfig);
