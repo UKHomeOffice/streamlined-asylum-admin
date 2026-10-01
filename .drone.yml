@@ -158,6 +158,8 @@ steps:
       branch:
         <<: *include_default_and_feature_branches
       event: [push, pull_request]
+    depends_on:
+      - scan_base_image_os
 
   - name: linting
     <<: *linting
@@ -184,8 +186,8 @@ steps:
         <<: *include_default_and_feature_branches
       event: [push, pull_request]
     depends_on:
-      - unit_tests
       - linting
+      - unit_tests
 
   - name: build_image_for_trivy
     pull: if-not-exists
@@ -202,31 +204,8 @@ steps:
         <<: *include_default_and_feature_branches
       event: [push, pull_request]
     depends_on:
-      - linting
-      - unit_tests
       - sonar_scanner
-
-  - name: build_image_and_push_to_ecr
-    pull: if-not-exists
-    image: plugins/ecr
-    settings:
-      access_key:
-        from_secret: aws_access_key_id
-      secret_key:
-        from_secret: aws_secret_access_key
-      region: eu-west-2
-      repo: sas/saa
-      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-      tags:
-        - ${DRONE_COMMIT_SHA}
-    when:
-      branch:
-        <<: *include_default_and_feature_branches
-      event: [push, pull_request]
-    depends_on:
-      - linting
-      - unit_tests
-      - build_image_for_trivy
+      - scan_base_image_os
 
   # Trivy Security Scannner for scanning nodejs packages in Yarn
   - name: scan_node_packages
@@ -249,6 +228,27 @@ steps:
       event: [push, pull_request]
     depends_on:
       - build_image_for_trivy
+      - clone_repos
+
+  - name: build_image_and_push_to_ecr
+    pull: if-not-exists
+    image: plugins/ecr
+    settings:
+      access_key:
+        from_secret: aws_access_key_id
+      secret_key:
+        from_secret: aws_secret_access_key
+      region: eu-west-2
+      repo: sas/saa
+      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
+      tags:
+        - ${DRONE_COMMIT_SHA}
+    when:
+      branch:
+        <<: *include_default_and_feature_branches
+      event: [push, pull_request]
+    depends_on:
+      - scan_node_packages
 
   # Deploy to pull request UAT environment
   - name: deploy_to_branch
@@ -309,8 +309,8 @@ steps:
       branch:
         <<: *include_default_and_feature_branches
       event: pull_request
-    # depends_on:
-    #   - e2e_tests
+    depends_on:
+      - e2e_tests
 
   # Upload Playwright HTML report for PR and comment a download link
   - name: publish_e2e_report_to_pr
