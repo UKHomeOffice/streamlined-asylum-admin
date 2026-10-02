@@ -1,6 +1,19 @@
 const hof = require('hof');
 const dateComponent = hof.components.date;
 module.exports = {
+  'changes-to-contact-details': {
+    mixin: 'checkbox-group',
+    options: [
+      'name',
+      'date-of-birth',
+      'nationality',
+      'address',
+      'email-address',
+      'phone-number'
+    ],
+    validate: ['required'],
+    isPageHeading: true
+  },
   'add-remove-dependant': {
     mixin: 'radio-group',
     options: ['yes', 'no'],

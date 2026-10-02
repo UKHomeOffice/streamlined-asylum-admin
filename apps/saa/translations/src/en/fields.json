@@ -1,4 +1,27 @@
 {
+  "changes-to-contact-details": {
+    "legend": "What details do you need to change?",
+    "options": {
+      "name": {
+        "label": "Name"
+      },
+      "date-of-birth": {
+        "label": "Date of Birth"
+      },
+      "nationality": {
+        "label": "Nationality"
+      },
+      "address": {
+        "label": "Address"
+      },
+      "email-address": {
+        "label": "Email address"
+      },
+      "phone-number": {
+        "label": "Phone number"
+      }
+    }
+  },
   "add-remove-dependant": {
     "legend": "Do you need to add or remove a child or partner as a dependant?",
     "hint": "For example, if you have had a baby, got married or divorced",

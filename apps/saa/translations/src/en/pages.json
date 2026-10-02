@@ -17,9 +17,6 @@
   "update-personal-details": {
     "header": "Update personal details"
   },
-  "changes-to-contact-details": {
-    "header": "What details do you need to change?"
-  },
   "do-you-need-to-change-your-name": {
     "header": "Do you need to change your name?"
   },
