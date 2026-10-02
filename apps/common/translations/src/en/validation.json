@@ -1,0 +1,6 @@
+{
+  "user-email": {
+    "required": "Enter your email address",
+    "email": "Enter a real email address"
+  }
+}

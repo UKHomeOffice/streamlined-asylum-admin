@@ -2,9 +2,11 @@ const hof = require('hof');
 const Summary = hof.components.summary;
 
 const CustomValidation = require('../common/behaviours/custom-validation');
+const CheckEmailToken = require('./behaviours/check-email-token');
 
 const steps = {
   '/continue-to-form': {
+    behaviours: [CheckEmailToken],
     next: '/which-form'
   },
   '/which-form': {

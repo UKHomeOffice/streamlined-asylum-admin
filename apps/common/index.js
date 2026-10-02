@@ -1,4 +1,5 @@
 const { disallowIndexing } = require('../../config');
+const SendVerificationEmail = require('./behaviours/send-verification-email');
 const steps = {
   '/': {
     template: 'start'
@@ -14,6 +15,10 @@ const steps = {
     next: '/email-address'
   },
   '/email-address': {
+    behaviours: [
+      SendVerificationEmail
+    ],
+    fields: ['user-email'],
     next: '/check-your-email'
   },
   '/cannot-use-form': {
