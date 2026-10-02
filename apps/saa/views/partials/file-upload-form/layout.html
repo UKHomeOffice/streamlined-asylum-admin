@@ -1,0 +1,11 @@
+{{<partials-page}}
+  {{$encoding}}enctype="multipart/form-data" name="file-upload-form"{{/encoding}}
+
+  {{$page-content}}
+    {{$file-upload-intro}}{{/file-upload-intro}}
+
+    {{> partials-file-upload-form-input-file}}
+    {{> partials-file-upload-form-list}}
+    {{> partials-file-upload-form-continue}}
+  {{/page-content}}
+{{/partials-page}}

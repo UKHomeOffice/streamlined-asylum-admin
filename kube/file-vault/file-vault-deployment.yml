@@ -65,9 +65,9 @@ spec:
               value: https://fv-{{ .APP_NAME }}.stg.sas.homeoffice.gov.uk
             {{ else if eq .KUBE_NAMESPACE .PROD_ENV }}
               value: https://fv-{{ .APP_NAME }}.sas.homeoffice.gov.uk
-            - name: DEBUG
-              value: "*"
             {{ end }}
+            - name: FILE_EXTENSION_WHITELIST
+              value: "doc,docx,pdf,rtf,txt,odt,jpeg,jpg,png"
             - name: PORT
               value: "3000"
             - name: CLAMAV_REST_URL
@@ -120,10 +120,6 @@ spec:
               value: "no"
             - name: ALLOW_GENERATE_LINK_ROUTE
               value: "yes"
-            {{ if eq .KUBE_NAMESPACE .BRANCH_ENV }}
-            - name: DEBUG
-              value: "*"
-            {{ end }}
           securityContext:
             runAsNonRoot: true
 

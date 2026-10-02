@@ -1,7 +1,25 @@
 const hof = require('hof');
 const Summary = hof.components.summary;
+const config = require('../../config');
 
 const CustomValidation = require('../common/behaviours/custom-validation');
+const RemoveDocument = require('../common/behaviours/remove-document');
+const SaveDocument = require('../common/behaviours/save-document');
+
+const documentUploadStep = category => ({
+  behaviours: [
+    SaveDocument(category, 'file-upload'),
+    RemoveDocument(category)
+  ],
+  fields: ['file-upload'],
+  locals: {
+    documentCategory: {
+      name: category,
+      acceptedFileExtensions: config.upload.acceptedFileExtensions,
+      ...config.upload.documentCategories[category]
+    }
+  }
+});
 
 const steps = {
   '/continue-to-form': {
@@ -216,6 +234,7 @@ const steps = {
     next: '/upload-supporting-evidence'
   },
   '/upload-supporting-evidence': {
+    ...documentUploadStep('supporting-evidence'),
     next: '/violent-upsetting-images'
   },
   '/violent-upsetting-images': {

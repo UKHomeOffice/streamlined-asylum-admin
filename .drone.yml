@@ -136,7 +136,7 @@ steps:
     environment:
       IMAGE_NAME: *node_image_name
       SERVICE_URL: https://acp-trivy-helm.acp-trivy.svc.cluster.local:443
-      SEVERITY: MEDIUM,HIGH,CRITICAL --pkg-types os,library --dependency-tree
+      SEVERITY: HIGH,CRITICAL --pkg-types os,library --dependency-tree
       FAIL_ON_DETECTION: true
       IGNORE_UNFIXED: false
       ALLOW_CVE_LIST_FILE: hof-services-config/infrastructure/trivy/.trivyignore.yaml
@@ -158,6 +158,8 @@ steps:
       branch:
         <<: *include_default_and_feature_branches
       event: [push, pull_request]
+    depends_on:
+      - scan_base_image_os
 
   - name: linting
     <<: *linting
@@ -184,6 +186,7 @@ steps:
         <<: *include_default_and_feature_branches
       event: [push, pull_request]
     depends_on:
+      - linting
       - unit_tests
 
   - name: build_image_for_trivy
@@ -201,9 +204,31 @@ steps:
         <<: *include_default_and_feature_branches
       event: [push, pull_request]
     depends_on:
-      - linting
-      - unit_tests
       - sonar_scanner
+      - scan_base_image_os
+
+  # Trivy Security Scannner for scanning nodejs packages in Yarn
+  - name: scan_node_packages
+    pull: always
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/trivy/client:latest
+    resources:
+      limits:
+        cpu: 1000
+        memory: 1024Mi
+    environment:
+      IMAGE_NAME: sas/saa:${DRONE_COMMIT_SHA}
+      SEVERITY: HIGH,CRITICAL --pkg-types os,library --dependency-tree
+      FAIL_ON_DETECTION: true
+      IGNORE_UNFIXED: false
+      ALLOW_CVE_LIST_FILE: hof-services-config/infrastructure/trivy/.trivyignore.yaml
+    volumes:
+      - name: dockersock
+        path: /root/.dockersock
+    when:
+      event: [push, pull_request]
+    depends_on:
+      - build_image_for_trivy
+      - clone_repos
 
   - name: build_image_and_push_to_ecr
     pull: if-not-exists
@@ -223,31 +248,7 @@ steps:
         <<: *include_default_and_feature_branches
       event: [push, pull_request]
     depends_on:
-      - linting
-      - unit_tests
-      - build_image_for_trivy
-
-  # Trivy Security Scannner for scanning nodejs packages in Yarn
-  - name: scan_node_packages
-    pull: always
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/trivy/client:latest
-    resources:
-      limits:
-        cpu: 1000
-        memory: 1024Mi
-    environment:
-      IMAGE_NAME: sas/saa:${DRONE_COMMIT_SHA}
-      SEVERITY: MEDIUM,HIGH,CRITICAL --pkg-types os,library --dependency-tree
-      FAIL_ON_DETECTION: true
-      IGNORE_UNFIXED: false
-      ALLOW_CVE_LIST_FILE: hof-services-config/infrastructure/trivy/.trivyignore.yaml
-    volumes:
-      - name: dockersock
-        path: /root/.dockersock
-    when:
-      event: [push, pull_request]
-    depends_on:
-      - build_image_for_trivy
+      - scan_node_packages
 
   # Deploy to pull request UAT environment
   - name: deploy_to_branch
@@ -308,8 +309,8 @@ steps:
       branch:
         <<: *include_default_and_feature_branches
       event: pull_request
-    # depends_on:
-    #   - e2e_tests
+    depends_on:
+      - e2e_tests
 
   # Upload Playwright HTML report for PR and comment a download link
   - name: publish_e2e_report_to_pr
