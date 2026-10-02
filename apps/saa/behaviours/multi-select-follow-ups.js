@@ -134,18 +134,16 @@ const getFieldsToUnset = (config, inactiveSections, removedSelections) =>
     config.options.reduce((fields, option) => {
       const sections = getSectionsForOption(option);
       const optionRemoved = removedSelections.includes(option.value);
-      const sectionInactive = sections.some(section =>
-        inactiveSections.includes(section.id)
-      );
-
-      if (optionRemoved || sectionInactive) {
-        return fields.concat(
-          option.fieldsToUnset || [],
-          ...sections.map(section => section.fieldsToUnset || [])
+      const optionFields = optionRemoved ? option.fieldsToUnset || [] : [];
+      const sectionFields = sections
+        .filter(section => inactiveSections.includes(section.id))
+        .reduce(
+          (fieldNames, section) =>
+            fieldNames.concat(section.fieldsToUnset || []),
+          []
         );
-      }
 
-      return fields;
+      return fields.concat(optionFields, sectionFields);
     }, [])
   );
 
@@ -177,14 +175,18 @@ const createState = (config, previousState, selections) => {
   const inactiveSections = previousSections.filter(
     section => !activeSectionIds.includes(section)
   );
+  const completedSections = asArray(previousState.completedSections).filter(
+    section => activeSectionIds.includes(section)
+  );
 
   return {
     selections: asArray(selections),
     activeSections: activeSectionIds,
     activeRoutes,
-    completedSections: asArray(previousState.completedSections).filter(
-      section => activeSectionIds.includes(section)
-    ),
+    completedSections,
+    lastCompletionRoute: completedSections.length
+      ? previousState.lastCompletionRoute
+      : undefined,
     addedSections,
     inactiveSections,
     fieldsToUnset: getFieldsToUnset(config, inactiveSections, removedSelections)
@@ -306,13 +308,33 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
               asArray(previousState.completedSections).concat(
                 completingSections.map(section => section.id)
               )
-            )
+            ),
+            lastCompletionRoute: completingSections.length
+              ? this.options.route
+              : previousState.lastCompletionRoute
           };
         }
 
         req.sessionModel.set(config.stateKey, state);
         callback();
       });
+    }
+
+    locals(req, res) {
+      const locals = super.locals(req, res);
+      const config = this.getMultiSelectFollowUpsConfig();
+
+      if (!config || this.options.route !== config.exitPoint) {
+        return locals;
+      }
+
+      const state = req.sessionModel.get(config.stateKey) || {};
+      const backLinkRoute = state.lastCompletionRoute || config.entryPoint;
+
+      return {
+        ...locals,
+        backLink: withBaseUrl(req, backLinkRoute)
+      };
     }
 
     getNextStep(req, res) {

@@ -318,6 +318,13 @@ multiSelectFollowUpsConfig.options
     );
   });
 
+if (steps[multiSelectFollowUpsConfig.exitPoint]) {
+  steps[multiSelectFollowUpsConfig.exitPoint].behaviours = [].concat(
+    steps[multiSelectFollowUpsConfig.exitPoint].behaviours || [],
+    multiSelectFollowUpsBehaviour
+  );
+}
+
 multiSelectFollowUpsConfig.options
   .reduce(
     (routes, option) =>

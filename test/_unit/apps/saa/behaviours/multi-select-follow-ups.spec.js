@@ -81,6 +81,10 @@ const buildController = route => {
     getNextStep(req) {
       return req.baseUrl + this.options.next;
     }
+
+    locals() {
+      return {};
+    }
   }
 
   const Controller = MultiSelectFollowUps(config)(BaseController);
@@ -139,6 +143,59 @@ describe('multi-select follow-ups behaviour', () => {
     expect(state.completedSections).toEqual(['first']);
     expect(state.inactiveSections).toEqual(['second']);
     expect(state.fieldsToUnset).toEqual(['second-answer']);
+  });
+
+  test('does not unset shared section fields while another selected option keeps the section active', () => {
+    const sharedConfig = {
+      field: 'changes',
+      entryPoint: '/changes',
+      exitPoint: '/exit',
+      stateKey: 'changes-follow-ups',
+      options: [
+        {
+          value: 'first-shared-option',
+          order: 10,
+          fieldsToUnset: ['first-option-answer'],
+          sections: [
+            {
+              id: 'shared-section',
+              start: '/shared-start',
+              completeOn: '/shared-end',
+              routes: ['/shared-start', '/shared-end'],
+              fieldsToUnset: ['shared-section-answer']
+            }
+          ]
+        },
+        {
+          value: 'second-shared-option',
+          order: 20,
+          fieldsToUnset: ['second-option-answer'],
+          sections: [
+            {
+              id: 'shared-section',
+              start: '/shared-start',
+              completeOn: '/shared-end',
+              routes: ['/shared-start', '/shared-end'],
+              fieldsToUnset: ['shared-section-answer']
+            }
+          ]
+        }
+      ]
+    };
+
+    const state = createState(
+      sharedConfig,
+      {
+        selections: ['first-shared-option', 'second-shared-option'],
+        activeSections: ['shared-section'],
+        completedSections: ['shared-section']
+      },
+      ['second-shared-option']
+    );
+
+    expect(state.activeSections).toEqual(['shared-section']);
+    expect(state.completedSections).toEqual(['shared-section']);
+    expect(state.fieldsToUnset).toEqual(['first-option-answer']);
   });
 
   test('entry route stores state, unsets inactive fields and routes to first added section', done => {
@@ -227,8 +284,48 @@ describe('multi-select follow-ups behaviour', () => {
       expect(
         req.sessionModel.get('changes-follow-ups').completedSections
       ).toEqual(['first']);
+      expect(
+        req.sessionModel.get('changes-follow-ups').lastCompletionRoute
+      ).toBe('/first-end');
       expect(controller.getNextStep(req, {})).toBe('/updates/second-start');
       done();
+    });
+  });
+
+  test('exit page back link returns to the last completed section route', () => {
+    const controller = buildController('/exit');
+    const req = {
+      baseUrl: '/updates',
+      sessionModel: buildSessionModel({
+        'changes-follow-ups': {
+          selections: ['first'],
+          activeSections: ['first'],
+          completedSections: ['first'],
+          lastCompletionRoute: '/first-end'
+        }
+      })
+    };
+
+    expect(controller.locals(req, {})).toEqual({
+      backLink: '/updates/first-end'
+    });
+  });
+
+  test('exit page back link falls back to the entry page when no section has completed', () => {
+    const controller = buildController('/exit');
+    const req = {
+      baseUrl: '/updates',
+      sessionModel: buildSessionModel({
+        'changes-follow-ups': {
+          selections: [],
+          activeSections: [],
+          completedSections: []
+        }
+      })
+    };
+
+    expect(controller.locals(req, {})).toEqual({
+      backLink: '/updates/changes'
     });
   });
 

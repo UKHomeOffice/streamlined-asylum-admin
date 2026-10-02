@@ -33,6 +33,12 @@ describe('SAA multi-select follow-up route config', () => {
     expect(app.steps['/your-phone-number'].backLink).toBeUndefined();
   });
 
+  test('attaches the multi-select behaviour to the configured exit point', () => {
+    expect(app.steps[multiSelectFollowUpsConfig.exitPoint].behaviours).toEqual(
+      expect.arrayContaining([expect.any(Function)])
+    );
+  });
+
   test.each([
     ['name', '/updates/do-you-need-to-change-your-name'],
     ['date-of-birth', '/updates/whose-date-of-birth'],
@@ -60,8 +66,9 @@ describe('SAA multi-select follow-up route config', () => {
         }
       }
 
-      const Controller =
-        MultiSelectFollowUps(multiSelectFollowUpsConfig)(BaseController);
+      const Controller = MultiSelectFollowUps(multiSelectFollowUpsConfig)(
+        BaseController
+      );
       const controller = new Controller({
         route: multiSelectFollowUpsConfig.entryPoint,
         next: multiSelectFollowUpsConfig.exitPoint
@@ -115,8 +122,9 @@ describe('SAA multi-select follow-up route config', () => {
       }
     }
 
-    const Controller =
-      MultiSelectFollowUps(multiSelectFollowUpsConfig)(BaseController);
+    const Controller = MultiSelectFollowUps(multiSelectFollowUpsConfig)(
+      BaseController
+    );
     const controller = new Controller({
       route: multiSelectFollowUpsConfig.entryPoint,
       next: multiSelectFollowUpsConfig.exitPoint
@@ -182,8 +190,9 @@ describe('SAA multi-select follow-up route config', () => {
       }
     }
 
-    const Controller =
-      MultiSelectFollowUps(multiSelectFollowUpsConfig)(BaseController);
+    const Controller = MultiSelectFollowUps(multiSelectFollowUpsConfig)(
+      BaseController
+    );
     const controller = new Controller({
       route: '/do-you-need-to-change-someone-elses-name',
       next: '/relationship-name-change'
