@@ -2,9 +2,9 @@
 
 const app = require('../../../../apps/saa');
 const MultiSelectFollowUps = require('../../../../apps/saa/behaviours/multi-select-follow-ups');
-const multiSelectFollowUps = require('../../../../apps/saa/config/multi-select-follow-ups');
+const multiSelectFollowUpsConfig = require('../../../../apps/saa/config/multi-select-follow-ups-config');
 
-const uniqueSectionStartRoutes = multiSelectFollowUps.options
+const uniqueSectionStartRoutes = multiSelectFollowUpsConfig.options
   .reduce(
     (routes, option) =>
       routes.concat((option.sections || []).map(section => section.start)),
@@ -16,7 +16,7 @@ describe('SAA multi-select follow-up route config', () => {
   test('allows each dynamic section start to be reached from the multi-select entry point', () => {
     uniqueSectionStartRoutes.forEach(route => {
       expect(app.steps[route].prereqs).toContain(
-        multiSelectFollowUps.entryPoint
+        multiSelectFollowUpsConfig.entryPoint
       );
     });
   });
@@ -24,7 +24,7 @@ describe('SAA multi-select follow-up route config', () => {
   test('allows the multi-select entry point as a fallback back link for each dynamic section start', () => {
     uniqueSectionStartRoutes.forEach(route => {
       expect(app.steps[route].backLinks).toContain(
-        multiSelectFollowUps.entryPoint
+        multiSelectFollowUpsConfig.entryPoint
       );
     });
   });
@@ -61,10 +61,10 @@ describe('SAA multi-select follow-up route config', () => {
       }
 
       const Controller =
-        MultiSelectFollowUps(multiSelectFollowUps)(BaseController);
+        MultiSelectFollowUps(multiSelectFollowUpsConfig)(BaseController);
       const controller = new Controller({
-        route: multiSelectFollowUps.entryPoint,
-        next: multiSelectFollowUps.exitPoint
+        route: multiSelectFollowUpsConfig.entryPoint,
+        next: multiSelectFollowUpsConfig.exitPoint
       });
       const sessionValues = {};
       const req = {
@@ -72,7 +72,7 @@ describe('SAA multi-select follow-up route config', () => {
         params: {},
         form: {
           values: {
-            [multiSelectFollowUps.field]: selection
+            [multiSelectFollowUpsConfig.field]: selection
           }
         },
         sessionModel: {
@@ -116,13 +116,13 @@ describe('SAA multi-select follow-up route config', () => {
     }
 
     const Controller =
-      MultiSelectFollowUps(multiSelectFollowUps)(BaseController);
+      MultiSelectFollowUps(multiSelectFollowUpsConfig)(BaseController);
     const controller = new Controller({
-      route: multiSelectFollowUps.entryPoint,
-      next: multiSelectFollowUps.exitPoint
+      route: multiSelectFollowUpsConfig.entryPoint,
+      next: multiSelectFollowUpsConfig.exitPoint
     });
     const sessionValues = {
-      [multiSelectFollowUps.stateKey]: {
+      [multiSelectFollowUpsConfig.stateKey]: {
         selections: ['email-address', 'phone-number'],
         activeSections: ['email-address', 'phone-number'],
         activeRoutes: [
@@ -140,7 +140,7 @@ describe('SAA multi-select follow-up route config', () => {
       params: {},
       form: {
         values: {
-          [multiSelectFollowUps.field]: ['email-address', 'phone-number']
+          [multiSelectFollowUpsConfig.field]: ['email-address', 'phone-number']
         }
       },
       sessionModel: {
@@ -183,13 +183,13 @@ describe('SAA multi-select follow-up route config', () => {
     }
 
     const Controller =
-      MultiSelectFollowUps(multiSelectFollowUps)(BaseController);
+      MultiSelectFollowUps(multiSelectFollowUpsConfig)(BaseController);
     const controller = new Controller({
       route: '/do-you-need-to-change-someone-elses-name',
       next: '/relationship-name-change'
     });
     const sessionValues = {
-      [multiSelectFollowUps.stateKey]: {
+      [multiSelectFollowUpsConfig.stateKey]: {
         selections: ['name', 'date-of-birth'],
         activeSections: ['name', 'date-of-birth'],
         activeRoutes: [
@@ -229,7 +229,7 @@ describe('SAA multi-select follow-up route config', () => {
     });
 
     expect(
-      sessionValues[multiSelectFollowUps.stateKey].completedSections
+      sessionValues[multiSelectFollowUpsConfig.stateKey].completedSections
     ).toEqual(['name']);
     expect(controller.getNextStep(req, {})).toBe(
       '/updates/whose-date-of-birth'

@@ -3,9 +3,9 @@ const Summary = hof.components.summary;
 const CustomValidation = require('../common/behaviours/custom-validation');
 
 const MultiSelectFollowUps = require('./behaviours/multi-select-follow-ups');
-const multiSelectFollowUps = require('./config/multi-select-follow-ups');
+const multiSelectFollowUpsConfig = require('./config/multi-select-follow-ups-config');
 const multiSelectFollowUpsBehaviour =
-  MultiSelectFollowUps(multiSelectFollowUps);
+  MultiSelectFollowUps(multiSelectFollowUpsConfig);
 const baseUrl = '/updates';
 
 /*
@@ -290,7 +290,7 @@ const steps = {
  * journeys. Completion pages are the hand-off points back to the common
  * orchestrator.
  */
-multiSelectFollowUps.options
+multiSelectFollowUpsConfig.options
   .reduce(
     (routes, option) =>
       routes.concat(
@@ -318,7 +318,7 @@ multiSelectFollowUps.options
     );
   });
 
-multiSelectFollowUps.options
+multiSelectFollowUpsConfig.options
   .reduce(
     (routes, option) =>
       routes.concat((option.sections || []).map(section => section.start)),
@@ -332,11 +332,11 @@ multiSelectFollowUps.options
 
     steps[route].prereqs = [].concat(
       steps[route].prereqs || [],
-      multiSelectFollowUps.entryPoint
+      multiSelectFollowUpsConfig.entryPoint
     );
     steps[route].backLinks = [].concat(
       steps[route].backLinks || [],
-      multiSelectFollowUps.entryPoint
+      multiSelectFollowUpsConfig.entryPoint
     );
   });
 
