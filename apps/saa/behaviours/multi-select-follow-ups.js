@@ -366,6 +366,8 @@ const multiSelectFollowUps = SuperClass =>
   };
 module.exports = multiSelectFollowUps;
 
+// Export pure helpers for service route wiring and focused unit tests.
+// The behaviour itself remains the runtime integration point.
 module.exports.createState = createState;
 module.exports.getActiveSections = getActiveSections;
 module.exports.getActiveRoutes = getActiveRoutes;
