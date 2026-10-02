@@ -4,6 +4,8 @@ const CustomValidation = require('../common/behaviours/custom-validation');
 
 const MultiSelectFollowUps = require('./behaviours/multi-select-follow-ups');
 const multiSelectFollowUps = require('./config/multi-select-follow-ups');
+const multiSelectFollowUpsBehaviour =
+  MultiSelectFollowUps(multiSelectFollowUps);
 const baseUrl = '/updates';
 
 /*
@@ -41,8 +43,7 @@ const steps = {
   '/changes-to-contact-details': {
     fields: ['changes-to-contact-details'],
     // Entry point: calculate active follow-up sections from the checkbox field.
-    behaviours: [MultiSelectFollowUps],
-    multiSelectFollowUps,
+    behaviours: [multiSelectFollowUpsBehaviour],
     next: '/do-you-need-add-remove-dependant'
   },
   '/do-you-need-to-change-your-name': {
@@ -290,29 +291,53 @@ const steps = {
  * orchestrator.
  */
 multiSelectFollowUps.options
-  .reduce((routes, option) => routes.concat((option.sections || [])
-    .reduce((sectionRoutes, section) => sectionRoutes.concat(MultiSelectFollowUps.asArray(section.completeOn)
-      .map(completion => MultiSelectFollowUps.getCompletionRoute(completion))), [])), [])
+  .reduce(
+    (routes, option) =>
+      routes.concat(
+        (option.sections || []).reduce(
+          (sectionRoutes, section) =>
+            sectionRoutes.concat(
+              MultiSelectFollowUps.asArray(section.completeOn).map(completion =>
+                MultiSelectFollowUps.getCompletionRoute(completion)
+              )
+            ),
+          []
+        )
+      ),
+    []
+  )
   .filter((route, index, routes) => routes.indexOf(route) === index)
   .forEach(route => {
     if (!steps[route]) {
       return;
     }
 
-    steps[route].behaviours = [].concat(steps[route].behaviours || [], MultiSelectFollowUps);
-    steps[route].multiSelectFollowUps = multiSelectFollowUps;
+    steps[route].behaviours = [].concat(
+      steps[route].behaviours || [],
+      multiSelectFollowUpsBehaviour
+    );
   });
 
 multiSelectFollowUps.options
-  .reduce((routes, option) => routes.concat((option.sections || []).map(section => section.start)), [])
+  .reduce(
+    (routes, option) =>
+      routes.concat((option.sections || []).map(section => section.start)),
+    []
+  )
   .filter((route, index, routes) => routes.indexOf(route) === index)
   .forEach(route => {
     if (!steps[route]) {
       return;
     }
 
-    steps[route].prereqs = [].concat(steps[route].prereqs || [], multiSelectFollowUps.entryPoint);
-    steps[route].backLinks = [].concat(steps[route].backLinks || [], multiSelectFollowUps.entryPoint);
+    steps[route].prereqs = [].concat(
+      steps[route].prereqs || [],
+      multiSelectFollowUps.entryPoint
+    );
+    steps[route].backLinks = [].concat(
+      steps[route].backLinks || [],
+      multiSelectFollowUps.entryPoint
+    );
   });
 
 module.exports = {

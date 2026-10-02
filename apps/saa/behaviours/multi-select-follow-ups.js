@@ -26,7 +26,10 @@ const asArray = value => {
   }
 
   if (typeof value === 'string') {
-    return value.split(',').map(item => item.trim()).filter(Boolean);
+    return value
+      .split(',')
+      .map(item => item.trim())
+      .filter(Boolean);
   }
 
   return value ? [value] : [];
@@ -236,12 +239,10 @@ const withEditSuffix = (req, config, route, nextRoute) => {
   return isEdit && nextRoute !== config.exitPoint ? `${route}/edit` : route;
 };
 
-const multiSelectFollowUps = SuperClass =>
+const multiSelectFollowUps = behaviourConfig => SuperClass =>
   class MultiSelectFollowUps extends SuperClass {
     getMultiSelectFollowUpsConfig() {
-      return this.options.multiSelectFollowUps
-        ? normaliseConfig(this.options.multiSelectFollowUps)
-        : false;
+      return behaviourConfig ? normaliseConfig(behaviourConfig) : false;
     }
 
     saveValues(req, res, callback) {

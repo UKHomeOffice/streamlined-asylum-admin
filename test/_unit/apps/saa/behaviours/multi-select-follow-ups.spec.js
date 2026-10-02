@@ -2,7 +2,8 @@
 
 const MultiSelectFollowUps = require('../../../../../apps/saa/behaviours/multi-select-follow-ups');
 
-const { createState, getActiveRoutes, getActiveSections } = MultiSelectFollowUps;
+const { createState, getActiveRoutes, getActiveSections } =
+  MultiSelectFollowUps;
 
 const config = {
   field: 'changes',
@@ -82,26 +83,23 @@ const buildController = route => {
     }
   }
 
-  const Controller = MultiSelectFollowUps(BaseController);
+  const Controller = MultiSelectFollowUps(config)(BaseController);
 
   return new Controller({
     route,
-    next: '/fallback',
-    multiSelectFollowUps: config
+    next: '/fallback'
   });
 };
 
 describe('multi-select follow-ups behaviour', () => {
   test('builds active sections and routes using configured order', () => {
-    expect(getActiveSections(config, ['second', 'first']).map(section => section.id)).toEqual([
-      'first',
-      'second'
-    ]);
+    expect(
+      getActiveSections(config, ['second', 'first']).map(section => section.id)
+    ).toEqual(['first', 'second']);
 
-    expect(getActiveSections(config, 'second, first').map(section => section.id)).toEqual([
-      'first',
-      'second'
-    ]);
+    expect(
+      getActiveSections(config, 'second, first').map(section => section.id)
+    ).toEqual(['first', 'second']);
 
     expect(getActiveRoutes(config, ['second', 'first'])).toEqual([
       '/first-start',
@@ -114,22 +112,30 @@ describe('multi-select follow-ups behaviour', () => {
   });
 
   test('keeps completion only for sections that remain active', () => {
-    const state = createState(config, {
-      selections: ['first', 'second'],
-      activeSections: ['first', 'second'],
-      activeRoutes: [
-        '/first-start',
-        '/first-middle',
-        '/first-end',
-        '/second-start',
-        '/second-middle',
-        '/second-end'
-      ],
-      completedSections: ['first', 'second']
-    }, ['first']);
+    const state = createState(
+      config,
+      {
+        selections: ['first', 'second'],
+        activeSections: ['first', 'second'],
+        activeRoutes: [
+          '/first-start',
+          '/first-middle',
+          '/first-end',
+          '/second-start',
+          '/second-middle',
+          '/second-end'
+        ],
+        completedSections: ['first', 'second']
+      },
+      ['first']
+    );
 
     expect(state.activeSections).toEqual(['first']);
-    expect(state.activeRoutes).toEqual(['/first-start', '/first-middle', '/first-end']);
+    expect(state.activeRoutes).toEqual([
+      '/first-start',
+      '/first-middle',
+      '/first-end'
+    ]);
     expect(state.completedSections).toEqual(['first']);
     expect(state.inactiveSections).toEqual(['second']);
     expect(state.fieldsToUnset).toEqual(['second-answer']);
@@ -158,7 +164,9 @@ describe('multi-select follow-ups behaviour', () => {
     controller.saveValues(req, {}, err => {
       expect(err).toBeUndefined();
       expect(req.sessionModel.get('second-answer')).toBeUndefined();
-      expect(req.sessionModel.get('changes-follow-ups').activeSections).toEqual(['first']);
+      expect(req.sessionModel.get('changes-follow-ups').activeSections).toEqual(
+        ['first']
+      );
       expect(req.sessionModel.get('changes-follow-ups').activeRoutes).toEqual([
         '/first-start',
         '/first-middle',
@@ -216,7 +224,9 @@ describe('multi-select follow-ups behaviour', () => {
 
     controller.saveValues(req, {}, err => {
       expect(err).toBeUndefined();
-      expect(req.sessionModel.get('changes-follow-ups').completedSections).toEqual(['first']);
+      expect(
+        req.sessionModel.get('changes-follow-ups').completedSections
+      ).toEqual(['first']);
       expect(controller.getNextStep(req, {})).toBe('/updates/second-start');
       done();
     });
@@ -243,7 +253,9 @@ describe('multi-select follow-ups behaviour', () => {
 
     controller.saveValues(req, {}, err => {
       expect(err).toBeUndefined();
-      expect(req.sessionModel.get('changes-follow-ups').completedSections).toEqual(['second']);
+      expect(
+        req.sessionModel.get('changes-follow-ups').completedSections
+      ).toEqual(['second']);
       expect(controller.getNextStep(req, {})).toBe('/updates/exit');
       done();
     });
