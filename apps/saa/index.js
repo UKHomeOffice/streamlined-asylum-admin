@@ -1,5 +1,7 @@
 const hof = require('hof');
 const Summary = hof.components.summary;
+const CustomValidation = require('../common/behaviours/custom-validation');
+
 const MultiSelectFollowUps = require('./behaviours/multi-select-follow-ups');
 const multiSelectFollowUps = require('./config/multi-select-follow-ups');
 const baseUrl = '/updates';
@@ -194,9 +196,12 @@ const steps = {
     next: '/child-partner-name'
   },
   '/child-partner-name': {
+    behaviours: [CustomValidation],
+    fields: ['child-partner-given-name', 'child-partner-family-name'],
     next: '/child-partner-date-of-birth'
   },
   '/child-partner-date-of-birth': {
+    fields: ['child-partner-date-of-birth'],
     next: '/child-partner-nationality'
   },
   '/child-partner-nationality': {
@@ -229,6 +234,7 @@ const steps = {
     next: '/violent-upsetting-images'
   },
   '/violent-upsetting-images': {
+    fields: ['evidence-violent-or-upsetting'],
     next: '/check-your-answers-evidence'
   },
   '/check-your-answers-evidence': {

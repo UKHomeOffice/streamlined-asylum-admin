@@ -143,10 +143,11 @@
     "captionHeading": "Add or remove a child or partner"
   },
   "child-partner-name": {
-    "header": "Their name"
+    "header": "Their name",
+    "captionHeading": "Add or remove a child or partner"
   },
   "child-partner-date-of-birth": {
-    "header": "Their date of birth"
+    "captionHeading": "Add or remove a child or partner"
   },
   "child-partner-nationality": {
     "header": "Their country of nationality"
@@ -168,7 +169,9 @@
     "header": "Upload evidence to help your claim"
   },
   "violent-upsetting-images": {
-    "header": "Violent or upsetting images"
+    "header": "Violent or upsetting images",
+    "captionHeading": "Send evidence for your claim",
+    "doNotUpload": "You must not upload anything sexually explicit. We will not accept it."
   },
   "check-your-answers-evidence": {
     "header": "Check your answers"
