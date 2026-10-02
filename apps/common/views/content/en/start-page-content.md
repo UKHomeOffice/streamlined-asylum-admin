@@ -23,7 +23,7 @@ If you are claiming asylum, use this form to:
 
 You can also use this form if you are helping someone, for example an immigration advisor or a family member.
 
-Do not use this form if you need to <a href="https://www.gov.uk/claim-asylum" rel="noopener" target="_blank">start a claim</a> or already have a decision.
+Do not use this form if you need to <a href="https://www.gov.uk/claim-asylum">start a claim</a> or already have a decision.
 
 <a href="/before-you-start" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button">
     {{#t}}buttons.start-now{{/t}}
@@ -41,7 +41,7 @@ You will get a copy of the information you have sent us by email.
 
 Unless we need more information, we aim to reply within 2 weeks to confirm what we will do next.
 
-If we do not confirm within 2 weeks, you can <a href="https://www.gov.uk/guidance/how-to-email-the-asylum-central-communications-hub" rel="noopener" target="_blank">contact us by email</a>.
+If we do not confirm within 2 weeks, you can <a href="https://www.gov.uk/guidance/how-to-email-the-asylum-central-communications-hub">contact us by email</a>.
 
 <h2 id="if-you-need-advice">If you need advice</h2>
 

@@ -1,7 +1,10 @@
 {{<partials-page}}
-{{$page-content}}
+    {{$pageTitle}}
+        {{#t}}pages.start.header{{/t}} &ndash; {{#t}}journey.serviceName{{/t}} &ndash; GOV.UK
+    {{/pageTitle}}
+    {{$page-content}}
+    <h1 class="govuk-heading-l">{{#t}}pages.start.header{{/t}}</h1>
+    {{#markdown}}start-page-content{{/markdown}}
 
-{{#markdown}}start-page-content{{/markdown}}
-
-{{/page-content}}
+    {{/page-content}}
 {{/partials-page}}
