@@ -67,7 +67,7 @@ const buildSessionModel = values => ({
   }
 });
 
-const buildController = route => {
+const buildController = (route, behaviourConfig = config) => {
   class BaseController {
     constructor(options) {
       this.options = options;
@@ -87,7 +87,7 @@ const buildController = route => {
     }
   }
 
-  const Controller = MultiSelectFollowUps(config)(BaseController);
+  const Controller = MultiSelectFollowUps(behaviourConfig)(BaseController);
 
   return new Controller({
     route,
@@ -220,9 +220,9 @@ describe('multi-select follow-ups behaviour', () => {
 
     controller.saveValues(req, {}, err => {
       expect(err).toBeUndefined();
-      expect(
-        req.sessionModel.get('changes-follow-ups').sectionStartRoute
-      ).toBe('/first-start');
+      expect(req.sessionModel.get('changes-follow-ups').sectionStartRoute).toBe(
+        '/first-start'
+      );
       expect(
         req.sessionModel.get('changes-follow-ups').sectionStartBackLink
       ).toBe('/changes');
@@ -264,9 +264,9 @@ describe('multi-select follow-ups behaviour', () => {
       expect(req.sessionModel.get('changes-follow-ups').addedSections).toEqual([
         'second'
       ]);
-      expect(
-        req.sessionModel.get('changes-follow-ups').sectionStartRoute
-      ).toBe('/first-start');
+      expect(req.sessionModel.get('changes-follow-ups').sectionStartRoute).toBe(
+        '/first-start'
+      );
       expect(
         req.sessionModel.get('changes-follow-ups').sectionStartBackLink
       ).toBe('/changes');
@@ -328,9 +328,9 @@ describe('multi-select follow-ups behaviour', () => {
       expect(
         req.sessionModel.get('changes-follow-ups').lastCompletionRoute
       ).toBe('/first-end');
-      expect(
-        req.sessionModel.get('changes-follow-ups').sectionStartRoute
-      ).toBe('/second-start');
+      expect(req.sessionModel.get('changes-follow-ups').sectionStartRoute).toBe(
+        '/second-start'
+      );
       expect(
         req.sessionModel.get('changes-follow-ups').sectionStartBackLink
       ).toBe('/first-end');
@@ -457,6 +457,70 @@ describe('multi-select follow-ups behaviour', () => {
 
     expect(controller.locals(req, {})).toEqual({
       backLink: '/updates/first-end/edit'
+    });
+  });
+
+  test('section start page keeps its back link after a later section is reached', done => {
+    const threeSectionConfig = {
+      ...config,
+      options: config.options.concat({
+        value: 'third',
+        order: 30,
+        sections: [
+          {
+            id: 'third',
+            start: '/third-start',
+            completeOn: '/third-end',
+            routes: ['/third-start', '/third-end']
+          }
+        ]
+      })
+    };
+    const firstCompletionController = buildController(
+      '/first-end',
+      threeSectionConfig
+    );
+    const secondCompletionController = buildController(
+      '/second-end',
+      threeSectionConfig
+    );
+    const secondStartController = buildController(
+      '/second-start',
+      threeSectionConfig
+    );
+    const req = {
+      baseUrl: '/updates',
+      params: {},
+      form: {
+        options: { exitPoint: '/exit' },
+        values: {}
+      },
+      sessionModel: buildSessionModel({
+        'changes-follow-ups': {
+          selections: ['first', 'second', 'third'],
+          activeSections: ['first', 'second', 'third'],
+          completedSections: []
+        }
+      })
+    };
+
+    firstCompletionController.saveValues(req, {}, firstErr => {
+      expect(firstErr).toBeUndefined();
+      secondCompletionController.saveValues(req, {}, secondErr => {
+        expect(secondErr).toBeUndefined();
+        expect(req.sessionModel.get('changes-follow-ups')).toMatchObject({
+          sectionStartRoute: '/third-start',
+          sectionStartBackLink: '/second-end',
+          sectionStartBackLinks: {
+            '/second-start': '/first-end',
+            '/third-start': '/second-end'
+          }
+        });
+        expect(secondStartController.locals(req, {})).toEqual({
+          backLink: '/updates/first-end'
+        });
+        done();
+      });
     });
   });
 

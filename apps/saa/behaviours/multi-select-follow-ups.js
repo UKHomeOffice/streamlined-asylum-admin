@@ -267,11 +267,29 @@ const getEntryPointNextRoute = (req, config, activeSections, state) => {
   return incompleteSection?.start || config.exitPoint;
 };
 
-const withSectionStartBackLink = (state, config, nextRoute, backLinkRoute) => ({
-  ...state,
-  sectionStartRoute: nextRoute === config.exitPoint ? undefined : nextRoute,
-  sectionStartBackLink: nextRoute === config.exitPoint ? undefined : backLinkRoute
-});
+const withSectionStartBackLink = (state, config, nextRoute, backLinkRoute) => {
+  if (nextRoute === config.exitPoint) {
+    return {
+      ...state,
+      sectionStartRoute: undefined,
+      sectionStartBackLink: undefined
+    };
+  }
+
+  return {
+    ...state,
+    sectionStartRoute: nextRoute,
+    sectionStartBackLink: backLinkRoute,
+    sectionStartBackLinks: {
+      ...state.sectionStartBackLinks,
+      [nextRoute]: backLinkRoute
+    }
+  };
+};
+
+const getSectionStartBackLink = (state, route) =>
+  state.sectionStartBackLinks?.[route] ||
+  (state.sectionStartRoute === route ? state.sectionStartBackLink : undefined);
 
 const getCompletionNextRoute = (config, activeSections, state) =>
   nextIncompleteSection(activeSections, state)?.start || config.exitPoint;
@@ -388,18 +406,26 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
       }
 
       const state = req.sessionModel.get(config.stateKey) || {};
-      const isTrackedSectionStart =
-        state.sectionStartRoute === this.options.route;
+      const sectionStartBackLink = getSectionStartBackLink(
+        state,
+        this.options.route
+      );
+      const isTrackedSectionStart = Boolean(sectionStartBackLink);
 
       if (this.options.route !== config.exitPoint && !isTrackedSectionStart) {
         return locals;
       }
 
       const backLinkRoute = isTrackedSectionStart
-        ? state.sectionStartBackLink
+        ? sectionStartBackLink
         : state.lastCompletionRoute || config.entryPoint;
       const backLink = isTrackedSectionStart
-        ? withEditSuffix(req, config, withBaseUrl(req, backLinkRoute), backLinkRoute)
+        ? withEditSuffix(
+          req,
+          config,
+          withBaseUrl(req, backLinkRoute),
+          backLinkRoute
+        )
         : withBaseUrl(req, backLinkRoute);
 
       return {
@@ -425,12 +451,7 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
          * In edit mode, prioritise a newly added section so adding Email later
          * does not make the user re-enter already completed sections.
          */
-        nextRoute = getEntryPointNextRoute(
-          req,
-          config,
-          activeSections,
-          state
-        );
+        nextRoute = getEntryPointNextRoute(req, config, activeSections, state);
       } else if (
         getCompletingSections(activeSections, this.options.route, req).length
       ) {
