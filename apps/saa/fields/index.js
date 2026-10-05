@@ -74,5 +74,12 @@ module.exports = {
     legend: {
       className: ['govuk-!-font-weight-bold']
     }
+  },
+  'someone-on-claim-died': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    isPageHeading: true
   }
 };

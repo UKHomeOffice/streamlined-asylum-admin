@@ -271,7 +271,18 @@ const steps = {
     next: '/someone-on-claim-died'
   },
   '/someone-on-claim-died': {
-    next: '/about-who-has-died'
+    fields: ['someone-on-claim-died'],
+    forks: [
+      {
+        target: '/about-who-has-died',
+        continueOnEdit: true,
+        condition: {
+          field: 'someone-on-claim-died',
+          value: 'yes'
+        }
+      }
+    ],
+    next: '/something-else'
   },
   '/about-who-has-died': {
     next: '/main-claimant-died'
