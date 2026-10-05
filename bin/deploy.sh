@@ -40,48 +40,7 @@ compute_branch_slug_max_length() {
 sanitize_branch_name() {
   local raw_branch="$1"
   local max_length="${2:-40}"
-  local dependabot_payload
-  local dependabot_dependency
   local sanitized_branch
-
-  # Rewrite Dependabot npm/yarn base-branch update branches to a shorter, meaningful slug.
-  # Example: dependabot-npm_and_yarn-master-eslint-10.4.1 -> dependabot-pr-eslint
-  if [[ "$raw_branch" =~ ^dependabot[-/]npm_and_yarn[-/](master|main)[-/](.+)$ ]]; then
-    dependabot_payload="${BASH_REMATCH[2]}"
-    dependabot_payload=$(echo "$dependabot_payload" | tr '[:upper:]' '[:lower:]' | tr '/' '-')
-    dependabot_payload=$(echo "$dependabot_payload" | sed -E 's/[^a-z0-9-]+/-/g; s/^-+//; s/-+$//; s/-+/-/g')
-
-    if [[ -n "$dependabot_payload" ]]; then
-      dependabot_dependency="$dependabot_payload"
-
-      # Trim trailing version token if present (e.g. package-1-2-3).
-      if [[ "$dependabot_payload" =~ ^(.+)-([0-9][0-9a-z-]*)$ ]]; then
-        dependabot_dependency="${BASH_REMATCH[1]}"
-      # Trim trailing git hash token if present (e.g. package-b4f7b4df17).
-      elif [[ "$dependabot_payload" =~ ^(.+)-([a-f0-9]{7,40})$ ]]; then
-        dependabot_dependency="${BASH_REMATCH[1]}"
-      fi
-
-      dependabot_dependency=$(echo "$dependabot_dependency" | sed -E 's/^-+//; s/-+$//; s/-+/-/g')
-      if [[ -z "$dependabot_dependency" ]]; then
-        dependabot_dependency="dependency"
-      fi
-
-      sanitized_branch="dependabot-pr-${dependabot_dependency}"
-    fi
-  fi
-
-  if [[ -n "$sanitized_branch" ]]; then
-    sanitized_branch="${sanitized_branch:0:max_length}"
-    sanitized_branch=$(echo "$sanitized_branch" | sed -E 's/-+$//')
-
-    if [[ -z "$sanitized_branch" ]]; then
-      sanitized_branch='branch'
-    fi
-
-    echo "$sanitized_branch"
-    return
-  fi
 
   sanitized_branch=$(echo "$raw_branch" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//; s/-+/-/g')
 
