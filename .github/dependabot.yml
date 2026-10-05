@@ -16,15 +16,13 @@ updates:
       prefix: "deps"
       template: "{prefix}/{name}"
       separator: "-"
-      word-separator: "-"
-      branch-name-case: "lowercase"
-      max-length: 60
+      max-length: 27
     groups:
-      hof-dependency:
+      hof:
         applies-to: version-updates
         patterns:
           - "hof"
-      patch-and-minor:
+      patch-minor:
         applies-to: version-updates
         patterns:
           - "*"
