@@ -24,7 +24,9 @@ const steps = {
   '/cannot-use-form': {
     // end of user journey
   },
-  '/check-your-email': {}
+  '/check-your-email': {
+    behaviours: [SendVerificationEmail]
+  }
 };
 const pages = {
   '/accessibility': 'static/accessibility'

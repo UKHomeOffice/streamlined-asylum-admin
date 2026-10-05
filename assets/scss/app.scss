@@ -283,3 +283,31 @@ pre.looped-records {
 .govuk-fieldset__heading {
   font-family: "GDS Transport", arial, sans-serif;
 }
+
+/* Links instead of regular buttons */
+.button-as-link .govuk-button {
+  background: none !important;
+  border: none;
+  padding: 0 !important;
+  font-family: inherit;
+  line-height: 25px;
+  -webkit-box-shadow: 0 0 0 #003618;
+  box-shadow: 0 0 0 #003618;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-bottom: 1em;
+  color: #1d70b8;
+  font-size: 1em;
+  display: inline !important;
+  max-width: 138px;
+  margin-right: -5px;
+}
+
+.button-as-link .govuk-button:active {
+  color: black;
+  line-height: 23px;
+  border-bottom-style: solid;
+  border-bottom-color: black;
+  border-bottom-width: 4px;
+  text-decoration: none;
+}

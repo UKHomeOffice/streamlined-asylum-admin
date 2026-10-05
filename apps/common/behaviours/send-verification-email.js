@@ -1,6 +1,7 @@
 'use strict';
 
 const Notify = require('hof/components/notify/notify');
+const { normaliseEmail } = require('../../../utils/index');
 const { govukNotify, env, auth } = require('../../../config');
 const notifyApiKey = govukNotify.notifyApiKey;
 const templateId = govukNotify.emailTemplates.userVerifyEmailTemplateId;
@@ -34,7 +35,15 @@ const sendVerificationEmail = superclass =>
     }
 
     async saveValues(req, res, next) {
-      const email = req.form.values['user-email'];
+      const email =
+        normaliseEmail(req.form.values['user-email']) ||
+        normaliseEmail(req.sessionModel.get('user-email'));
+
+      if (!email) {
+        const errorMsg = 'Email address is required';
+        logger.error(errorMsg);
+        return next(errorMsg);
+      }
 
       if (this.skipEmailVerification(email)) {
         return res.redirect(`${auth.continueAppPath}?token=skip`);

@@ -65,6 +65,9 @@ describe('send verification email behaviour', () => {
           'user-email': 'person@example.com'
         }
       },
+      sessionModel: {
+        get: jest.fn()
+      },
       get: jest.fn().mockReturnValue('example.com')
     };
     baseSaveValues.mockClear();
@@ -102,6 +105,45 @@ describe('send verification email behaviour', () => {
     );
     expect(log.log).toHaveBeenCalledWith('info', 'verification email sent to user');
     expect(next).toHaveBeenCalledWith();
+  });
+
+  test('should lower case the form email before saving the token and sending the email', async () => {
+    req.form.values['user-email'] = 'PERSON@EXAMPLE.COM';
+
+    await behaviour.saveValues(req, res, next);
+
+    expect(tokenGenerator.save).toHaveBeenCalledWith('person@example.com');
+    expect(notifyClient.sendEmail).toHaveBeenCalledWith(
+      'verify-template-id',
+      'person@example.com',
+      expect.any(Object)
+    );
+    expect(req.sessionModel.get).not.toHaveBeenCalled();
+  });
+
+  test('should use a lower case session email when the form email is missing', async () => {
+    req.form.values['user-email'] = '';
+    req.sessionModel.get.mockReturnValue('SESSION@EXAMPLE.COM');
+
+    await behaviour.saveValues(req, res, next);
+
+    expect(req.sessionModel.get).toHaveBeenCalledWith('user-email');
+    expect(tokenGenerator.save).toHaveBeenCalledWith('session@example.com');
+    expect(notifyClient.sendEmail).toHaveBeenCalledWith(
+      'verify-template-id',
+      'session@example.com',
+      expect.any(Object)
+    );
+  });
+
+  test('should pass an error to next when no email is available', async () => {
+    req.form.values['user-email'] = '';
+
+    await behaviour.saveValues(req, res, next);
+
+    expect(log.error).toHaveBeenCalledWith('Email address is required');
+    expect(next).toHaveBeenCalledWith('Email address is required');
+    expect(baseSaveValues).not.toHaveBeenCalled();
   });
 
   test('should pass superclass save errors to next', async () => {

@@ -1,4 +1,4 @@
-const { sanitiseFilename } = require('../../../utils/index');
+const { sanitiseFilename, normaliseEmail } = require('../../../utils/index');
 
 describe('SAA utilities tests', () => {
   test('should redact the middle of a filename while keeping the start and extension visible', () => {
@@ -26,5 +26,19 @@ describe('SAA utilities tests', () => {
   test('should return undefined when no filename is provided', () => {
     expect(sanitiseFilename(undefined)).toBeUndefined();
     expect(sanitiseFilename(null)).toBeUndefined();
+  });
+
+  test('should lower case an email address', () => {
+    expect(normaliseEmail('PERSON@EXAMPLE.COM')).toBe('person@example.com');
+  });
+
+  test('should return an empty string when an email address is not provided', () => {
+    expect(normaliseEmail(undefined)).toBe('');
+    expect(normaliseEmail(null)).toBe('');
+    expect(normaliseEmail('')).toBe('');
+  });
+
+  test('should return an empty string when the email address is not a string', () => {
+    expect(normaliseEmail(123)).toBe('');
   });
 });

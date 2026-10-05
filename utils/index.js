@@ -21,6 +21,14 @@ const sanitiseFilename = filename => {
   )}`;
 };
 
+const normaliseEmail = email => {
+  if (!email || typeof email !== 'string') {
+    return '';
+  }
+  return email.toLowerCase();
+};
+
 module.exports = {
-  sanitiseFilename
+  sanitiseFilename,
+  normaliseEmail
 };

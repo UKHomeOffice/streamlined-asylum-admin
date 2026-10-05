@@ -7,7 +7,8 @@ const CheckEmailToken = require('./behaviours/check-email-token');
 const steps = {
   '/continue-to-form': {
     behaviours: [CheckEmailToken],
-    next: '/which-form'
+    next: '/which-form',
+    backLink: false
   },
   '/which-form': {
     next: '/information-given'
