@@ -29,6 +29,14 @@ describe('SAA multi-select follow-up route config', () => {
     });
   });
 
+  test('attaches the multi-select behaviour to each dynamic section start', () => {
+    uniqueSectionStartRoutes.forEach(route => {
+      expect(app.steps[route].behaviours).toEqual(
+        expect.arrayContaining([expect.any(Function)])
+      );
+    });
+  });
+
   test('does not force later dynamic section starts back to the multi-select entry point', () => {
     expect(app.steps['/your-phone-number'].backLink).toBeUndefined();
   });

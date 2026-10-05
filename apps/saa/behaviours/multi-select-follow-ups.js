@@ -254,6 +254,28 @@ const withEditSuffix = (req, config, route, nextRoute) => {
   return isEdit && nextRoute !== config.exitPoint ? `${route}/edit` : route;
 };
 
+const getEntryPointNextRoute = (req, config, activeSections, state) => {
+  const addedSection = asArray(state.addedSections)
+    .map(section => getSectionById(activeSections, section))
+    .find(Boolean);
+  const incompleteSection = nextIncompleteSection(activeSections, state);
+
+  if (req.params?.action === 'edit') {
+    return (addedSection || incompleteSection)?.start || config.exitPoint;
+  }
+
+  return incompleteSection?.start || config.exitPoint;
+};
+
+const withSectionStartBackLink = (state, config, nextRoute, backLinkRoute) => ({
+  ...state,
+  sectionStartRoute: nextRoute === config.exitPoint ? undefined : nextRoute,
+  sectionStartBackLink: nextRoute === config.exitPoint ? undefined : backLinkRoute
+});
+
+const getCompletionNextRoute = (config, activeSections, state) =>
+  nextIncompleteSection(activeSections, state)?.start || config.exitPoint;
+
 const multiSelectFollowUps = behaviourConfig => SuperClass =>
   class MultiSelectFollowUps extends SuperClass {
     getMultiSelectFollowUpsConfig() {
@@ -295,6 +317,18 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
             req.form.values[config.field]
           );
 
+          state = withSectionStartBackLink(
+            state,
+            config,
+            getEntryPointNextRoute(
+              req,
+              config,
+              getActiveSections(config, state.selections),
+              state
+            ),
+            config.entryPoint
+          );
+
           if (state.fieldsToUnset.length) {
             req.sessionModel.unset(state.fieldsToUnset);
           }
@@ -315,18 +349,29 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
             req
           );
 
-          state = {
-            ...previousState,
-            completedSections: getCompletedSections(
-              previousState,
-              completingSections
-            ),
-            lastCompletionRoute: getLastCompletionRoute(
-              previousState,
-              this.options.route,
-              completingSections
-            )
-          };
+          if (completingSections.length) {
+            state = {
+              ...previousState,
+              completedSections: getCompletedSections(
+                previousState,
+                completingSections
+              ),
+              lastCompletionRoute: getLastCompletionRoute(
+                previousState,
+                this.options.route,
+                completingSections
+              )
+            };
+
+            state = withSectionStartBackLink(
+              state,
+              config,
+              getCompletionNextRoute(config, activeSections, state),
+              this.options.route
+            );
+          } else {
+            state = previousState;
+          }
         }
 
         req.sessionModel.set(config.stateKey, state);
@@ -338,12 +383,21 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
       const locals = super.locals(req, res);
       const config = this.getMultiSelectFollowUpsConfig();
 
-      if (!config || this.options.route !== config.exitPoint) {
+      if (!config) {
         return locals;
       }
 
       const state = req.sessionModel.get(config.stateKey) || {};
-      const backLinkRoute = state.lastCompletionRoute || config.entryPoint;
+      const isTrackedSectionStart =
+        state.sectionStartRoute === this.options.route;
+
+      if (this.options.route !== config.exitPoint && !isTrackedSectionStart) {
+        return locals;
+      }
+
+      const backLinkRoute = isTrackedSectionStart
+        ? state.sectionStartBackLink
+        : state.lastCompletionRoute || config.entryPoint;
 
       return {
         ...locals,
@@ -364,18 +418,16 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
 
       if (this.options.route === config.entryPoint) {
         /*
-         * After the multi-select page, prioritise a newly added section. That is
-         * the edit-journey behaviour users expect: adding Email later should send
-         * them to the Email section rather than making them re-enter already
-         * completed sections.
+         * After the multi-select page, follow configured order in normal journeys.
+         * In edit mode, prioritise a newly added section so adding Email later
+         * does not make the user re-enter already completed sections.
          */
-        const addedSection = asArray(state.addedSections)
-          .map(section => getSectionById(activeSections, section))
-          .find(Boolean);
-        const incompleteSection = nextIncompleteSection(activeSections, state);
-
-        nextRoute =
-          (addedSection || incompleteSection)?.start || config.exitPoint;
+        nextRoute = getEntryPointNextRoute(
+          req,
+          config,
+          activeSections,
+          state
+        );
       } else if (
         getCompletingSections(activeSections, this.options.route, req).length
       ) {

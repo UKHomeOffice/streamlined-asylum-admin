@@ -220,6 +220,12 @@ describe('multi-select follow-ups behaviour', () => {
 
     controller.saveValues(req, {}, err => {
       expect(err).toBeUndefined();
+      expect(
+        req.sessionModel.get('changes-follow-ups').sectionStartRoute
+      ).toBe('/first-start');
+      expect(
+        req.sessionModel.get('changes-follow-ups').sectionStartBackLink
+      ).toBe('/changes');
       expect(req.sessionModel.get('second-answer')).toBeUndefined();
       expect(req.sessionModel.get('changes-follow-ups').activeSections).toEqual(
         ['first']
@@ -230,6 +236,41 @@ describe('multi-select follow-ups behaviour', () => {
         '/first-end'
       ]);
       expect(controller.getNextStep(req, {})).toBe('/updates/first-start/edit');
+      done();
+    });
+  });
+
+  test('entry route follows configured order in non-edit journeys when a later section is newly added', done => {
+    const controller = buildController('/changes');
+    const req = {
+      baseUrl: '/updates',
+      params: {},
+      form: {
+        options: { exitPoint: '/exit' },
+        values: { changes: ['first', 'second'] }
+      },
+      sessionModel: buildSessionModel({
+        'changes-follow-ups': {
+          selections: ['first'],
+          activeSections: ['first'],
+          activeRoutes: ['/first-start', '/first-middle', '/first-end'],
+          completedSections: []
+        }
+      })
+    };
+
+    controller.saveValues(req, {}, err => {
+      expect(err).toBeUndefined();
+      expect(req.sessionModel.get('changes-follow-ups').addedSections).toEqual([
+        'second'
+      ]);
+      expect(
+        req.sessionModel.get('changes-follow-ups').sectionStartRoute
+      ).toBe('/first-start');
+      expect(
+        req.sessionModel.get('changes-follow-ups').sectionStartBackLink
+      ).toBe('/changes');
+      expect(controller.getNextStep(req, {})).toBe('/updates/first-start');
       done();
     });
   });
@@ -287,6 +328,12 @@ describe('multi-select follow-ups behaviour', () => {
       expect(
         req.sessionModel.get('changes-follow-ups').lastCompletionRoute
       ).toBe('/first-end');
+      expect(
+        req.sessionModel.get('changes-follow-ups').sectionStartRoute
+      ).toBe('/second-start');
+      expect(
+        req.sessionModel.get('changes-follow-ups').sectionStartBackLink
+      ).toBe('/first-end');
       expect(controller.getNextStep(req, {})).toBe('/updates/second-start');
       done();
     });
@@ -326,6 +373,76 @@ describe('multi-select follow-ups behaviour', () => {
 
     expect(controller.locals(req, {})).toEqual({
       backLink: '/updates/changes'
+    });
+  });
+
+  test('section start page back link falls back to the entry page', () => {
+    const controller = buildController('/second-start');
+    const req = {
+      baseUrl: '/updates',
+      sessionModel: buildSessionModel({
+        'changes-follow-ups': {
+          selections: ['second'],
+          activeSections: ['second'],
+          completedSections: [],
+          sectionStartRoute: '/second-start',
+          sectionStartBackLink: '/changes'
+        }
+      })
+    };
+
+    expect(controller.locals(req, {})).toEqual({
+      backLink: '/updates/changes'
+    });
+  });
+
+  test('section start page back link returns to the previous completion route', () => {
+    const controller = buildController('/second-start');
+    const req = {
+      baseUrl: '/updates',
+      sessionModel: buildSessionModel({
+        'changes-follow-ups': {
+          selections: ['first', 'second'],
+          activeSections: ['first', 'second'],
+          completedSections: ['first'],
+          lastCompletionRoute: '/first-end',
+          sectionStartRoute: '/second-start',
+          sectionStartBackLink: '/first-end'
+        }
+      })
+    };
+
+    expect(controller.locals(req, {})).toEqual({
+      backLink: '/updates/first-end'
+    });
+  });
+
+  test('section start page save does not change orchestration state', done => {
+    const controller = buildController('/second-start');
+    const previousState = {
+      selections: ['first', 'second'],
+      activeSections: ['first', 'second'],
+      completedSections: ['first'],
+      lastCompletionRoute: '/first-end',
+      sectionStartRoute: '/second-start',
+      sectionStartBackLink: '/first-end'
+    };
+    const req = {
+      baseUrl: '/updates',
+      params: {},
+      form: {
+        options: { exitPoint: '/exit' },
+        values: { 'second-answer': 'yes' }
+      },
+      sessionModel: buildSessionModel({
+        'changes-follow-ups': previousState
+      })
+    };
+
+    controller.saveValues(req, {}, err => {
+      expect(err).toBeUndefined();
+      expect(req.sessionModel.get('changes-follow-ups')).toEqual(previousState);
+      done();
     });
   });
 

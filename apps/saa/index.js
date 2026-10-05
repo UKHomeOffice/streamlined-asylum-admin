@@ -357,6 +357,10 @@ getConfiguredStartRoutes(multiSelectFollowUpsConfig)
       return;
     }
 
+    steps[route].behaviours = [].concat(
+      steps[route].behaviours || [],
+      multiSelectFollowUpsBehaviour
+    );
     steps[route].prereqs = [].concat(
       steps[route].prereqs || [],
       multiSelectFollowUpsConfig.entryPoint
