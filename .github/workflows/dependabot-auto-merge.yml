@@ -36,11 +36,29 @@ jobs:
             core.info(`Adapting metadata branch context: ${branch} -> ${event.pull_request.head.ref}`);
             core.setOutput('path', eventPath);
 
+      - name: Download verified Dependabot metadata action
+        uses: actions/checkout@v5
+        with:
+          repository: dependabot/fetch-metadata
+          ref: 25dd0e34f4fe68f24cc83900b1fe3fe149efef98
+          path: .dependabot-fetch-metadata
+          persist-credentials: false
+
+      - name: Set up metadata action runtime
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+
       - name: Read Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v3
+        shell: bash
         env:
-          GITHUB_EVENT_PATH: ${{ steps.metadata-event.outputs.path }}
+          DEPENDABOT_EVENT_PATH: ${{ steps.metadata-event.outputs.path }}
+          INPUT_GITHUB-TOKEN: ${{ github.token }}
+          INPUT_SKIP-COMMIT-VERIFICATION: 'false'
+          INPUT_SKIP-VERIFICATION: 'false'
+        # The runner restores GITHUB_EVENT_PATH for each step; override it inside the process.
+        run: GITHUB_EVENT_PATH="$DEPENDABOT_EVENT_PATH" node .dependabot-fetch-metadata/dist/index.js
 
       - name: Generate approver App token
         id: app-token
