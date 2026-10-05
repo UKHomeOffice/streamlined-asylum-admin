@@ -41,7 +41,7 @@
     "required": "Select a file",
     "maxFileSize": "File size must be 25MB or smaller",
     "emptyFile": "The selected file is empty",
-    "fileType": "File must be a document (.doc, .docx, .pdf, .rtf, .odt, .txt) or image (.png, .jpeg, .jpg)",
+    "fileType": "File must be a document (.doc, .docx, .pdf, .rtf, .txt, .odt) or image (.jpeg, .jpg, .png)",
     "supportingEvidenceLimit": "You can only upload up to {{supportingEvidenceLimit}} files. Remove a file before uploading another",
     "isDuplicateFileName": "A file with this name has already been uploaded"
   }

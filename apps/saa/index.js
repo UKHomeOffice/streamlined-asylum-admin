@@ -3,8 +3,8 @@ const Summary = hof.components.summary;
 const config = require('../../config');
 
 const CustomValidation = require('../common/behaviours/custom-validation');
-const RemoveDocument = require('../common/behaviours/remove-document');
-const SaveDocument = require('../common/behaviours/save-document');
+const RemoveDocument = require('./behaviours/remove-document');
+const SaveDocument = require('./behaviours/save-document');
 
 const documentUploadStep = category => ({
   behaviours: [
@@ -234,7 +234,7 @@ const steps = {
     next: '/upload-supporting-evidence'
   },
   '/upload-supporting-evidence': {
-    ...documentUploadStep('supporting-evidence'),
+    ...documentUploadStep('documents-help-your-claim'),
     next: '/violent-upsetting-images'
   },
   '/violent-upsetting-images': {

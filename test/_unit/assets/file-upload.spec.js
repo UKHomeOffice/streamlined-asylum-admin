@@ -33,7 +33,7 @@ const createDocument = file => {
         changeHandler = handler;
       }
     }),
-    getAttribute: jest.fn().mockReturnValue('supporting-evidence'),
+    getAttribute: jest.fn().mockReturnValue('documents-help-your-claim'),
     setAttribute: jest.fn(),
     removeAttribute: jest.fn()
   };

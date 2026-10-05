@@ -15,7 +15,7 @@ module.exports = {
     'application/vnd.oasis.opendocument.text'
   ],
   documentCategories: {
-    'supporting-evidence': {
+    'documents-help-your-claim': {
       limit: 6,
       limitValidationError: 'supportingEvidenceLimit'
     }

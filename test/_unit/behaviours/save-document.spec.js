@@ -8,7 +8,7 @@ jest.mock('../../../utils/file-upload', () => jest.fn().mockImplementation(() =>
   toJSON: mockUploadToJSON
 })));
 
-const SaveDocument = require('../../../apps/common/behaviours/save-document');
+const SaveDocument = require('../../../apps/saa/behaviours/save-document');
 const FileUpload = require('../../../utils/file-upload');
 const uploadConfig = require('../../../assets/js/file-upload-config');
 
@@ -47,7 +47,7 @@ class BaseBehaviour {
   }
 }
 
-const Behaviour = SaveDocument('supporting-evidence', 'file-upload')(BaseBehaviour);
+const Behaviour = SaveDocument('documents-help-your-claim', 'file-upload')(BaseBehaviour);
 
 const createRequest = (overrides = {}) => ({
   baseUrl: '/updates',
@@ -246,7 +246,7 @@ describe('save document behaviour', () => {
   });
 
   test('rejects uploads when the category limit is reached', () => {
-    const categoryLimit = uploadConfig.documentCategories['supporting-evidence'].limit;
+    const categoryLimit = uploadConfig.documentCategories['documents-help-your-claim'].limit;
     const req = createRequest({
       files: {
         'file-upload': {
@@ -316,7 +316,7 @@ describe('save document behaviour', () => {
 
     expect(FileUpload).toHaveBeenCalledWith(file);
     expect(mockUploadSave).toHaveBeenCalled();
-    expect(req.sessionModel.set).toHaveBeenCalledWith('supporting-evidence', [
+    expect(req.sessionModel.set).toHaveBeenCalledWith('documents-help-your-claim', [
       existingDocument,
       { id: 'upload-id', name: 'evidence.pdf' }
     ]);

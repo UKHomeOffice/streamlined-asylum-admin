@@ -1,6 +1,6 @@
 'use strict';
 
-const RemoveDocument = require('../../../apps/common/behaviours/remove-document');
+const RemoveDocument = require('../../../apps/saa/behaviours/remove-document');
 
 const baseConfigure = jest.fn();
 
@@ -10,7 +10,7 @@ class BaseBehaviour {
   }
 }
 
-const Behaviour = RemoveDocument('supporting-evidence')(BaseBehaviour);
+const Behaviour = RemoveDocument('documents-help-your-claim')(BaseBehaviour);
 
 const createRequest = query => ({
   baseUrl: '/updates',
@@ -40,7 +40,7 @@ describe('remove document behaviour', () => {
 
     behaviour.configure(req, res, jest.fn());
 
-    expect(req.sessionModel.set).toHaveBeenCalledWith('supporting-evidence', [
+    expect(req.sessionModel.set).toHaveBeenCalledWith('documents-help-your-claim', [
       { id: 'keep-me', name: 'keep.pdf' }
     ]);
     expect(res.redirect).toHaveBeenCalledWith('/updates/upload-supporting-evidence');
@@ -52,7 +52,7 @@ describe('remove document behaviour', () => {
 
     behaviour.configure(req, { redirect: jest.fn() }, jest.fn());
 
-    expect(req.sessionModel.set).toHaveBeenCalledWith('supporting-evidence', []);
+    expect(req.sessionModel.set).toHaveBeenCalledWith('documents-help-your-claim', []);
   });
 
   test('delegates configuration when no document is selected', () => {
