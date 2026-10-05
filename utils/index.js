@@ -21,13 +21,12 @@ const sanitiseFilename = filename => {
   )}`;
 };
 
-const removeWhiteSpace = value => value?.replace(/\s+/g, '');
+const removeWhiteSpace = value => value?.replaceAll(/\s+/g, '');
 
 const validUniqueApplicationNumber = uanValue => {
-  if(!uanValue) return null;
+  if (!uanValue) { return null; }
   const uanNoWhitespace = removeWhiteSpace(uanValue);
-  const isValidUan = uanNoWhitespace.match(/^\d(?:-?\d){15,19}$/);
-  return isValidUan;
+  return uanNoWhitespace.match(/^\d(?:-?\d){15,19}$/);
 };
 
 module.exports = {
