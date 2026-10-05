@@ -15,7 +15,8 @@ const steps = {
     next: '/email-address'
   },
   '/email-address': {
-    // Decide whether this flow should find an existing record or create one before sending a magic link.
+    // Once the schema is finalised, on each common form submission reaching check-your-email,
+    // create a new record if no record matches the combination of email, UAN and date of birth.
     behaviours: [SendVerificationEmail],
     fields: ['user-email'],
     next: '/check-your-email'

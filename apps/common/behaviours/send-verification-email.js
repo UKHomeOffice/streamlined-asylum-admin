@@ -31,7 +31,11 @@ const sendEmail = async (req, email, host, token) => {
 const sendVerificationEmail = superclass =>
   class extends superclass {
     skipEmailVerification(email) {
-      return auth.allowSkip && email === auth.skipEmail;
+      return (
+        auth.allowSkip &&
+        auth.skipEmail &&
+        email === normaliseEmail(auth.skipEmail)
+      );
     }
 
     async saveValues(req, res, next) {

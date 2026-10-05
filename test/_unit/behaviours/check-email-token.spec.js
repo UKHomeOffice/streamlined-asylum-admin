@@ -53,7 +53,7 @@ describe('check email token behaviour', () => {
   test('should skip token validation when skip auth is allowed', async () => {
     req.query = {
       token: 'skip',
-      email: 'skip@example.com'
+      email: 'someone-else@example.com'
     };
 
     await behaviour.getValues(req, res, next);
@@ -66,16 +66,20 @@ describe('check email token behaviour', () => {
     expect(baseGetValues).toHaveBeenCalledWith(req, res, next);
   });
 
-  test('should continue when the session already has a valid token', async () => {
-    req.sessionModel.get.mockReturnValue(true);
+  test('should continue with the stored session email when the session already has a valid token', async () => {
+    req.query.email = 'someone-else@example.com';
+    req.sessionModel.get.mockImplementation(
+      key =>
+        ({
+          'user-email': 'person@example.com',
+          'valid-token': true
+        })[key]
+    );
 
     await behaviour.getValues(req, res, next);
 
     expect(getToken.read).not.toHaveBeenCalled();
-    expect(req.sessionModel.set).toHaveBeenCalledWith(
-      'user-email',
-      'skip@example.com'
-    );
+    expect(req.sessionModel.set).not.toHaveBeenCalled();
     expect(baseGetValues).toHaveBeenCalledWith(req, res, next);
   });
 

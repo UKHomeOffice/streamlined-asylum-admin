@@ -9,7 +9,7 @@ jest.mock('../../../config', () => ({
   auth: {
     continueAppPath: '/check-your-email',
     allowSkip: true,
-    skipEmail: 'skip@example.com'
+    skipEmail: 'SKIP@EXAMPLE.COM'
   }
 }));
 

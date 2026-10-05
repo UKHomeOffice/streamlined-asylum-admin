@@ -5,12 +5,17 @@ const checkEmailToken = superclass =>
   class extends superclass {
     async getValues(req, res, next) {
       const token = req.query.token;
-      const email = req.query.email || auth.skipEmail;
+      const sessionEmail = req.sessionModel.get('user-email');
 
-      const skipEmailAuth = token === 'skip' && auth.allowSkip && email;
+      const skipEmailAuth =
+        token === 'skip' && auth.allowSkip && auth.skipEmail;
       const validEmailToken = req.sessionModel.get('valid-token') === true;
-      if (skipEmailAuth || validEmailToken) {
-        req.sessionModel.set('user-email', email);
+      if (skipEmailAuth) {
+        req.sessionModel.set('user-email', auth.skipEmail);
+        return super.getValues(req, res, next);
+      }
+
+      if (validEmailToken && sessionEmail) {
         return super.getValues(req, res, next);
       }
 
