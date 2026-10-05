@@ -36,5 +36,8 @@
   },
   "evidence-violent-or-upsetting": {
     "required": "Select if the evidence contains violent or upsetting images"
+  },
+  "someone-on-claim-died": {
+    "required": "Tell us if someone on your claim has died"
   }
 }
