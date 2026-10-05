@@ -68,6 +68,17 @@
       }
     }
   },
+  "someone-on-claim-died": {
+    "legend": "Do you need to tell us someone on your claim has died?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
   "file-upload": {
     "label": "Upload a file",
     "no-files-uploaded": "No files uploaded",
