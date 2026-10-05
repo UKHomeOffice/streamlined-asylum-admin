@@ -226,6 +226,18 @@ const sectionCompletesOnRoute = (section, route, req) =>
 const getCompletingSections = (sections, route, req) =>
   sections.filter(section => sectionCompletesOnRoute(section, route, req));
 
+const getSectionIds = sections => sections.map(section => section.id);
+
+const getCompletedSections = (previousState, completingSections) =>
+  unique(
+    asArray(previousState.completedSections).concat(
+      getSectionIds(completingSections)
+    )
+  );
+
+const getLastCompletionRoute = (previousState, route, completingSections) =>
+  completingSections.length ? route : previousState.lastCompletionRoute;
+
 const withBaseUrl = (req, route) => {
   const baseUrl = req.baseUrl === '/' ? '' : req.baseUrl || '';
   return `${baseUrl.replace(/\/$/, '')}/${route.replace(/^\//, '')}`;
@@ -305,14 +317,15 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
 
           state = {
             ...previousState,
-            completedSections: unique(
-              asArray(previousState.completedSections).concat(
-                completingSections.map(section => section.id)
-              )
+            completedSections: getCompletedSections(
+              previousState,
+              completingSections
             ),
-            lastCompletionRoute: completingSections.length
-              ? this.options.route
-              : previousState.lastCompletionRoute
+            lastCompletionRoute: getLastCompletionRoute(
+              previousState,
+              this.options.route,
+              completingSections
+            )
           };
         }
 
