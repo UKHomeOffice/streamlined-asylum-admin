@@ -4,7 +4,12 @@ const dateComponent = hof.components.date;
 module.exports = {
   'claimant-unique-application-number': {
     mixin: 'input-text',
-    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 24 }, { type: 'minlength', arguments: 16 }, validUniqueApplicationNumber],
+    validate: [
+      'required',
+      'notUrl',
+      { type: 'maxlength', arguments: 24 },
+      { type: 'minlength', arguments: 16 },
+      validUniqueApplicationNumber],
     labelClassName: 'govuk-label--s'
   },
   'claimant-date-of-birth': dateComponent('claimant-date-of-birth', {
@@ -14,7 +19,8 @@ module.exports = {
       'required',
       'date',
       'before',
-      { type: 'after', arguments: '1900-01-01' }, { type: 'before', arguments: ['0', 'days'] }
+      { type: 'after', arguments: '1900-01-01' },
+      { type: 'before', arguments: ['0', 'days'] }
     ]
-  }),
+  })
 };
