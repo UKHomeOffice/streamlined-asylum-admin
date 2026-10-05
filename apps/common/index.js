@@ -15,9 +15,8 @@ const steps = {
     next: '/email-address'
   },
   '/email-address': {
-    behaviours: [
-      SendVerificationEmail
-    ],
+    // Decide whether this flow should find an existing record or create one before sending a magic link.
+    behaviours: [SendVerificationEmail],
     fields: ['user-email'],
     next: '/check-your-email'
   },
