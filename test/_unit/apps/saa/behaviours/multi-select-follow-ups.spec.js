@@ -396,6 +396,27 @@ describe('multi-select follow-ups behaviour', () => {
     });
   });
 
+  test('section start page back link preserves edit mode for the entry page', () => {
+    const controller = buildController('/second-start');
+    const req = {
+      baseUrl: '/updates',
+      params: { action: 'edit' },
+      sessionModel: buildSessionModel({
+        'changes-follow-ups': {
+          selections: ['second'],
+          activeSections: ['second'],
+          completedSections: [],
+          sectionStartRoute: '/second-start',
+          sectionStartBackLink: '/changes'
+        }
+      })
+    };
+
+    expect(controller.locals(req, {})).toEqual({
+      backLink: '/updates/changes/edit'
+    });
+  });
+
   test('section start page back link returns to the previous completion route', () => {
     const controller = buildController('/second-start');
     const req = {
@@ -414,6 +435,28 @@ describe('multi-select follow-ups behaviour', () => {
 
     expect(controller.locals(req, {})).toEqual({
       backLink: '/updates/first-end'
+    });
+  });
+
+  test('section start page back link preserves edit mode for a previous completion route', () => {
+    const controller = buildController('/second-start');
+    const req = {
+      baseUrl: '/updates',
+      params: { action: 'edit' },
+      sessionModel: buildSessionModel({
+        'changes-follow-ups': {
+          selections: ['first', 'second'],
+          activeSections: ['first', 'second'],
+          completedSections: ['first'],
+          lastCompletionRoute: '/first-end',
+          sectionStartRoute: '/second-start',
+          sectionStartBackLink: '/first-end'
+        }
+      })
+    };
+
+    expect(controller.locals(req, {})).toEqual({
+      backLink: '/updates/first-end/edit'
     });
   });
 

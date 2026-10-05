@@ -398,10 +398,13 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
       const backLinkRoute = isTrackedSectionStart
         ? state.sectionStartBackLink
         : state.lastCompletionRoute || config.entryPoint;
+      const backLink = isTrackedSectionStart
+        ? withEditSuffix(req, config, withBaseUrl(req, backLinkRoute), backLinkRoute)
+        : withBaseUrl(req, backLinkRoute);
 
       return {
         ...locals,
-        backLink: withBaseUrl(req, backLinkRoute)
+        backLink
       };
     }
 
