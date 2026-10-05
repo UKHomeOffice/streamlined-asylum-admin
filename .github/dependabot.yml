@@ -13,11 +13,8 @@ updates:
     commit-message:
       prefix: deps
     pull-request-branch-name:
-      prefix: "deps"
-      template: "{prefix}/{name}"
+      prefix: "dependabot"
       separator: "-"
-      word-separator: "-"
-      branch-name-case: "lowercase"
       max-length: 60
     groups:
       hof-dependency:
