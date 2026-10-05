@@ -4,9 +4,38 @@ const CustomValidation = require('../common/behaviours/custom-validation');
 
 const MultiSelectFollowUps = require('./behaviours/multi-select-follow-ups');
 const multiSelectFollowUpsConfig = require('./config/multi-select-follow-ups-config');
-const multiSelectFollowUpsBehaviour =
-  MultiSelectFollowUps(multiSelectFollowUpsConfig);
+const multiSelectFollowUpsBehaviour = MultiSelectFollowUps(
+  multiSelectFollowUpsConfig
+);
 const baseUrl = '/updates';
+
+const getConfiguredSections = option => option.sections || [];
+
+const getCompletionRoutesForSection = section =>
+  MultiSelectFollowUps.asArray(section.completeOn).map(completion =>
+    MultiSelectFollowUps.getCompletionRoute(completion)
+  );
+
+const getCompletionRoutesForOption = option =>
+  getConfiguredSections(option).reduce(
+    (routes, section) => routes.concat(getCompletionRoutesForSection(section)),
+    []
+  );
+
+const getConfiguredCompletionRoutes = config =>
+  config.options.reduce(
+    (routes, option) => routes.concat(getCompletionRoutesForOption(option)),
+    []
+  );
+
+const getStartRoutesForOption = option =>
+  getConfiguredSections(option).map(section => section.start);
+
+const getConfiguredStartRoutes = config =>
+  config.options.reduce(
+    (routes, option) => routes.concat(getStartRoutesForOption(option)),
+    []
+  );
 
 /*
  * The multi-select follow-up behaviour is intentionally used as a thin wrapper
@@ -290,22 +319,7 @@ const steps = {
  * journeys. Completion pages are the hand-off points back to the common
  * orchestrator.
  */
-multiSelectFollowUpsConfig.options
-  .reduce(
-    (routes, option) =>
-      routes.concat(
-        (option.sections || []).reduce(
-          (sectionRoutes, section) =>
-            sectionRoutes.concat(
-              MultiSelectFollowUps.asArray(section.completeOn).map(completion =>
-                MultiSelectFollowUps.getCompletionRoute(completion)
-              )
-            ),
-          []
-        )
-      ),
-    []
-  )
+getConfiguredCompletionRoutes(multiSelectFollowUpsConfig)
   .filter((route, index, routes) => routes.indexOf(route) === index)
   .forEach(route => {
     if (!steps[route]) {
@@ -325,12 +339,7 @@ if (steps[multiSelectFollowUpsConfig.exitPoint]) {
   );
 }
 
-multiSelectFollowUpsConfig.options
-  .reduce(
-    (routes, option) =>
-      routes.concat((option.sections || []).map(section => section.start)),
-    []
-  )
+getConfiguredStartRoutes(multiSelectFollowUpsConfig)
   .filter((route, index, routes) => routes.indexOf(route) === index)
   .forEach(route => {
     if (!steps[route]) {

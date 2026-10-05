@@ -50,6 +50,11 @@ const sortByOrder = items =>
 
 const getRoutesForSection = section => section.routes || section.steps || [];
 
+const sectionIsInactive = inactiveSections => section =>
+  inactiveSections.includes(section.id);
+
+const getFieldsForSection = section => section.fieldsToUnset || [];
+
 /*
  * Sections are the unit of orchestration. A section has a start route, a route
  * that marks it complete, and a list of owned routes used as metadata. The
@@ -136,14 +141,10 @@ const getFieldsToUnset = (config, inactiveSections, removedSelections) =>
       const optionRemoved = removedSelections.includes(option.value);
       const optionFields = optionRemoved ? option.fieldsToUnset || [] : [];
       const sectionFields = sections
-        .filter(section => inactiveSections.includes(section.id))
-        .reduce(
-          (fieldNames, section) =>
-            fieldNames.concat(section.fieldsToUnset || []),
-          []
-        );
+        .filter(sectionIsInactive(inactiveSections))
+        .map(getFieldsForSection);
 
-      return fields.concat(optionFields, sectionFields);
+      return fields.concat(optionFields, ...sectionFields);
     }, [])
   );
 
