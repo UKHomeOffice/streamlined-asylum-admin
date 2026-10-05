@@ -24,7 +24,9 @@ const sanitiseFilename = filename => {
 const removeWhiteSpace = value => value?.replaceAll(/\s+/g, '');
 
 const validUniqueApplicationNumber = uanValue => {
-  if (!uanValue) { return null; }
+  if (!uanValue) {
+    return null;
+  }
   const uanNoWhitespace = removeWhiteSpace(uanValue);
   return uanNoWhitespace.match(/^\d(?:-?\d){15,19}$/);
 };
