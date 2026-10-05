@@ -59,6 +59,7 @@ const steps = {
     next: '/new-name-evidence'
   },
   '/new-name-evidence': {
+    // provisional document category: documents-new-name
     next: '/check-your-answers-name'
   },
   '/check-your-answers-name': {
@@ -71,6 +72,10 @@ const steps = {
     next: '/someone-else-new-name'
   },
   '/someone-else-new-name': {
+    next: '/someone-else-new-name-evidence'
+  },
+  '/someone-else-new-name-evidence': {
+    // provisional document category: documents-someone-else-new-name
     next: '/whose-date-of-birth'
   },
   '/whose-date-of-birth': {
@@ -80,6 +85,7 @@ const steps = {
     next: '/new-date-of-birth-evidence'
   },
   '/new-date-of-birth-evidence': {
+    // provisional document category: documents-new-dob
     next: '/check-your-answers-date-of-birth'
   },
   '/check-your-answers-date-of-birth': {
@@ -89,6 +95,7 @@ const steps = {
     next: '/someone-else-correct-date-of-birth'
   },
   '/someone-else-correct-date-of-birth': {
+    // provisional document category: documents-someone-else-new-dob
     next: '/whose-nationality-to-change'
   },
   '/whose-nationality-to-change': {
@@ -101,6 +108,7 @@ const steps = {
     next: '/upload-nationality-evidence'
   },
   '/upload-nationality-evidence': {
+    // provisional document category: documents-nationality
     next: '/check-your-answers-nationality'
   },
   '/check-your-answers-nationality': {
@@ -113,9 +121,11 @@ const steps = {
     next: '/someone-else-correct-nationality'
   },
   '/someone-else-correct-nationality': {
+    // provisional document category: documents-someone-else-nationality
     next: '/provide-photo-update-contact'
   },
   '/provide-photo-update-contact': {
+    // provisional document category: documents-update-contact
     next: '/change-uk-address'
   },
   '/change-uk-address': {
@@ -211,6 +221,7 @@ const steps = {
     next: '/evidence-child-partner'
   },
   '/evidence-child-partner': {
+    // provisional document category: documents-child-partner
     next: '/check-your-answers-add-child-partner'
   },
   '/check-your-answers-add-child-partner': {
@@ -274,6 +285,7 @@ const steps = {
     next: '/upload-death-certificate'
   },
   '/upload-death-certificate': {
+    // provisional document category: documents-death-certificate
     next: '/check-your-answers-death'
   },
   '/check-your-answers-death': {
