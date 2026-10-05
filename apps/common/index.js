@@ -8,6 +8,7 @@ const steps = {
     backLink: ' ' // workaround to allow the back link to route to the root of the app
   },
   '/claimant-details': {
+    fields: ['claimant-unique-application-number', 'claimant-date-of-birth'],
     next: '/claim-decided'
   },
   '/claim-decided': {
