@@ -78,5 +78,16 @@
         "label": "No"
       }
     }
+  },
+  "something-else": {
+    "legend": "Do you need to do something else?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
   }
 }

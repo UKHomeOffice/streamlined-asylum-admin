@@ -2,6 +2,7 @@ const hof = require('hof');
 const Summary = hof.components.summary;
 
 const CustomValidation = require('../common/behaviours/custom-validation');
+const somethingElseFork = require('../saa/behaviours/something-else-fork');
 
 const steps = {
   '/continue-to-form': {
@@ -196,7 +197,7 @@ const steps = {
     next: '/check-your-answers-add-child-partner'
   },
   '/check-your-answers-add-child-partner': {
-    next: '/reason-for-removing-child-partner'
+    next: '/send-evidence-for-your-claim'
   },
   '/send-evidence-for-your-claim': {
     fields: ['send-evidence-for-your-claim'],
@@ -258,14 +259,15 @@ const steps = {
     next: '/check-your-answers-death'
   },
   '/check-your-answers-death': {
-    next: '/confirm'
+    next: '/something-else'
   },
   '/confirm': {
     behaviours: [Summary],
     sections: require('./sections/summary-data-sections')
   },
   '/something-else': {
-    next: '/contact-us-by-email'
+    behaviours: [somethingElseFork],
+    fields: ['something-else']
   },
   '/contact-us-by-email': {},
   '/not-selected-options': {},

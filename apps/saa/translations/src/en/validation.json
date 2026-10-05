@@ -39,5 +39,8 @@
   },
   "someone-on-claim-died": {
     "required": "Tell us if someone on your claim has died"
+  },
+  "something-else": {
+    "required": "Select if you need to do something else"
   }
 }
