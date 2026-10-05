@@ -68,5 +68,5 @@ module.exports = {
     validate: ['required'],
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
-  },
+  }
 };
