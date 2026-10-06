@@ -28,7 +28,7 @@ const validUniqueApplicationNumber = uanValue => {
     return null;
   }
 
-  const uanNoWhitespace = removeWhiteSpace(uanValue);  
+  const uanNoWhitespace = removeWhiteSpace(uanValue);
   return uanNoWhitespace.match(/^\d(?:-?\d){15,19}$/);
 };
 
