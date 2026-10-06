@@ -4,6 +4,9 @@ on:
   repository_dispatch:
     types: [trigger-from-scanmaestro]
 
+permissions:
+  contents: read
+
 jobs:
   scan:
     runs-on: ubuntu-22.04

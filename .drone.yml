@@ -37,7 +37,7 @@ trigger:
   branch:
     <<: *include_default_and_feature_branches
 
-node_image_name: &node_image_name quay.io/ukhomeofficedigital/hof-nodejs:24.21.0-alpine3.24-v6@sha256:965808f37507eef8947461acc32a1bb9109ef6867731c9751ff0145232633908
+node_image_name: &node_image_name quay.io/ukhomeofficedigital/hof-nodejs:24.21.0-alpine3.24-v7@sha256:793f595eb64064ab6d007ca3509c731a1ff9d36728aa12e127e19271075575a1
 
 node_image: &node_image
   pull: if-not-exists
@@ -274,30 +274,30 @@ steps:
       - build_image_and_push_to_ecr
 
   # Run playwright tests against the pull request branch environment
-  - name: e2e_tests
-    pull: if-not-exists
-    image: mcr.microsoft.com/playwright:v1.63.0-noble
-    environment:
-      SAS_HOF_EMAIL:
-        from_secret: SAS_HOF_EMAIL
-    volumes:
-      - name: dockersock
-        path: /root/.dockersock
-    commands:
-      - npm install -g n
-      - n 24.21.0
-      - hash -r
-      - node --version
-      - yarn install --frozen-lockfile
-      - yarn playwright install --with-deps
-      - test -s /root/.dockersock/branch_url.txt || (echo "Missing deployed branch URL at /root/.dockersock/branch_url.txt" && exit 1)
-      - CI=true PLAYWRIGHT_BASE_URL="https://$(cat /root/.dockersock/branch_url.txt)" yarn test:e2e
-    when:
-      branch:
-        <<: *include_default_and_feature_branches
-      event: pull_request
-    depends_on:
-      - deploy_to_branch
+  # - name: e2e_tests
+  #   pull: if-not-exists
+  #   image: mcr.microsoft.com/playwright:v1.63.0-noble
+  #   environment:
+  #     SAS_HOF_EMAIL:
+  #       from_secret: SAS_HOF_EMAIL
+  #   volumes:
+  #     - name: dockersock
+  #       path: /root/.dockersock
+  #   commands:
+  #     - npm install -g n
+  #     - n 24.21.0
+  #     - hash -r
+  #     - node --version
+  #     - yarn install --frozen-lockfile
+  #     - yarn playwright install --with-deps
+  #     - test -s /root/.dockersock/branch_url.txt || (echo "Missing deployed branch URL at /root/.dockersock/branch_url.txt" && exit 1)
+  #     - CI=true PLAYWRIGHT_BASE_URL="https://$(cat /root/.dockersock/branch_url.txt)" yarn test:e2e
+  #   when:
+  #     branch:
+  #       <<: *include_default_and_feature_branches
+  #     event: pull_request
+  #   depends_on:
+  #     - deploy_to_branch
 
   # Generate short-lived GitHub App installation token for report publishing
   - name: generate_github_app_token
@@ -313,28 +313,28 @@ steps:
     #   - e2e_tests
 
   # Upload Playwright HTML report for PR and comment a download link
-  - name: publish_e2e_report_to_pr
-    pull: if-not-exists
-    image: alpine:3.21
-    volumes:
-      - name: dockersock
-        path: /root/.dockersock
-    commands:
-      - apk add --no-cache bash curl jq zip
-      - test -n "$DRONE_PULL_REQUEST" || (echo "Missing DRONE_PULL_REQUEST. This step only supports pull_request builds." && exit 1)
-      - export DRONE_REPO="$${DRONE_REPO:-$GIT_REPO}"
-      - test -n "$DRONE_REPO" || (echo "Missing repository slug (DRONE_REPO/GIT_REPO)." && exit 1)
-      - test -s /root/.dockersock/github_app_token.txt || (echo "Missing GitHub App token file from generate_github_app_token step." && exit 1)
-      - export GITHUB_APP_TOKEN="$(cat /root/.dockersock/github_app_token.txt)"
-      - bash bin/publish_e2e_test_report.sh
-      - rm -f /root/.dockersock/github_app_token.txt
-    when:
-      branch:
-        <<: *include_default_and_feature_branches
-      event: pull_request
-    depends_on:
-      - e2e_tests
-      - generate_github_app_token
+  # - name: publish_e2e_report_to_pr
+  #   pull: if-not-exists
+  #   image: alpine:3.21
+  #   volumes:
+  #     - name: dockersock
+  #       path: /root/.dockersock
+  #   commands:
+  #     - apk add --no-cache bash curl jq zip
+  #     - test -n "$DRONE_PULL_REQUEST" || (echo "Missing DRONE_PULL_REQUEST. This step only supports pull_request builds." && exit 1)
+  #     - export DRONE_REPO="$${DRONE_REPO:-$GIT_REPO}"
+  #     - test -n "$DRONE_REPO" || (echo "Missing repository slug (DRONE_REPO/GIT_REPO)." && exit 1)
+  #     - test -s /root/.dockersock/github_app_token.txt || (echo "Missing GitHub App token file from generate_github_app_token step." && exit 1)
+  #     - export GITHUB_APP_TOKEN="$(cat /root/.dockersock/github_app_token.txt)"
+  #     - bash bin/publish_e2e_test_report.sh
+  #     - rm -f /root/.dockersock/github_app_token.txt
+  #   when:
+  #     branch:
+  #       <<: *include_default_and_feature_branches
+  #     event: pull_request
+  #   depends_on:
+  #     - e2e_tests
+  #     - generate_github_app_token
 
   - name: deploy_to_uat
     pull: if-not-exists

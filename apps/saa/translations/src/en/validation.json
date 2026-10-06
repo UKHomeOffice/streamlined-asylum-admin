@@ -2,6 +2,9 @@
   "changes-to-contact-details": {
     "required": "Select what details you need to change"
   },
+  "update-personal-details": {
+    "required": "Select if you need to update personal details"
+  },
   "add-remove-dependant": {
     "required": "Select if you need to add or remove a child or partner as a dependant"
   },

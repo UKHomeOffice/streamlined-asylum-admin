@@ -14,6 +14,13 @@ module.exports = {
     validate: ['required'],
     isPageHeading: true
   },
+  'update-personal-details': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    isPageHeading: true
+  },
   'add-remove-dependant': {
     mixin: 'radio-group',
     options: ['yes', 'no'],
