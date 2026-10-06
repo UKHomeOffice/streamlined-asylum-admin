@@ -1,6 +1,13 @@
 const hof = require('hof');
 const dateComponent = hof.components.date;
 module.exports = {
+  'update-personal-details': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    isPageHeading: true
+  },
   'add-remove-dependant': {
     mixin: 'radio-group',
     options: ['yes', 'no'],

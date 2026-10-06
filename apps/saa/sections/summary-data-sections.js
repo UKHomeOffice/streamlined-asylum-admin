@@ -1,5 +1,13 @@
 // Using default labels for now. Review and update when the final CYA design is available.
 module.exports = {
+  'personal-details': {
+    steps: [
+      {
+        step: '/update-personal-details',
+        field: 'update-personal-details'
+      }
+    ]
+  },
   dependant: {
     steps: [
       {
