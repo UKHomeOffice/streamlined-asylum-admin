@@ -14,7 +14,7 @@ h3 {
 }
 
 ul {
-  @extend .govuk-list, .govuk-list--bullet;
+  @extend .govuk-list;
 }
 
 p {
@@ -282,6 +282,18 @@ pre.looped-records {
 
 .govuk-fieldset__heading {
   font-family: "GDS Transport", arial, sans-serif;
+}
+
+ul:not(p.govuk-list-label--content + ul) {
+  @extend .govuk-list--bullet;
+}
+
+p.govuk-list-label--content + ul {
+  list-style-type: none;
+
+  a {
+    @extend .govuk-link;
+  }
 }
 
 /* Links instead of regular buttons */
