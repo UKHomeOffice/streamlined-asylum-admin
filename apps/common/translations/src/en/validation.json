@@ -7,6 +7,6 @@
     "required": "Enter a date of birth",
     "date": "Enter a valid date",
     "before": "Date of birth must be in the past",
-    "after": "Enter a valid date of birth"
+    "after": "Enter a date after 01 01 1900"
   }
 }
