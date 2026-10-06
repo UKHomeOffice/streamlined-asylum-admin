@@ -1,8 +1,6 @@
 {
   "claimant-unique-application-number": {
     "required": "Enter a unique application number",
-    "maxlength": "Unique application number must have between 16 and 20 numbers, like 1234-5678-9101-1121",
-    "minlength": "Unique application number must have between 16 and 20 numbers, like 1234-5678-9101-1121",
     "validUniqueApplicationNumber": "Unique application number must have between 16 and 20 numbers, like 1234-5678-9101-1121"
   },
   "claimant-date-of-birth": {

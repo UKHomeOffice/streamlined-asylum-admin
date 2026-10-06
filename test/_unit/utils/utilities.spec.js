@@ -34,7 +34,8 @@ describe('validUniqueApplicationNumber', () => {
     '1234567890123456',
     '1234-5678-9012-3456',
     '12 34\t-5678\n-9012 -3456',
-    '12345678901234567890'
+    '12345678901234567890',
+    '1234 - 5678 - 9012 - 3456 - 7890'
   ])('accepts a valid UAN: %s', value => {
     expect(validUniqueApplicationNumber(value)?.[0]).toBe(value.replace(/\s+/g, ''));
   });

@@ -7,8 +7,6 @@ module.exports = {
     validate: [
       'required',
       'notUrl',
-      { type: 'maxlength', arguments: 24 },
-      { type: 'minlength', arguments: 16 },
       validUniqueApplicationNumber],
     labelClassName: 'govuk-label--s'
   },
