@@ -553,6 +553,131 @@ describe('multi-select follow-ups behaviour', () => {
     });
   });
 
+  test.each([{}, { action: 'edit' }])(
+    'reopens a conditionally completed section and resumes it with params %p',
+    async params => {
+      const controller = buildController('/second-question');
+      const entryController = buildController('/changes');
+      const req = {
+        baseUrl: '/updates',
+        params,
+        form: { values: { 'second-question': 'no' } },
+        sessionModel: buildSessionModel({
+          'changes-follow-ups': {
+            selections: ['first', 'second'],
+            activeSections: ['first', 'second'],
+            completedSections: ['first'],
+            sectionStartBackLinks: { '/second-start': '/first-end' }
+          }
+        })
+      };
+      const save = currentController =>
+        new Promise((resolve, reject) => {
+          currentController.saveValues(req, {}, err => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        });
+
+      await save(controller);
+      expect(
+        req.sessionModel.get('changes-follow-ups').completedSections
+      ).toEqual(['first', 'second']);
+      expect(controller.getNextStep(req, {})).toBe('/updates/exit');
+
+      req.form.values = { 'second-question': 'yes' };
+      await save(controller);
+      expect(req.sessionModel.get('changes-follow-ups')).toMatchObject({
+        completedSections: ['first'],
+        sectionStartBackLinks: { '/second-start': '/first-end' }
+      });
+      expect(
+        req.sessionModel.get('changes-follow-ups').lastCompletionRoute
+      ).toBeUndefined();
+      expect(controller.getNextStep(req, {})).toBe('/updates/fallback');
+
+      req.form.values = { changes: ['first', 'second'] };
+      await save(entryController);
+      expect(entryController.getNextStep(req, {})).toBe(
+        `/updates/second-start${params.action === 'edit' ? '/edit' : ''}`
+      );
+
+      req.form.values = {};
+      await save(buildController('/second-end'));
+      expect(
+        req.sessionModel.get('changes-follow-ups').completedSections
+      ).toEqual(['first', 'second']);
+    }
+  );
+
+  test.each(['/second-question', '/third-end'])(
+    'reopening clears invalid navigation but preserves unrelated state when last completion is %s',
+    (lastCompletionRoute, done) => {
+      const threeSectionConfig = {
+        ...config,
+        options: config.options.concat({
+          value: 'third',
+          order: 30,
+          sections: [
+            {
+              id: 'third',
+              start: '/third-start',
+              completeOn: '/third-end'
+            }
+          ]
+        })
+      };
+      const controller = buildController(
+        '/second-question',
+        threeSectionConfig
+      );
+      const req = {
+        baseUrl: '/updates',
+        params: {},
+        form: { values: { 'second-question': 'yes' } },
+        sessionModel: buildSessionModel({
+          'changes-follow-ups': {
+            selections: ['first', 'second', 'third'],
+            activeSections: ['first', 'second', 'third'],
+            completedSections: ['first', 'second', 'third'],
+            lastCompletionRoute,
+            sectionStartRoute: '/third-start',
+            sectionStartBackLink: '/second-question',
+            sectionStartBackLinks: {
+              '/first-start': '/changes',
+              '/second-start': '/first-end',
+              '/third-start': '/second-question'
+            }
+          }
+        })
+      };
+
+      controller.saveValues(req, {}, err => {
+        expect(err).toBeUndefined();
+        expect(req.sessionModel.get('changes-follow-ups')).toMatchObject({
+          completedSections: ['first', 'third'],
+          lastCompletionRoute:
+            lastCompletionRoute === '/second-question'
+              ? undefined
+              : lastCompletionRoute,
+          sectionStartRoute: undefined,
+          sectionStartBackLink: undefined
+        });
+        expect(
+          req.sessionModel.get('changes-follow-ups').sectionStartBackLinks
+        ).toEqual({
+          '/first-start': '/changes',
+          '/second-start': '/first-end'
+        });
+        expect(controller.getNextStep(req, {})).toBe('/updates/fallback');
+        done();
+      });
+    }
+  );
+
   test('conditional completion route only completes section when condition is met', done => {
     const controller = buildController('/second-question');
     const req = {

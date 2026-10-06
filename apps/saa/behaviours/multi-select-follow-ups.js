@@ -228,6 +228,48 @@ const getCompletingSections = (sections, route, req) =>
 
 const getSectionIds = sections => sections.map(section => section.id);
 
+const completionIsOnRoute = route => completion =>
+  getCompletionRoute(completion) === route;
+
+const sectionReopensOnRoute = (state, route, req) => section =>
+  asArray(state.completedSections).includes(section.id) &&
+  asArray(section.completeOn).some(completionIsOnRoute(route)) &&
+  !sectionCompletesOnRoute(section, route, req);
+
+const invalidateReopenedSections = (state, sections, route, req) => {
+  const reopenedIds = getSectionIds(
+    sections.filter(sectionReopensOnRoute(state, route, req))
+  );
+
+  if (!reopenedIds.length) {
+    return state;
+  }
+
+  const sectionStartBackLinks = Object.fromEntries(
+    Object.entries(state.sectionStartBackLinks || {}).filter(
+      ([, backLink]) => backLink !== route
+    )
+  );
+  const invalidStartLink = state.sectionStartBackLink === route;
+
+  // Reopening a boundary revokes completion and links created by that completion.
+  return {
+    ...state,
+    completedSections: asArray(state.completedSections).filter(
+      sectionId => !reopenedIds.includes(sectionId)
+    ),
+    lastCompletionRoute:
+      state.lastCompletionRoute === route
+        ? undefined
+        : state.lastCompletionRoute,
+    sectionStartRoute: invalidStartLink ? undefined : state.sectionStartRoute,
+    sectionStartBackLink: invalidStartLink
+      ? undefined
+      : state.sectionStartBackLink,
+    sectionStartBackLinks
+  };
+};
+
 const getCompletedSections = (previousState, completingSections) =>
   unique(
     asArray(previousState.completedSections).concat(
@@ -367,15 +409,22 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
             req
           );
 
+          state = invalidateReopenedSections(
+            previousState,
+            activeSections,
+            this.options.route,
+            req
+          );
+
           if (completingSections.length) {
             state = {
-              ...previousState,
+              ...state,
               completedSections: getCompletedSections(
-                previousState,
+                state,
                 completingSections
               ),
               lastCompletionRoute: getLastCompletionRoute(
-                previousState,
+                state,
                 this.options.route,
                 completingSections
               )
@@ -387,8 +436,6 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
               getCompletionNextRoute(config, activeSections, state),
               this.options.route
             );
-          } else {
-            state = previousState;
           }
         }
 
