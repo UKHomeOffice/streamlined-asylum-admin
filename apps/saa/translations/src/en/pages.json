@@ -14,9 +14,6 @@
   "who-are-you": {
     "header": "Who are you?"
   },
-  "update-personal-details": {
-    "header": "Update personal details"
-  },
   "changes-to-contact-details": {
     "header": "What details do you need to change?"
   },
@@ -234,6 +231,9 @@
   "confirm": {
     "header": "Check your answers",
     "sections": {
+      "personal-details": {
+        "header": "Personal details"
+      },
       "evidences": {
         "header": "Send evidence"
       },

@@ -44,7 +44,18 @@ const steps = {
     next: '/update-personal-details'
   },
   '/update-personal-details': {
-    next: '/changes-to-contact-details'
+    fields: ['update-personal-details'],
+    forks: [
+      {
+        target: '/changes-to-contact-details',
+        continueOnEdit: true,
+        condition: {
+          field: 'update-personal-details',
+          value: 'yes'
+        }
+      }
+    ],
+    next: '/do-you-need-add-remove-dependant'
   },
   '/changes-to-contact-details': {
     next: '/do-you-need-to-change-your-name'
