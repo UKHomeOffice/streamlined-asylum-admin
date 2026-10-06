@@ -1,7 +1,8 @@
 {
   "claimant-unique-application-number": {
     "required": "Enter a unique application number",
-    "validUniqueApplicationNumber": "Unique application number must have between 16 and 20 numbers, like 1234-5678-9101-1121"
+    "validUniqueApplicationNumber": "Unique application number must have between 16 and 20 numbers, like 1234-5678-9101-1121",
+    "notUrl": "Unique application number must not contain a URL"
   },
   "claimant-date-of-birth": {
     "required": "Enter a date of birth",
