@@ -16,8 +16,12 @@ The `deps` commit-message prefix is independent of branch naming and is retained
 The auto-merge job accepts `deps-...`, `dependabot-...`, and `dependabot/...`
 branches authored by Dependabot. For `deps-...` branches, it provides a temporary
 event file with a standard `dependabot/npm_and_yarn/...` branch name to
-`dependabot/fetch-metadata`. This adapter assumes npm updates at the repository
-root; update it if more ecosystems or directories are added. The actual PR,
+`dependabot/fetch-metadata`. The official action bundle is checked out at a pinned
+commit without persisted credentials (no PR code is checked out) and run in a
+shell process that sets `GITHUB_EVENT_PATH` after the runner has initialised the
+step. A step-level override is insufficient because the runner restores this
+reserved variable before launching actions. This adapter assumes npm updates at
+the repository root; update it if more ecosystems or directories are added. The actual PR,
 commit SHA, and signature verification are unchanged. Approval still requires
 patch/minor metadata with no maintainer changes.
 
