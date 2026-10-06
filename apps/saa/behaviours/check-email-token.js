@@ -21,9 +21,8 @@ const checkEmailToken = superclass =>
       }
 
       try {
-        const user = await getToken.read(token);
+        const user = await getToken.consume(token);
         if (user.valid && user.email) {
-          await getToken.delete(token);
           req.sessionModel.set(KEY_VALID_TOKEN, true);
           req.sessionModel.set(KEY_USER_EMAIL, user.email);
           return super.getValues(req, res, next);

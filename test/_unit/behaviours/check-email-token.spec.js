@@ -1,6 +1,5 @@
 jest.mock('../../../utils/check-token', () => ({
-  read: jest.fn(),
-  delete: jest.fn()
+  consume: jest.fn()
 }));
 
 jest.mock('../../../config', () => ({
@@ -46,8 +45,7 @@ describe('check email token behaviour', () => {
       redirect: jest.fn()
     };
     baseGetValues.mockReset();
-    getToken.read.mockReset();
-    getToken.delete.mockReset();
+    getToken.consume.mockReset();
   });
 
   test('should skip token validation when skip auth is allowed', async () => {
@@ -58,7 +56,7 @@ describe('check email token behaviour', () => {
 
     await behaviour.getValues(req, res, next);
 
-    expect(getToken.read).not.toHaveBeenCalled();
+    expect(getToken.consume).not.toHaveBeenCalled();
     expect(req.sessionModel.set).toHaveBeenCalledWith(
       'user-email',
       'skip@example.com'
@@ -78,21 +76,20 @@ describe('check email token behaviour', () => {
 
     await behaviour.getValues(req, res, next);
 
-    expect(getToken.read).not.toHaveBeenCalled();
+    expect(getToken.consume).not.toHaveBeenCalled();
     expect(req.sessionModel.set).not.toHaveBeenCalled();
     expect(baseGetValues).toHaveBeenCalledWith(req, res, next);
   });
 
-  test('should validate a token, delete it and continue with the token email', async () => {
-    getToken.read.mockResolvedValue({
+  test('should consume a token and continue with the token email', async () => {
+    getToken.consume.mockResolvedValue({
       valid: 'token-id',
       email: 'person@example.com'
     });
 
     await behaviour.getValues(req, res, next);
 
-    expect(getToken.read).toHaveBeenCalledWith('token-id');
-    expect(getToken.delete).toHaveBeenCalledWith('token-id');
+    expect(getToken.consume).toHaveBeenCalledWith('token-id');
     expect(req.sessionModel.set).toHaveBeenCalledWith('valid-token', true);
     expect(req.sessionModel.set).toHaveBeenCalledWith(
       'user-email',
@@ -102,7 +99,7 @@ describe('check email token behaviour', () => {
   });
 
   test('should redirect to the invalid token path when the token is not valid', async () => {
-    getToken.read.mockResolvedValue({
+    getToken.consume.mockResolvedValue({
       valid: null,
       email: 'person@example.com'
     });
@@ -114,7 +111,7 @@ describe('check email token behaviour', () => {
   });
 
   test('should log and redirect to the invalid token path when token lookup fails', async () => {
-    getToken.read.mockRejectedValue(new Error('redis unavailable'));
+    getToken.consume.mockRejectedValue(new Error('redis unavailable'));
 
     await behaviour.getValues(req, res, next);
 
@@ -124,5 +121,26 @@ describe('check email token behaviour', () => {
     );
     expect(res.redirect).toHaveBeenCalledWith('/updates/expired-link');
     expect(baseGetValues).not.toHaveBeenCalled();
+  });
+
+  test('should authenticate only one session when concurrent requests consume the same token', async () => {
+    getToken.consume
+      .mockResolvedValueOnce({ valid: 'token-id', email: 'person@example.com' })
+      .mockResolvedValueOnce({ valid: null, email: null });
+    const secondReq = {
+      ...req,
+      sessionModel: { get: jest.fn(), set: jest.fn() }
+    };
+    const secondRes = { redirect: jest.fn() };
+
+    await Promise.all([
+      behaviour.getValues(req, res, next),
+      behaviour.getValues(secondReq, secondRes, next)
+    ]);
+
+    expect(req.sessionModel.set).toHaveBeenCalledWith('valid-token', true);
+    expect(secondReq.sessionModel.set).not.toHaveBeenCalled();
+    expect(secondRes.redirect).toHaveBeenCalledWith('/updates/expired-link');
+    expect(baseGetValues).toHaveBeenCalledTimes(1);
   });
 });
