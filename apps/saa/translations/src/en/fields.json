@@ -1,6 +1,6 @@
 {
   "update-personal-details": {
-    "legend": "Do you need to update your personal details?",
+    "legend": "Do you need to update personal details?",
     "hint": "For example, a new address, phone number, email address or name",
     "options": {
       "yes": {
