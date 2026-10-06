@@ -310,8 +310,8 @@ steps:
       branch:
         <<: *include_default_and_feature_branches
       event: pull_request
-    depends_on:
-      - e2e_tests
+    # depends_on:
+    #   - e2e_tests
 
   # Upload Playwright HTML report for PR and comment a download link
   # - name: publish_e2e_report_to_pr
