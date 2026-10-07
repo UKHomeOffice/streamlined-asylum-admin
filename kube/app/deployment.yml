@@ -140,7 +140,8 @@ spec:
               name: public
 
         - name: nginx-proxy
-          image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/sas/hof-docker-nginx-proxy:v2.1.0@sha256:d0498e46e8eb8f743c6341f4b0d45c8064e1658cda2ae42b2b6c1c62c8b5a02e
+          # nginx-proxy-govuk:v4
+          image: quay.io/ukhomeofficedigital/nginx-proxy-govuk@sha256:4470064d0b1d20ae08c5fd85551576cb687f342a22d6cb456fda9b2c4ce8c8df
           resources:
             requests:
               memory: 10Mi

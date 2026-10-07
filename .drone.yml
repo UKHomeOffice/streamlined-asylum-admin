@@ -300,17 +300,17 @@ steps:
   #     - deploy_to_branch
 
   # Generate short-lived GitHub App installation token for report publishing
-  - name: generate_github_app_token
-    <<: *github_app_token_step
-    environment:
-      <<: *github_app_token_secrets_ukho
-      OUTPUT_TOKEN_FILE: /root/.dockersock/github_app_token.txt
-    when:
-      branch:
-        <<: *include_default_and_feature_branches
-      event: pull_request
-    # depends_on:
-    #   - e2e_tests
+  # - name: generate_github_app_token
+  #   <<: *github_app_token_step
+  #   environment:
+  #     <<: *github_app_token_secrets_ukho
+  #     OUTPUT_TOKEN_FILE: /root/.dockersock/github_app_token.txt
+  #   when:
+  #     branch:
+  #       <<: *include_default_and_feature_branches
+  #     event: pull_request
+  #   depends_on:
+  #     - e2e_tests
 
   # Upload Playwright HTML report for PR and comment a download link
   # - name: publish_e2e_report_to_pr
