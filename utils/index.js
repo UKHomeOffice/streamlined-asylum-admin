@@ -21,14 +21,26 @@ const sanitiseFilename = filename => {
   )}`;
 };
 
-const normaliseEmail = email => {
-  if (!email || typeof email !== 'string') {
-    return '';
+const removeWhiteSpace = value => value?.replaceAll(/\s+/g, '');
+
+const validUniqueApplicationNumber = uanValue => {
+  if (!uanValue) {
+    return null;
   }
-  return email.toLowerCase();
+
+  const uanNoWhitespace = removeWhiteSpace(uanValue);
+  return uanNoWhitespace.match(/^\d(?:-?\d){15,19}$/);
+};
+
+const normaliseEmail = email => {
+    if (!email || typeof email !== 'string') {
+        return '';
+    }
+    return email.toLowerCase();
 };
 
 module.exports = {
   sanitiseFilename,
-  normaliseEmail
+  validUniqueApplicationNumber,
+    normaliseEmail
 };
