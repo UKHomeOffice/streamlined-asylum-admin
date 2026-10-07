@@ -33,14 +33,14 @@ const validUniqueApplicationNumber = uanValue => {
 };
 
 const normaliseEmail = email => {
-    if (!email || typeof email !== 'string') {
-        return '';
-    }
-    return email.toLowerCase();
+  if (!email || typeof email !== 'string') {
+    return '';
+  }
+  return email.toLowerCase();
 };
 
 module.exports = {
   sanitiseFilename,
   validUniqueApplicationNumber,
-    normaliseEmail
+  normaliseEmail
 };
