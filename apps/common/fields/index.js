@@ -17,5 +17,12 @@ module.exports = {
       'before',
       { type: 'after', arguments: '1900-01-01' }
     ]
-  })
+  }),
+  'claim-decided': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    isPageHeading: true
+  }
 };
