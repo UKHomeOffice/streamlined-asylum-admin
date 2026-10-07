@@ -6,5 +6,16 @@
   "claimant-date-of-birth": {
     "legend": "Date of birth",
     "hint": "For example, 27 3 2020"
+  },
+  "claim-decided": {
+    "legend": "Has there been a decision on the asylum claim?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
   }
 }
