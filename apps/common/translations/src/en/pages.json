@@ -8,9 +8,6 @@
   "claimant-details": {
     "header": "About the person who made the claim"
   },
-  "claim-decided": {
-    "header": "Has there been a decision on the asylum claim?"
-  },
   "cannot-use-form": {
     "header": "You cannot use this form"
   },
