@@ -281,7 +281,9 @@ const steps = {
     fields: ['something-else']
   },
   '/contact-us-by-email': {},
-  '/not-selected-options': {},
+  '/not-selected-options': {
+    backLink: 'something-else'
+  },
   '/page-not-found': {},
   '/service-unavailable': {},
   '/problem-with-service': {},
