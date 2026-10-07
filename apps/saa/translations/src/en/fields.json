@@ -93,6 +93,7 @@
   },
   "something-else": {
     "legend": "Do you need to do something else?",
+    "hint": "For example, ask about progress on your claim or submit a letter of authority",
     "options": {
       "yes": {
         "label": "Yes"
