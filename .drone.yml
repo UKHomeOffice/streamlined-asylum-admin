@@ -98,8 +98,8 @@ clone_repos_step: &clone_repos_step
   commands:
     - test -s "$CLONE_TOKEN_FILE" || (echo "$CLONE_TOKEN_MISSING_MESSAGE" && exit 1)
     - export GITHUB_TOKEN="$(cat "$CLONE_TOKEN_FILE")"
-    - git clone https://x-access-token:$${GITHUB_TOKEN}@github.com/UKHomeOfficeForms/hof-services-config.git
-    - if [ "${CLONE_REPOS_PRUNE:-false}" = "true" ]; then find hof-services-config/* | grep -v $HOF_CONFIG | grep -v 'infrastructure' | xargs rm -rf; fi
+    - git clone --depth 1 --filter=blob:none --sparse https://x-access-token:$${GITHUB_TOKEN}@github.com/UKHomeOfficeForms/hof-services-config.git
+    - git -C hof-services-config sparse-checkout set "$${HOF_CONFIG#hof-services-config/}" infrastructure
     - rm -f "$CLONE_TOKEN_FILE"
 
 steps:
@@ -118,7 +118,6 @@ steps:
     environment:
       CLONE_TOKEN_FILE: /root/.dockersock/github_app_token_for_clone.txt
       CLONE_TOKEN_MISSING_MESSAGE: Missing GitHub App token file for clone step.
-      CLONE_REPOS_PRUNE: "true"
     when:
       branch:
         <<: *include_default_and_feature_branches
