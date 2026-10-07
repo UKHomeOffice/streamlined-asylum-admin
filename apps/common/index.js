@@ -29,6 +29,9 @@ const steps = {
   },
   '/check-your-email': {
     behaviours: [SendVerificationEmail]
+  },
+  '/team-email-invalid': {
+    backLink: 'email-address'
   }
 };
 const pages = {

@@ -17,6 +17,9 @@
   "email-address": {
     "header": "What is your email address?"
   },
+  "team-email-invalid": {
+    "header": "Invalid team email address"
+  },
   "check-your-email": {
     "header": "Check your email"
   }

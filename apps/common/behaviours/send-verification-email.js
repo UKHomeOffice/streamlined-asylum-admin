@@ -1,7 +1,11 @@
 'use strict';
 
 const Notify = require('hof/components/notify/notify');
-const { normaliseEmail } = require('../../../utils/index');
+const {
+  normaliseEmail,
+  getNotifyErrorMessage,
+  isTeamOnlyNotifyError
+} = require('../../../utils/index');
 const { govukNotify, env, auth } = require('../../../config');
 const notifyApiKey = govukNotify.notifyApiKey;
 const templateId = govukNotify.emailTemplates.userVerifyEmailTemplateId;
@@ -18,14 +22,9 @@ const getPersonalisation = (protocol, host, token) => {
 };
 
 const sendEmail = async (req, email, host, token) => {
-  try {
-    const personalisation = getPersonalisation(req.protocol, host, token);
-    await notifyClient.sendEmail(templateId, email, personalisation);
-    logger.log('info', 'verification email sent to user');
-  } catch (error) {
-    logger.error(`Error sending email: ${error}`);
-    throw error;
-  }
+  const personalisation = getPersonalisation(req.protocol, host, token);
+  await notifyClient.sendEmail(templateId, email, personalisation);
+  logger.log('info', 'verification email sent to user');
 };
 
 const sendVerificationEmail = superclass =>
@@ -63,7 +62,12 @@ const sendVerificationEmail = superclass =>
           await sendEmail(req, email, host, token);
           return next();
         } catch (error) {
-          logger.error(`Error in the saveValues method ${error.message}`);
+          const notifyMessage =
+            getNotifyErrorMessage(error) ?? 'Unknown verification email error';
+          logger.error(`Verification email flow failed: ${notifyMessage}`);
+          if (isTeamOnlyNotifyError(error)) {
+            return res.redirect('/team-email-invalid');
+          }
           return next(error);
         }
       });

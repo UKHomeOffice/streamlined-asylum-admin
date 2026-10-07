@@ -39,8 +39,18 @@ const normaliseEmail = email => {
   return email.toLowerCase();
 };
 
+const getNotifyErrorMessage = error =>
+  error?.response?.data?.errors?.[0]?.message ?? error?.message;
+
+const isTeamOnlyNotifyError = error => {
+  const message = getNotifyErrorMessage(error);
+  return message === 'Can’t send to this recipient using a team-only API key';
+};
+
 module.exports = {
   sanitiseFilename,
   validUniqueApplicationNumber,
-  normaliseEmail
+  normaliseEmail,
+  getNotifyErrorMessage,
+  isTeamOnlyNotifyError
 };

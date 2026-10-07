@@ -71,7 +71,9 @@ describe('send verification email behaviour', () => {
       get: jest.fn().mockReturnValue('example.com')
     };
     baseSaveValues.mockClear();
-    baseSaveValues.mockImplementation((request, response, callback) => callback());
+    baseSaveValues.mockImplementation((request, response, callback) =>
+      callback()
+    );
     tokenGenerator.save.mockResolvedValue('token');
     tokenGenerator.save.mockClear();
     notifyClient.sendEmail.mockReset();
@@ -103,7 +105,10 @@ describe('send verification email behaviour', () => {
         link: 'https://example.com/check-your-email?token=token'
       }
     );
-    expect(log.log).toHaveBeenCalledWith('info', 'verification email sent to user');
+    expect(log.log).toHaveBeenCalledWith(
+      'info',
+      'verification email sent to user'
+    );
     expect(next).toHaveBeenCalledWith();
   });
 
@@ -148,7 +153,9 @@ describe('send verification email behaviour', () => {
 
   test('should pass superclass save errors to next', async () => {
     const error = new Error('save failed');
-    baseSaveValues.mockImplementation((request, response, callback) => callback(error));
+    baseSaveValues.mockImplementation((request, response, callback) =>
+      callback(error)
+    );
 
     await behaviour.saveValues(req, res, next);
 
@@ -164,25 +171,44 @@ describe('send verification email behaviour', () => {
     await behaviour.saveValues(req, res, next);
 
     expect(log.error).toHaveBeenCalledWith(
-      'Error in the saveValues method redis unavailable'
+      'Verification email flow failed: redis unavailable'
     );
     expect(next).toHaveBeenCalledWith(error);
     expect(notifyClient.sendEmail).not.toHaveBeenCalled();
   });
 
   test('should log and propagate HOF Notify errors', async () => {
-    const error = new Error(
-      "Can't send to this recipient using a team-only API key"
-    );
+    const error = new Error('Notify unavailable');
     notifyClient.sendEmail.mockRejectedValue(error);
 
     await behaviour.saveValues(req, res, next);
 
-    expect(log.error).toHaveBeenCalledWith(`Error sending email: ${error}`);
     expect(log.error).toHaveBeenCalledWith(
-      `Error in the saveValues method ${error.message}`
+      `Verification email flow failed: ${error.message}`
     );
+    expect(log.error).toHaveBeenCalledTimes(1);
     expect(next).toHaveBeenCalledWith(error);
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
+
+  test('should redirect when Notify rejects a recipient with a team-only API key', async () => {
+    const error = new Error('Notify request failed');
+    error.response = {
+      data: {
+        errors: [
+          {
+            message:
+              'Can\u2019t send to this recipient using a team-only API key'
+          }
+        ]
+      }
+    };
+    notifyClient.sendEmail.mockRejectedValue(error);
+
+    await behaviour.saveValues(req, res, next);
+
+    expect(res.redirect).toHaveBeenCalledWith('/team-email-invalid');
+    expect(next).not.toHaveBeenCalled();
   });
 
   test('should log object-string HOF Notify errors without changing them', async () => {
@@ -191,10 +217,36 @@ describe('send verification email behaviour', () => {
 
     await behaviour.saveValues(req, res, next);
 
-    expect(log.error).toHaveBeenCalledWith(`Error sending email: ${error}`);
     expect(log.error).toHaveBeenCalledWith(
-      `Error in the saveValues method ${error.message}`
+      `Verification email flow failed: ${error.message}`
     );
     expect(next).toHaveBeenCalledWith(error);
+  });
+
+  test('should redirect for a team-only error using the error message fallback', async () => {
+    const error = new Error(
+      'Can\u2019t send to this recipient using a team-only API key'
+    );
+    notifyClient.sendEmail.mockRejectedValue(error);
+
+    await behaviour.saveValues(req, res, next);
+
+    expect(res.redirect).toHaveBeenCalledWith('/team-email-invalid');
+    expect(next).not.toHaveBeenCalled();
+    expect(log.error).toHaveBeenCalledTimes(1);
+  });
+
+  test('should propagate unrelated Notify response errors without redirecting', async () => {
+    const error = new Error('Notify request failed');
+    error.response = { data: { errors: [{ message: 'Invalid API key' }] } };
+    notifyClient.sendEmail.mockRejectedValue(error);
+
+    await behaviour.saveValues(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(error);
+    expect(res.redirect).not.toHaveBeenCalled();
+    expect(log.error).toHaveBeenCalledWith(
+      'Verification email flow failed: Invalid API key'
+    );
   });
 });
