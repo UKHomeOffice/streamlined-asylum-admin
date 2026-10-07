@@ -47,6 +47,8 @@ spec:
                 name: {{ .APP_NAME }}-configmap
                 {{ end }}
           env:
+            - name: PGSSLMODE
+              value: no-verify
             - name: SERVICE_NAME
               value: "{{ .APP_NAME }}"
             - name: MAX_PAYLOAD_SIZE
