@@ -15,6 +15,17 @@ const steps = {
     next: '/claim-decided'
   },
   '/claim-decided': {
+    fields: ['claim-decided'],
+    forks: [
+      {
+        target: '/cannot-use-form',
+        continueOnEdit: true,
+        condition: {
+          field: 'claim-decided',
+          value: 'yes'
+        }
+      }
+    ],
     next: '/email-address'
   },
   '/email-address': {

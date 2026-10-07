@@ -10,6 +10,9 @@
     "before": "Date of birth must be in the past",
     "after": "Enter a date after 01 01 1900"
   },
+  "claim-decided": {
+    "required": "Select if there has been a decision on the claim"
+  },
   "user-email": {
     "required": "Enter your email address",
     "email": "Enter a real email address"
