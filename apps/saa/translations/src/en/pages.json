@@ -235,6 +235,9 @@
       },
       "dependant": {
         "header": "Dependant"
+      },
+      "something-else": {
+        "header": "Something else"
       }
     },
     "fields": {}

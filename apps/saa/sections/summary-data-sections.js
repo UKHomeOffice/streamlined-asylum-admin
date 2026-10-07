@@ -23,5 +23,13 @@ module.exports = {
         field: 'send-evidence-for-your-claim'
       }
     ]
+  },
+  'something-else': {
+    steps: [
+      {
+        step: '/something-else',
+        field: 'something-else'
+      }
+    ]
   }
 };
