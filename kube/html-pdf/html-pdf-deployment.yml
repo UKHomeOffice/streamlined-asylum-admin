@@ -61,7 +61,8 @@ spec:
             runAsNonRoot: true
 
         - name: nginx-proxy
-          image: quay.io/ukhomeofficedigital/nginx-proxy:v4.4.8@sha256:5b6c87e6fcbf555e3257a02bd6736e7ad4b8888a20fef798c53784dfe53bdcd6
+          # nginx-proxy-govuk:v4
+          image: quay.io/ukhomeofficedigital/nginx-proxy-govuk@sha256:4470064d0b1d20ae08c5fd85551576cb687f342a22d6cb456fda9b2c4ce8c8df
           resources:
             requests:
               memory: 10Mi
