@@ -1,9 +1,50 @@
 const hof = require('hof');
 const Summary = hof.components.summary;
-
 const CustomValidation = require('../common/behaviours/custom-validation');
 const somethingElseFork = require('../saa/behaviours/something-else-fork');
 
+const MultiSelectFollowUps = require('./behaviours/multi-select-follow-ups');
+const multiSelectFollowUpsConfig = require('./config/multi-select-follow-ups-config');
+const multiSelectFollowUpsBehaviour = MultiSelectFollowUps(
+  multiSelectFollowUpsConfig
+);
+const baseUrl = '/changes';
+
+const getConfiguredSections = option => option.sections || [];
+
+const getCompletionRoutesForSection = section =>
+  MultiSelectFollowUps.asArray(section.completeOn).map(completion =>
+    MultiSelectFollowUps.getCompletionRoute(completion)
+  );
+
+const getCompletionRoutesForOption = option =>
+  getConfiguredSections(option).reduce(
+    (routes, section) => routes.concat(getCompletionRoutesForSection(section)),
+    []
+  );
+
+const getConfiguredCompletionRoutes = config =>
+  config.options.reduce(
+    (routes, option) => routes.concat(getCompletionRoutesForOption(option)),
+    []
+  );
+
+const getStartRoutesForOption = option =>
+  getConfiguredSections(option).map(section => section.start);
+
+const getConfiguredStartRoutes = config =>
+  config.options.reduce(
+    (routes, option) => routes.concat(getStartRoutesForOption(option)),
+    []
+  );
+
+/*
+ * The multi-select follow-up behaviour is intentionally used as a thin wrapper
+ * around normal HOF routes. It only decides which selected section starts next
+ * after `/changes-to-contact-details`, and which section starts after a section
+ * completion page posts. Individual pages below still use their existing `next`
+ * and `forks` settings.
+ */
 const steps = {
   '/continue-to-form': {
     next: '/which-form'
@@ -41,10 +82,14 @@ const steps = {
     next: '/do-you-need-add-remove-dependant'
   },
   '/changes-to-contact-details': {
-    next: '/do-you-need-to-change-your-name'
+    fields: ['changes-to-contact-details'],
+    // Entry point: calculate active follow-up sections from the checkbox field.
+    behaviours: [multiSelectFollowUpsBehaviour],
+    next: '/do-you-need-add-remove-dependant'
   },
   '/do-you-need-to-change-your-name': {
-    next: '/reason-name-change'
+    next: '/reason-name-change',
+    backLink: '/changes/changes-to-contact-details'
   },
   '/reason-name-change': {
     next: '/new-name'
@@ -293,9 +338,57 @@ const steps = {
   '/expired-link': {}
 };
 
+/*
+ * Attach the behaviour only to configured section completion pages. This is the
+ * key design choice: the behaviour should not run every page in a selected flow,
+ * because section internals can include HOF forks, aggregate loops and local CYA
+ * journeys. Completion pages are the hand-off points back to the common
+ * orchestrator.
+ */
+getConfiguredCompletionRoutes(multiSelectFollowUpsConfig)
+  .filter((route, index, routes) => routes.indexOf(route) === index)
+  .forEach(route => {
+    if (!steps[route]) {
+      return;
+    }
+
+    steps[route].behaviours = [].concat(
+      steps[route].behaviours || [],
+      multiSelectFollowUpsBehaviour
+    );
+  });
+
+if (steps[multiSelectFollowUpsConfig.exitPoint]) {
+  steps[multiSelectFollowUpsConfig.exitPoint].behaviours = [].concat(
+    steps[multiSelectFollowUpsConfig.exitPoint].behaviours || [],
+    multiSelectFollowUpsBehaviour
+  );
+}
+
+getConfiguredStartRoutes(multiSelectFollowUpsConfig)
+  .filter((route, index, routes) => routes.indexOf(route) === index)
+  .forEach(route => {
+    if (!steps[route]) {
+      return;
+    }
+
+    steps[route].behaviours = [].concat(
+      steps[route].behaviours || [],
+      multiSelectFollowUpsBehaviour
+    );
+    steps[route].prereqs = [].concat(
+      steps[route].prereqs || [],
+      multiSelectFollowUpsConfig.entryPoint
+    );
+    steps[route].backLinks = [].concat(
+      steps[route].backLinks || [],
+      multiSelectFollowUpsConfig.entryPoint
+    );
+  });
+
 module.exports = {
   name: 'saa',
-  baseUrl: '/changes',
+  baseUrl,
   params: '/:action?/:id?/:edit?',
   fields: 'apps/saa/fields',
   views: 'apps/saa/views',
