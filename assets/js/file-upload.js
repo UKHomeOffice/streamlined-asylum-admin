@@ -27,7 +27,12 @@ const setUploadStatus = (status, errorType, elements) => {
       button.disabled = true;
       button.ariaDisabled = true;
     });
-    removeLinks.forEach(link => link.classList.add('disabled-link'));
+    removeLinks.forEach(link => {
+      link.classList.add('disabled-link');
+      link.setAttribute('aria-disabled', 'true');
+      // Enter key and assistive tech activation also dispatch click
+      link.addEventListener('click', event => event.preventDefault());
+    });
   }
 };
 

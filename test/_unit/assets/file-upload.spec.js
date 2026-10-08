@@ -39,7 +39,11 @@ const createDocument = file => {
   };
   const spinner = { style: {} };
   const continueButton = { disabled: false, ariaDisabled: false };
-  const removeLink = { classList: createClassList() };
+  const removeLink = {
+    classList: createClassList(),
+    setAttribute: jest.fn(),
+    addEventListener: jest.fn()
+  };
   const form = { submit: jest.fn() };
 
   const document = {
@@ -130,6 +134,12 @@ describe('file upload client validation', () => {
     expect(fixture.input.disabled).toBe(true);
     expect(fixture.continueButton.disabled).toBe(true);
     expect(fixture.removeLink.classList.add).toHaveBeenCalledWith('disabled-link');
+    expect(fixture.removeLink.setAttribute).toHaveBeenCalledWith('aria-disabled', 'true');
+    expect(fixture.removeLink.addEventListener).toHaveBeenCalledWith('click', expect.any(Function));
+
+    const event = { preventDefault: jest.fn() };
+    fixture.removeLink.addEventListener.mock.calls[0][1](event);
+    expect(event.preventDefault).toHaveBeenCalled();
   });
 
   test.each([
