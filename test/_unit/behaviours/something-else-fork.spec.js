@@ -17,7 +17,7 @@ describe('something else fork behaviour', () => {
   });
 
   beforeEach(() => {
-    baseGetNextStep.mockReturnValue('/updates/not-selected-options');
+    baseGetNextStep.mockReturnValue('/updates/no-options');
   });
 
   test('should go to contact us by email when something else is yes', () => {
@@ -37,7 +37,7 @@ describe('something else fork behaviour', () => {
     });
 
     expect(behaviour.getNextStep(req, {})).toBe(
-      '/updates/not-selected-options'
+      '/updates/no-options'
     );
   });
 
@@ -56,7 +56,7 @@ describe('something else fork behaviour', () => {
     const req = createRequest({ 'something-else': 'another-value' });
 
     expect(behaviour.getNextStep(req, {})).toBe(
-      '/updates/not-selected-options'
+      '/updates/no-options'
     );
   });
 });

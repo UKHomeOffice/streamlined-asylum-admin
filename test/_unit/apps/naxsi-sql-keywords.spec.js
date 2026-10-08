@@ -6,13 +6,12 @@ const commonApp = require('../../../apps/common');
 const saaApp = require('../../../apps/saa');
 
 // Mirrors the NAXSI core rule 1000 "sql keywords" pattern
-const NAXSI_SQL_KEYWORDS = new RegExp(
-  `\\b(${[
-    'select', 'union', 'update', 'delete', 'insert', 'table', 'from', 'ascii',
-    'hex', 'unhex', 'drop', 'load_file', 'substr', 'group_concat', 'dumpfile'
-  ].join('|')})\\b`,
-  'i'
-);
+const SQL_KEYWORDS = [
+  'select', 'union', 'update', 'delete', 'insert', 'table', 'from', 'ascii',
+  'hex', 'unhex', 'drop', 'load_file', 'substr', 'group_concat', 'dumpfile'
+];
+
+const NAXSI_SQL_KEYWORDS = new RegExp(SQL_KEYWORDS.join('|'), 'i');
 
 const rootDir = path.resolve(__dirname, '../../..');
 const apps = [commonApp, saaApp];

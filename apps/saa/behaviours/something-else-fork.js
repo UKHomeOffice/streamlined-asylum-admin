@@ -19,7 +19,7 @@ const somethingElseFork = superclass =>
           return `${req.baseUrl}/confirm`;
         }
 
-        return `${req.baseUrl}/not-selected-options`;
+        return `${req.baseUrl}/no-options`;
       }
 
       return nextStep;

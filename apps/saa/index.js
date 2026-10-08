@@ -326,7 +326,7 @@ const steps = {
     fields: ['something-else']
   },
   '/contact-us-by-email': {},
-  '/not-selected-options': {
+  '/no-options': {
     backLink: 'something-else'
   },
   '/page-not-found': {},
