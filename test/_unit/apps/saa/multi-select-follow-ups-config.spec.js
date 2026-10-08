@@ -48,14 +48,14 @@ describe('SAA multi-select follow-up route config', () => {
   });
 
   test.each([
-    ['name', '/updates/do-you-need-to-change-your-name'],
-    ['date-of-birth', '/updates/whose-date-of-birth'],
-    ['nationality', '/updates/whose-nationality-to-change'],
-    ['address', '/updates/change-uk-address'],
-    ['email-address', '/updates/new-email-address'],
-    ['phone-number', '/updates/your-phone-number'],
-    [['nationality', 'address'], '/updates/whose-nationality-to-change'],
-    [['address', 'nationality'], '/updates/whose-nationality-to-change']
+    ['name', '/changes/do-you-need-to-change-your-name'],
+    ['date-of-birth', '/changes/whose-date-of-birth'],
+    ['nationality', '/changes/whose-nationality-to-change'],
+    ['address', '/changes/change-uk-address'],
+    ['email-address', '/changes/new-email-address'],
+    ['phone-number', '/changes/your-phone-number'],
+    [['nationality', 'address'], '/changes/whose-nationality-to-change'],
+    [['address', 'nationality'], '/changes/whose-nationality-to-change']
   ])(
     'routes selection %p to the expected first section',
     (selection, expectedRoute) => {
@@ -179,7 +179,7 @@ describe('SAA multi-select follow-up route config', () => {
       expect(err).toBeUndefined();
     });
 
-    expect(controller.getNextStep(req, {})).toBe('/updates/your-phone-number');
+    expect(controller.getNextStep(req, {})).toBe('/changes/your-phone-number');
   });
 
   test('completes the name section when someone else name change is answered no', () => {
@@ -249,7 +249,7 @@ describe('SAA multi-select follow-up route config', () => {
       sessionValues[multiSelectFollowUpsConfig.stateKey].completedSections
     ).toEqual(['name']);
     expect(controller.getNextStep(req, {})).toBe(
-      '/updates/whose-date-of-birth'
+      '/changes/whose-date-of-birth'
     );
   });
 });

@@ -7,7 +7,7 @@ const multiSelectFollowUpsConfig = require('./config/multi-select-follow-ups-con
 const multiSelectFollowUpsBehaviour = MultiSelectFollowUps(
   multiSelectFollowUpsConfig
 );
-const baseUrl = '/updates';
+const baseUrl = '/changes';
 
 const getConfiguredSections = option => option.sections || [];
 
@@ -88,7 +88,7 @@ const steps = {
   },
   '/do-you-need-to-change-your-name': {
     next: '/reason-name-change',
-    backLink: '/updates/changes-to-contact-details'
+    backLink: '/changes/changes-to-contact-details'
   },
   '/reason-name-change': {
     next: '/new-name'

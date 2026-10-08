@@ -201,7 +201,7 @@ describe('multi-select follow-ups behaviour', () => {
   test('entry route stores state, unsets inactive fields and routes to first added section', done => {
     const controller = buildController('/changes');
     const req = {
-      baseUrl: '/updates',
+      baseUrl: '/changes',
       params: { action: 'edit' },
       form: {
         options: { exitPoint: '/exit' },
@@ -235,7 +235,7 @@ describe('multi-select follow-ups behaviour', () => {
         '/first-middle',
         '/first-end'
       ]);
-      expect(controller.getNextStep(req, {})).toBe('/updates/first-start/edit');
+      expect(controller.getNextStep(req, {})).toBe('/changes/first-start/edit');
       done();
     });
   });
@@ -243,7 +243,7 @@ describe('multi-select follow-ups behaviour', () => {
   test('entry route follows configured order in non-edit journeys when a later section is newly added', done => {
     const controller = buildController('/changes');
     const req = {
-      baseUrl: '/updates',
+      baseUrl: '/changes',
       params: {},
       form: {
         options: { exitPoint: '/exit' },
@@ -270,7 +270,7 @@ describe('multi-select follow-ups behaviour', () => {
       expect(
         req.sessionModel.get('changes-follow-ups').sectionStartBackLink
       ).toBe('/changes');
-      expect(controller.getNextStep(req, {})).toBe('/updates/first-start');
+      expect(controller.getNextStep(req, {})).toBe('/changes/first-start');
       done();
     });
   });
@@ -278,7 +278,7 @@ describe('multi-select follow-ups behaviour', () => {
   test('entry route joins base URL without duplicating slashes', done => {
     const controller = buildController('/changes');
     const req = {
-      baseUrl: '/updates/',
+      baseUrl: '/changes/',
       params: {},
       form: {
         options: { exitPoint: '/exit' },
@@ -289,7 +289,7 @@ describe('multi-select follow-ups behaviour', () => {
 
     controller.saveValues(req, {}, err => {
       expect(err).toBeUndefined();
-      expect(controller.getNextStep(req, {})).toBe('/updates/first-start');
+      expect(controller.getNextStep(req, {})).toBe('/changes/first-start');
       done();
     });
   });
@@ -297,7 +297,7 @@ describe('multi-select follow-ups behaviour', () => {
   test('completed follow-up section advances to next incomplete section', done => {
     const controller = buildController('/first-end');
     const req = {
-      baseUrl: '/updates',
+      baseUrl: '/changes',
       params: {},
       form: {
         options: { exitPoint: '/exit' },
@@ -334,7 +334,7 @@ describe('multi-select follow-ups behaviour', () => {
       expect(
         req.sessionModel.get('changes-follow-ups').sectionStartBackLink
       ).toBe('/first-end');
-      expect(controller.getNextStep(req, {})).toBe('/updates/second-start');
+      expect(controller.getNextStep(req, {})).toBe('/changes/second-start');
       done();
     });
   });
@@ -342,7 +342,7 @@ describe('multi-select follow-ups behaviour', () => {
   test('exit page back link returns to the last completed section route', () => {
     const controller = buildController('/exit');
     const req = {
-      baseUrl: '/updates',
+      baseUrl: '/changes',
       sessionModel: buildSessionModel({
         'changes-follow-ups': {
           selections: ['first'],
@@ -354,14 +354,14 @@ describe('multi-select follow-ups behaviour', () => {
     };
 
     expect(controller.locals(req, {})).toEqual({
-      backLink: '/updates/first-end'
+      backLink: '/changes/first-end'
     });
   });
 
   test('exit page back link falls back to the entry page when no section has completed', () => {
     const controller = buildController('/exit');
     const req = {
-      baseUrl: '/updates',
+      baseUrl: '/changes',
       sessionModel: buildSessionModel({
         'changes-follow-ups': {
           selections: [],
@@ -372,14 +372,14 @@ describe('multi-select follow-ups behaviour', () => {
     };
 
     expect(controller.locals(req, {})).toEqual({
-      backLink: '/updates/changes'
+      backLink: '/changes/changes'
     });
   });
 
   test('section start page back link falls back to the entry page', () => {
     const controller = buildController('/second-start');
     const req = {
-      baseUrl: '/updates',
+      baseUrl: '/changes',
       sessionModel: buildSessionModel({
         'changes-follow-ups': {
           selections: ['second'],
@@ -392,14 +392,14 @@ describe('multi-select follow-ups behaviour', () => {
     };
 
     expect(controller.locals(req, {})).toEqual({
-      backLink: '/updates/changes'
+      backLink: '/changes/changes'
     });
   });
 
   test('section start page back link preserves edit mode for the entry page', () => {
     const controller = buildController('/second-start');
     const req = {
-      baseUrl: '/updates',
+      baseUrl: '/changes',
       params: { action: 'edit' },
       sessionModel: buildSessionModel({
         'changes-follow-ups': {
@@ -413,14 +413,14 @@ describe('multi-select follow-ups behaviour', () => {
     };
 
     expect(controller.locals(req, {})).toEqual({
-      backLink: '/updates/changes/edit'
+      backLink: '/changes/changes/edit'
     });
   });
 
   test('section start page back link returns to the previous completion route', () => {
     const controller = buildController('/second-start');
     const req = {
-      baseUrl: '/updates',
+      baseUrl: '/changes',
       sessionModel: buildSessionModel({
         'changes-follow-ups': {
           selections: ['first', 'second'],
@@ -434,14 +434,14 @@ describe('multi-select follow-ups behaviour', () => {
     };
 
     expect(controller.locals(req, {})).toEqual({
-      backLink: '/updates/first-end'
+      backLink: '/changes/first-end'
     });
   });
 
   test('section start page back link preserves edit mode for a previous completion route', () => {
     const controller = buildController('/second-start');
     const req = {
-      baseUrl: '/updates',
+      baseUrl: '/changes',
       params: { action: 'edit' },
       sessionModel: buildSessionModel({
         'changes-follow-ups': {
@@ -456,7 +456,7 @@ describe('multi-select follow-ups behaviour', () => {
     };
 
     expect(controller.locals(req, {})).toEqual({
-      backLink: '/updates/first-end/edit'
+      backLink: '/changes/first-end/edit'
     });
   });
 
@@ -489,7 +489,7 @@ describe('multi-select follow-ups behaviour', () => {
       threeSectionConfig
     );
     const req = {
-      baseUrl: '/updates',
+      baseUrl: '/changes',
       params: {},
       form: {
         options: { exitPoint: '/exit' },
@@ -517,7 +517,7 @@ describe('multi-select follow-ups behaviour', () => {
           }
         });
         expect(secondStartController.locals(req, {})).toEqual({
-          backLink: '/updates/first-end'
+          backLink: '/changes/first-end'
         });
         done();
       });
@@ -535,7 +535,7 @@ describe('multi-select follow-ups behaviour', () => {
       sectionStartBackLink: '/first-end'
     };
     const req = {
-      baseUrl: '/updates',
+      baseUrl: '/changes',
       params: {},
       form: {
         options: { exitPoint: '/exit' },
@@ -559,7 +559,7 @@ describe('multi-select follow-ups behaviour', () => {
       const controller = buildController('/second-question');
       const entryController = buildController('/changes');
       const req = {
-        baseUrl: '/updates',
+        baseUrl: '/changes',
         params,
         form: { values: { 'second-question': 'no' } },
         sessionModel: buildSessionModel({
@@ -586,7 +586,7 @@ describe('multi-select follow-ups behaviour', () => {
       expect(
         req.sessionModel.get('changes-follow-ups').completedSections
       ).toEqual(['first', 'second']);
-      expect(controller.getNextStep(req, {})).toBe('/updates/exit');
+      expect(controller.getNextStep(req, {})).toBe('/changes/exit');
 
       req.form.values = { 'second-question': 'yes' };
       await save(controller);
@@ -597,12 +597,12 @@ describe('multi-select follow-ups behaviour', () => {
       expect(
         req.sessionModel.get('changes-follow-ups').lastCompletionRoute
       ).toBeUndefined();
-      expect(controller.getNextStep(req, {})).toBe('/updates/fallback');
+      expect(controller.getNextStep(req, {})).toBe('/changes/fallback');
 
       req.form.values = { changes: ['first', 'second'] };
       await save(entryController);
       expect(entryController.getNextStep(req, {})).toBe(
-        `/updates/second-start${params.action === 'edit' ? '/edit' : ''}`
+        `/changes/second-start${params.action === 'edit' ? '/edit' : ''}`
       );
 
       req.form.values = {};
@@ -635,7 +635,7 @@ describe('multi-select follow-ups behaviour', () => {
         threeSectionConfig
       );
       const req = {
-        baseUrl: '/updates',
+        baseUrl: '/changes',
         params: {},
         form: { values: { 'second-question': 'yes' } },
         sessionModel: buildSessionModel({
@@ -672,7 +672,7 @@ describe('multi-select follow-ups behaviour', () => {
           '/first-start': '/changes',
           '/second-start': '/first-end'
         });
-        expect(controller.getNextStep(req, {})).toBe('/updates/fallback');
+        expect(controller.getNextStep(req, {})).toBe('/changes/fallback');
         done();
       });
     }
@@ -681,7 +681,7 @@ describe('multi-select follow-ups behaviour', () => {
   test('conditional completion route only completes section when condition is met', done => {
     const controller = buildController('/second-question');
     const req = {
-      baseUrl: '/updates',
+      baseUrl: '/changes',
       params: {},
       form: {
         options: { exitPoint: '/exit' },
@@ -702,7 +702,7 @@ describe('multi-select follow-ups behaviour', () => {
       expect(
         req.sessionModel.get('changes-follow-ups').completedSections
       ).toEqual(['second']);
-      expect(controller.getNextStep(req, {})).toBe('/updates/exit');
+      expect(controller.getNextStep(req, {})).toBe('/changes/exit');
       done();
     });
   });
