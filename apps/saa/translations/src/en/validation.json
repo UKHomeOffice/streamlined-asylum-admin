@@ -2,7 +2,7 @@
   "changes-to-contact-details": {
     "required": "Select what details you need to change"
   },
-  "update-personal-details": {
+  "change-personal-details": {
     "required": "Select if you need to update personal details"
   },
   "add-remove-dependant": {

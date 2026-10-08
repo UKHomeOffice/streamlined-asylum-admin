@@ -14,7 +14,7 @@ module.exports = {
     validate: ['required'],
     isPageHeading: true
   },
-  'update-personal-details': {
+  'change-personal-details': {
     mixin: 'radio-group',
     options: ['yes', 'no'],
     validate: ['required'],
