@@ -294,7 +294,7 @@ const steps = {
 
 module.exports = {
   name: 'saa',
-  baseUrl: '/updates',
+  baseUrl: '/changes',
   params: '/:action?/:id?/:edit?',
   fields: 'apps/saa/fields',
   views: 'apps/saa/views',
