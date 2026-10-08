@@ -15,7 +15,7 @@ describe('file upload configuration', () => {
     );
 
     expect(whitelist).not.toBeNull();
-    // file-vault 3.0.1 compares extensions without the leading dot
+    // File-vault expects whitelist entries without the leading dot
     expect(whitelist[1]).toBe(uploadConfig.acceptedFileExtensions.replaceAll('.', ''));
   });
 });
