@@ -7,7 +7,7 @@ jest.mock('../../../config', () => ({
   auth: {
     allowSkip: true,
     skipEmail: 'skip@example.com',
-    invalidTokenPath: '/updates/expired-link'
+    invalidTokenPath: '/changes/expired-link'
   }
 }));
 
@@ -125,7 +125,7 @@ describe('check email token behaviour', () => {
 
     await behaviour.getValues(req, res, next);
 
-    expect(res.redirect).toHaveBeenCalledWith('/updates/expired-link');
+    expect(res.redirect).toHaveBeenCalledWith('/changes/expired-link');
     expect(baseGetValues).not.toHaveBeenCalled();
   });
 
@@ -138,7 +138,7 @@ describe('check email token behaviour', () => {
       'error',
       'Check Token Error: Error: redis unavailable'
     );
-    expect(res.redirect).toHaveBeenCalledWith('/updates/expired-link');
+    expect(res.redirect).toHaveBeenCalledWith('/changes/expired-link');
     expect(baseGetValues).not.toHaveBeenCalled();
   });
 
@@ -167,7 +167,7 @@ describe('check email token behaviour', () => {
 
     expect(req.sessionModel.set).toHaveBeenCalledWith('valid-token', true);
     expect(secondReq.sessionModel.set).not.toHaveBeenCalled();
-    expect(secondRes.redirect).toHaveBeenCalledWith('/updates/expired-link');
+    expect(secondRes.redirect).toHaveBeenCalledWith('/changes/expired-link');
     expect(baseSaveValues).toHaveBeenCalledTimes(1);
   });
 

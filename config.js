@@ -10,8 +10,8 @@ module.exports = {
   },
   auth: {
     tokenExpiry: 1800,
-    continueAppPath: '/updates/continue-to-form',
-    invalidTokenPath: '/updates/expired-link',
+    continueAppPath: '/changes/continue-to-form',
+    invalidTokenPath: '/changes/expired-link',
     allowSkip: String(process.env.ALLOW_SKIP) === 'true',
     skipEmail: process.env.SKIP_EMAIL
   },
