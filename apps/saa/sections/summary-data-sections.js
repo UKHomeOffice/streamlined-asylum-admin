@@ -3,8 +3,8 @@ module.exports = {
   'personal-details': {
     steps: [
       {
-        step: '/update-personal-details',
-        field: 'update-personal-details'
+        step: '/personal-details',
+        field: 'change-personal-details'
       }
     ]
   },
@@ -21,6 +21,14 @@ module.exports = {
       {
         step: '/send-evidence-for-your-claim',
         field: 'send-evidence-for-your-claim'
+      }
+    ]
+  },
+  'something-else': {
+    steps: [
+      {
+        step: '/something-else',
+        field: 'something-else'
       }
     ]
   }
