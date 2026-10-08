@@ -22,7 +22,7 @@
       }
     }
   },
-  "update-personal-details": {
+  "change-personal-details": {
     "legend": "Do you need to update personal details?",
     "hint": "For example, a new address, phone number, email address or name",
     "options": {
@@ -105,6 +105,18 @@
   },
   "someone-on-claim-died": {
     "legend": "Do you need to tell us someone on your claim has died?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
+  "something-else": {
+    "legend": "Do you need to do something else?",
+    "hint": "For example, ask about progress on your claim or submit a letter of authority",
     "options": {
       "yes": {
         "label": "Yes"

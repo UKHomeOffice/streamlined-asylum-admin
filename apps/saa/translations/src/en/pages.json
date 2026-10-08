@@ -86,7 +86,7 @@
   "someone-else-correct-nationality": {
     "header": "Change someone else’s nationality"
   },
-  "provide-photo-update-contact": {
+  "provide-photo-identity": {
     "header": "Provide a photo identity document to update your contact details"
   },
   "change-uk-address": {
@@ -197,13 +197,10 @@
   "check-your-answers-death": {
     "header": "Check your answers"
   },
-  "something-else": {
-    "header": "Do you need to do something else?"
-  },
   "contact-us-by-email": {
     "header": "You should contact the Home Office a different way"
   },
-  "not-selected-options": {
+  "no-options": {
     "header": "You have not selected any options"
   },
   "page-not-found": {
@@ -238,6 +235,9 @@
       },
       "dependant": {
         "header": "Dependant"
+      },
+      "something-else": {
+        "header": "Something else"
       }
     },
     "fields": {}

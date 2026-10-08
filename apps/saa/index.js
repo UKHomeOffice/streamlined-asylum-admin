@@ -1,6 +1,7 @@
 const hof = require('hof');
 const Summary = hof.components.summary;
 const CustomValidation = require('../common/behaviours/custom-validation');
+const somethingElseFork = require('../saa/behaviours/something-else-fork');
 
 const MultiSelectFollowUps = require('./behaviours/multi-select-follow-ups');
 const multiSelectFollowUpsConfig = require('./config/multi-select-follow-ups-config');
@@ -64,16 +65,16 @@ const steps = {
     next: '/who-are-you'
   },
   '/who-are-you': {
-    next: '/update-personal-details'
+    next: '/personal-details'
   },
-  '/update-personal-details': {
-    fields: ['update-personal-details'],
+  '/personal-details': {
+    fields: ['change-personal-details'],
     forks: [
       {
         target: '/changes-to-contact-details',
         continueOnEdit: true,
         condition: {
-          field: 'update-personal-details',
+          field: 'change-personal-details',
           value: 'yes'
         }
       }
@@ -151,9 +152,9 @@ const steps = {
     next: '/someone-else-correct-nationality'
   },
   '/someone-else-correct-nationality': {
-    next: '/provide-photo-update-contact'
+    next: '/provide-photo-identity'
   },
-  '/provide-photo-update-contact': {
+  '/provide-photo-identity': {
     next: '/change-uk-address'
   },
   '/change-uk-address': {
@@ -252,7 +253,7 @@ const steps = {
     next: '/check-your-answers-add-child-partner'
   },
   '/check-your-answers-add-child-partner': {
-    next: '/reason-for-removing-child-partner'
+    next: '/send-evidence-for-your-claim'
   },
   '/send-evidence-for-your-claim': {
     fields: ['send-evidence-for-your-claim'],
@@ -314,17 +315,20 @@ const steps = {
     next: '/check-your-answers-death'
   },
   '/check-your-answers-death': {
-    next: '/confirm'
+    next: '/something-else'
   },
   '/confirm': {
     behaviours: [Summary],
     sections: require('./sections/summary-data-sections')
   },
   '/something-else': {
-    next: '/contact-us-by-email'
+    behaviours: [somethingElseFork],
+    fields: ['something-else']
   },
   '/contact-us-by-email': {},
-  '/not-selected-options': {},
+  '/no-options': {
+    backLink: 'something-else'
+  },
   '/page-not-found': {},
   '/service-unavailable': {},
   '/problem-with-service': {},
