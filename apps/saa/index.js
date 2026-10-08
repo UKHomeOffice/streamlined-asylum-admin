@@ -24,9 +24,9 @@ const steps = {
     next: '/who-are-you'
   },
   '/who-are-you': {
-    next: '/update-personal-details'
+    next: '/personal-details'
   },
-  '/update-personal-details': {
+  '/personal-details': {
     fields: ['change-personal-details'],
     forks: [
       {
@@ -107,9 +107,9 @@ const steps = {
     next: '/someone-else-correct-nationality'
   },
   '/someone-else-correct-nationality': {
-    next: '/provide-photo-update-contact'
+    next: '/provide-photo-identity'
   },
-  '/provide-photo-update-contact': {
+  '/provide-photo-identity': {
     next: '/change-uk-address'
   },
   '/change-uk-address': {

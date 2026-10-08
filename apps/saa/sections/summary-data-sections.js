@@ -3,7 +3,7 @@ module.exports = {
   'personal-details': {
     steps: [
       {
-        step: '/update-personal-details',
+        step: '/personal-details',
         field: 'change-personal-details'
       }
     ]
