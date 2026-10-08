@@ -27,13 +27,13 @@ const steps = {
     next: '/update-personal-details'
   },
   '/update-personal-details': {
-    fields: ['update-personal-details'],
+    fields: ['change-personal-details'],
     forks: [
       {
         target: '/changes-to-contact-details',
         continueOnEdit: true,
         condition: {
-          field: 'update-personal-details',
+          field: 'change-personal-details',
           value: 'yes'
         }
       }

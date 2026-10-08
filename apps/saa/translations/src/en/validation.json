@@ -1,5 +1,5 @@
 {
-  "update-personal-details": {
+  "change-personal-details": {
     "required": "Select if you need to update personal details"
   },
   "add-remove-dependant": {

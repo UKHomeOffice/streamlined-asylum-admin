@@ -1,7 +1,7 @@
 const hof = require('hof');
 const dateComponent = hof.components.date;
 module.exports = {
-  'update-personal-details': {
+  'change-personal-details': {
     mixin: 'radio-group',
     options: ['yes', 'no'],
     validate: ['required'],

@@ -42,7 +42,7 @@ describe('something else fork behaviour', () => {
   });
 
   test.each([
-    'update-personal-details',
+    'change-personal-details',
     'add-remove-dependant',
     'send-evidence-for-your-claim',
     'someone-on-claim-died'

@@ -9,7 +9,7 @@ const somethingElseFork = superclass =>
 
       if (req.sessionModel.get('something-else') === 'no') {
         const selectedSection = [
-			    'update-personal-details',
+			    'change-personal-details',
           'add-remove-dependant',
           'send-evidence-for-your-claim',
           'someone-on-claim-died'
