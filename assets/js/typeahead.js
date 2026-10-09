@@ -17,6 +17,10 @@ function initTypeahead(element) {
   }
 
   // This needed to do custom validation in validate-autocomplete behaviour
+  const required = element.getAttribute('aria-required');
+  if (required !== null) {
+    input.setAttribute('aria-required', required);
+  }
   input.setAttribute('name', `${element.name}-auto`);
   const values = Array.from(document.getElementById(`${element.name}-select`).options).map(option => option.value);
 
