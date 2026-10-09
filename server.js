@@ -62,15 +62,6 @@ app.use((req, res, next) => {
           return;
         }
 
-        const isDataEmpty = data.length === 0;
-
-        if (isDataEmpty) {
-          logger.error(`Empty file received, data length: ${data.length}, 
-          filename: ${sanitiseFilename(fileInfo.filename)}`);
-          next(new Error('Empty file received'));
-          return;
-        }
-
         req.files[key] = {
           data: file.truncated ? null : data,
           name: fileInfo.filename || null,

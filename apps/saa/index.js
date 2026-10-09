@@ -1,7 +1,26 @@
 const hof = require('hof');
 const Summary = hof.components.summary;
+const config = require('../../config');
+
 const CustomValidation = require('../common/behaviours/custom-validation');
 const somethingElseFork = require('../saa/behaviours/something-else-fork');
+const RemoveDocument = require('./behaviours/remove-document');
+const SaveDocument = require('./behaviours/save-document');
+
+const documentUploadStep = category => ({
+  behaviours: [
+    SaveDocument(category, 'file-upload'),
+    RemoveDocument(category)
+  ],
+  fields: ['file-upload'],
+  locals: {
+    documentCategory: {
+      name: category,
+      acceptedFileExtensions: config.upload.acceptedFileExtensions,
+      ...config.upload.documentCategories[category]
+    }
+  }
+});
 
 const MultiSelectFollowUps = require('./behaviours/multi-select-follow-ups');
 const multiSelectFollowUpsConfig = require('./config/multi-select-follow-ups-config');
@@ -23,8 +42,8 @@ const getCompletionRoutesForOption = option =>
     []
   );
 
-const getConfiguredCompletionRoutes = config =>
-  config.options.reduce(
+const getConfiguredCompletionRoutes = followUpsConfig =>
+  followUpsConfig.options.reduce(
     (routes, option) => routes.concat(getCompletionRoutesForOption(option)),
     []
   );
@@ -32,8 +51,8 @@ const getConfiguredCompletionRoutes = config =>
 const getStartRoutesForOption = option =>
   getConfiguredSections(option).map(section => section.start);
 
-const getConfiguredStartRoutes = config =>
-  config.options.reduce(
+const getConfiguredStartRoutes = followUpsConfig =>
+  followUpsConfig.options.reduce(
     (routes, option) => routes.concat(getStartRoutesForOption(option)),
     []
   );
@@ -98,6 +117,7 @@ const steps = {
     next: '/new-name-evidence'
   },
   '/new-name-evidence': {
+    // provisional document category: documents-new-name
     next: '/check-your-answers-name'
   },
   '/check-your-answers-name': {
@@ -110,6 +130,10 @@ const steps = {
     next: '/someone-else-new-name'
   },
   '/someone-else-new-name': {
+    next: '/someone-else-new-name-evidence'
+  },
+  '/someone-else-new-name-evidence': {
+    // provisional document category: documents-someone-else-new-name
     next: '/whose-date-of-birth'
   },
   '/whose-date-of-birth': {
@@ -119,6 +143,7 @@ const steps = {
     next: '/new-date-of-birth-evidence'
   },
   '/new-date-of-birth-evidence': {
+    // provisional document category: documents-new-dob
     next: '/check-your-answers-date-of-birth'
   },
   '/check-your-answers-date-of-birth': {
@@ -128,6 +153,7 @@ const steps = {
     next: '/someone-else-correct-date-of-birth'
   },
   '/someone-else-correct-date-of-birth': {
+    // provisional document category: documents-someone-else-new-dob
     next: '/whose-nationality-to-change'
   },
   '/whose-nationality-to-change': {
@@ -140,6 +166,7 @@ const steps = {
     next: '/upload-nationality-evidence'
   },
   '/upload-nationality-evidence': {
+    // provisional document category: documents-nationality
     next: '/check-your-answers-nationality'
   },
   '/check-your-answers-nationality': {
@@ -152,9 +179,11 @@ const steps = {
     next: '/someone-else-correct-nationality'
   },
   '/someone-else-correct-nationality': {
+    // provisional document category: documents-someone-else-nationality
     next: '/provide-photo-identity'
   },
   '/provide-photo-identity': {
+    // provisional document category: documents-update-contact
     next: '/change-uk-address'
   },
   '/change-uk-address': {
@@ -250,6 +279,7 @@ const steps = {
     next: '/evidence-child-partner'
   },
   '/evidence-child-partner': {
+    // provisional document category: documents-child-partner
     next: '/check-your-answers-add-child-partner'
   },
   '/check-your-answers-add-child-partner': {
@@ -273,6 +303,7 @@ const steps = {
     next: '/upload-supporting-evidence'
   },
   '/upload-supporting-evidence': {
+    ...documentUploadStep('documents-help-your-claim'),
     next: '/violent-upsetting-images'
   },
   '/violent-upsetting-images': {
@@ -312,6 +343,7 @@ const steps = {
     next: '/upload-death-certificate'
   },
   '/upload-death-certificate': {
+    // provisional document category: documents-death-certificate
     next: '/check-your-answers-death'
   },
   '/check-your-answers-death': {

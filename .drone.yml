@@ -98,8 +98,8 @@ clone_repos_step: &clone_repos_step
   commands:
     - test -s "$CLONE_TOKEN_FILE" || (echo "$CLONE_TOKEN_MISSING_MESSAGE" && exit 1)
     - export GITHUB_TOKEN="$(cat "$CLONE_TOKEN_FILE")"
-    - git clone https://x-access-token:$${GITHUB_TOKEN}@github.com/UKHomeOfficeForms/hof-services-config.git
-    - if [ "${CLONE_REPOS_PRUNE:-false}" = "true" ]; then find hof-services-config/* | grep -v $HOF_CONFIG | grep -v 'infrastructure' | xargs rm -rf; fi
+    - git clone --depth 1 --filter=blob:none --sparse https://x-access-token:$${GITHUB_TOKEN}@github.com/UKHomeOfficeForms/hof-services-config.git
+    - git -C hof-services-config sparse-checkout set "$${HOF_CONFIG#hof-services-config/}" infrastructure
     - rm -f "$CLONE_TOKEN_FILE"
 
 steps:
@@ -118,7 +118,6 @@ steps:
     environment:
       CLONE_TOKEN_FILE: /root/.dockersock/github_app_token_for_clone.txt
       CLONE_TOKEN_MISSING_MESSAGE: Missing GitHub App token file for clone step.
-      CLONE_REPOS_PRUNE: "true"
     when:
       branch:
         <<: *include_default_and_feature_branches
@@ -159,6 +158,8 @@ steps:
       branch:
         <<: *include_default_and_feature_branches
       event: [push, pull_request]
+    depends_on:
+      - scan_base_image_os
 
   - name: linting
     <<: *linting
@@ -185,6 +186,7 @@ steps:
         <<: *include_default_and_feature_branches
       event: [push, pull_request]
     depends_on:
+      - linting
       - unit_tests
 
   - name: build_image_for_trivy
@@ -202,31 +204,8 @@ steps:
         <<: *include_default_and_feature_branches
       event: [push, pull_request]
     depends_on:
-      - linting
-      - unit_tests
       - sonar_scanner
-
-  - name: build_image_and_push_to_ecr
-    pull: if-not-exists
-    image: plugins/ecr
-    settings:
-      access_key:
-        from_secret: aws_access_key_id
-      secret_key:
-        from_secret: aws_secret_access_key
-      region: eu-west-2
-      repo: sas/saa
-      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
-      tags:
-        - ${DRONE_COMMIT_SHA}
-    when:
-      branch:
-        <<: *include_default_and_feature_branches
-      event: [push, pull_request]
-    depends_on:
-      - linting
-      - unit_tests
-      - build_image_for_trivy
+      - scan_base_image_os
 
   # Trivy Security Scannner for scanning nodejs packages in Yarn
   - name: scan_node_packages
@@ -249,6 +228,27 @@ steps:
       event: [push, pull_request]
     depends_on:
       - build_image_for_trivy
+      - clone_repos
+
+  - name: build_image_and_push_to_ecr
+    pull: if-not-exists
+    image: plugins/ecr
+    settings:
+      access_key:
+        from_secret: aws_access_key_id
+      secret_key:
+        from_secret: aws_secret_access_key
+      region: eu-west-2
+      repo: sas/saa
+      registry: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
+      tags:
+        - ${DRONE_COMMIT_SHA}
+    when:
+      branch:
+        <<: *include_default_and_feature_branches
+      event: [push, pull_request]
+    depends_on:
+      - scan_node_packages
 
   # Deploy to pull request UAT environment
   - name: deploy_to_branch
