@@ -3,14 +3,14 @@
 const mockUploadSave = jest.fn();
 const mockUploadToJSON = jest.fn();
 
-jest.mock('../../../utils/file-upload', () => jest.fn().mockImplementation(() => ({
+jest.mock('../../../../../utils/file-upload', () => jest.fn().mockImplementation(() => ({
   save: mockUploadSave,
   toJSON: mockUploadToJSON
 })));
 
-const SaveDocument = require('../../../apps/saa/behaviours/save-document');
-const FileUpload = require('../../../utils/file-upload');
-const uploadConfig = require('../../../assets/js/file-upload-config');
+const SaveDocument = require('../../../../../apps/saa/behaviours/save-document');
+const FileUpload = require('../../../../../utils/file-upload');
+const uploadConfig = require('../../../../../assets/js/file-upload-config');
 
 class ValidationError extends Error {
   constructor(key, options) {

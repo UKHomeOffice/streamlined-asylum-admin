@@ -197,7 +197,8 @@
     "header": "Check your answers"
   },
   "contact-us-by-email": {
-    "header": "You should contact the Home Office a different way"
+    "header": "You should contact the Home Office a different way",
+    "captionHeading": "Something else"
   },
   "no-options": {
     "header": "You have not selected any options"

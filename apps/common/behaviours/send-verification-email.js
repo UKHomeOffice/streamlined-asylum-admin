@@ -68,7 +68,7 @@ const sendVerificationEmail = superclass =>
           if (isTeamOnlyNotifyError(error)) {
             return res.redirect('/team-email-invalid');
           }
-          return next(error);
+          return next(new Error(notifyMessage));
         }
       });
     }
