@@ -1,3 +1,5 @@
+const { SECTION_FIELDS } = require('./constants');
+
 /**
  * Redacts the middle of a filename while preserving its first two characters,
  * final two basename characters, and extension.
@@ -47,10 +49,14 @@ const isTeamOnlyNotifyError = error => {
   return message === 'Can’t send to this recipient using a team-only API key';
 };
 
+const hasSelectedSection = sessionModel =>
+  SECTION_FIELDS.some(field => sessionModel.get(field) === 'yes');
+
 module.exports = {
   sanitiseFilename,
   validUniqueApplicationNumber,
   normaliseEmail,
   getNotifyErrorMessage,
-  isTeamOnlyNotifyError
+  isTeamOnlyNotifyError,
+  hasSelectedSection
 };

@@ -4,6 +4,7 @@ const config = require('../../config');
 
 const CustomValidation = require('../common/behaviours/custom-validation');
 const somethingElseFork = require('../saa/behaviours/something-else-fork');
+const ContactUsByEmail = require('./behaviours/contact-us-by-email');
 const CheckEmailToken = require('./behaviours/check-email-token');
 const RemoveDocument = require('./behaviours/remove-document');
 const SaveDocument = require('./behaviours/save-document');
@@ -359,9 +360,14 @@ const steps = {
   },
   '/something-else': {
     behaviours: [somethingElseFork],
-    fields: ['something-else']
+    fields: ['something-else'],
+    next: '/confirm'
   },
-  '/contact-us-by-email': {},
+  '/contact-us-by-email': {
+    behaviours: [ContactUsByEmail],
+    backLink: 'something-else',
+    next: '/confirm'
+  },
   '/no-options': {
     backLink: 'something-else'
   },
