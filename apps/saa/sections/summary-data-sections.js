@@ -16,7 +16,8 @@ module.exports = {
       },
       {
         step: '/child-partner-nationality',
-        field: 'child-partner-nationality'
+        field: 'child-partner-nationality',
+        dependsOn: 'add-remove-dependant'
       }
     ]
   },
