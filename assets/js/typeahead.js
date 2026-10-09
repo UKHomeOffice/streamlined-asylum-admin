@@ -1,4 +1,3 @@
-/* eslint-disable no-var, vars-on-top */
 'use strict';
 
 const accessibleAutocomplete = require('accessible-autocomplete');
