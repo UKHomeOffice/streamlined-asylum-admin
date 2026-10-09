@@ -1,4 +1,5 @@
 const hof = require('hof');
+const countries = require('hof').utils.countries();
 const dateComponent = hof.components.date;
 module.exports = {
   'changes-to-contact-details': {
@@ -95,5 +96,14 @@ module.exports = {
     validate: ['required'],
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
+  },
+  'child-partner-nationality': {
+    mixin: 'select',
+    className: ['typeahead'],
+    validate: ['required'],
+    options: [{
+      value: '',
+      label: 'fields.child-partner-nationality.options.none_selected'
+    }].concat(countries)
   }
 };

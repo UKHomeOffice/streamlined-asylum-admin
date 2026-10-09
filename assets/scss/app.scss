@@ -284,7 +284,7 @@ pre.looped-records {
   font-family: "GDS Transport", arial, sans-serif;
 }
 
-ul:not(p.govuk-list-label--content + ul):not(.govuk-error-summary__list) {
+ul:not([class]):not(p.govuk-list-label--content + ul) {
   @extend .govuk-list--bullet;
 }
 
