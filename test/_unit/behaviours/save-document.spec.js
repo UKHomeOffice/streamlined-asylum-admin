@@ -261,7 +261,7 @@ describe('save document behaviour', () => {
     );
 
     expect(behaviour.validateField('file-upload', req)).toMatchObject({
-      type: 'supportingEvidenceLimit',
+      type: 'fileCountLimit',
       arguments: [categoryLimit]
     });
   });

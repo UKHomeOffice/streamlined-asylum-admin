@@ -17,7 +17,11 @@ module.exports = {
   documentCategories: {
     'documents-help-your-claim': {
       limit: 6,
-      limitValidationError: 'supportingEvidenceLimit'
+      limitValidationError: 'fileCountLimit'
+    },
+    'documents-child-partner': {
+      limit: 6,
+      limitValidationError: 'fileCountLimit'
     }
   }
 };

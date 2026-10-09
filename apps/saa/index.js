@@ -279,7 +279,7 @@ const steps = {
     next: '/evidence-child-partner'
   },
   '/evidence-child-partner': {
-    // provisional document category: documents-child-partner
+    ...documentUploadStep('documents-child-partner'),
     next: '/check-your-answers-add-child-partner'
   },
   '/check-your-answers-add-child-partner': {
