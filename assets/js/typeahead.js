@@ -22,7 +22,6 @@ function initTypeahead(element) {
     input.setAttribute('aria-required', required);
   }
   input.setAttribute('name', `${element.name}-auto`);
-  const values = Array.from(document.getElementById(`${element.name}-select`).options).map(option => option.value);
 
   function clear() {
     element.value = '';
