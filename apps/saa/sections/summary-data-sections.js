@@ -13,6 +13,10 @@ module.exports = {
       {
         step: '/do-you-need-add-remove-dependant',
         field: 'add-remove-dependant'
+      },
+      {
+        step: '/child-partner-nationality',
+        field: 'child-partner-nationality'
       }
     ]
   },

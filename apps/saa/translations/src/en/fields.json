@@ -130,5 +130,11 @@
     "label": "Upload a file",
     "no-files-uploaded": "No files uploaded",
     "files-uploaded": "Files uploaded"
+  },
+  "child-partner-nationality": {
+    "label": "Country of nationality",
+    "options": {
+      "none_selected": "Select a country"
+    }
   }
 }

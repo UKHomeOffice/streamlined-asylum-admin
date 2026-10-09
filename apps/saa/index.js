@@ -279,6 +279,7 @@ const steps = {
     next: '/child-partner-nationality'
   },
   '/child-partner-nationality': {
+    fields: ['child-partner-nationality'],
     next: '/evidence-child-partner'
   },
   '/evidence-child-partner': {

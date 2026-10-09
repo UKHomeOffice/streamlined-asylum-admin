@@ -56,5 +56,8 @@
     "fileType": "File must be a document (.doc, .docx, .pdf, .rtf, .txt, .odt) or image (.jpeg, .jpg, .png)",
     "supportingEvidenceLimit": "You can only upload up to {{supportingEvidenceLimit}} files. Remove a file before uploading another",
     "isDuplicateFileName": "A file with this name has already been uploaded"
+  },
+  "child-partner-nationality": {
+    "required": "Select their country of nationality"
   }
 }
