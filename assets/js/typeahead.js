@@ -30,11 +30,9 @@ function initTypeahead(element) {
   }
 
   input.addEventListener('input', () => {
-    // If user clears the field completely
-    if (!input.value) clear();
-
-    // If user enters a value not in the values array
-    if (input.value && !values.includes(input.value)) clear();
+    if(input.value !== element.value) {
+      clear();
+    }
   });
 }
 
