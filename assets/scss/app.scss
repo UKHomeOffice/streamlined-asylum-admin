@@ -284,10 +284,6 @@ pre.looped-records {
   font-family: "GDS Transport", arial, sans-serif;
 }
 
-/*ul:not(p.govuk-list-label--content + ul):not(.autocomplete__menu):not(.govuk-error-summary__list) {
-  @extend .govuk-list--bullet;
-}*/
-
 ul:not([class]):not(p.govuk-list-label--content + ul) {
   @extend .govuk-list--bullet;
 }
