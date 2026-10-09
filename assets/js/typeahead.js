@@ -29,7 +29,7 @@ function initTypeahead(element) {
   }
 
   input.addEventListener('input', () => {
-    if(input.value !== element.value) {
+    if (element.value && input.value !== element.value) {
       clear();
     }
   });
