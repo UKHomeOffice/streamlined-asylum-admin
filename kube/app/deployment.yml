@@ -70,6 +70,15 @@ spec:
               {{ else }}
               value: redis
               {{ end }}
+            {{ if or (eq .KUBE_NAMESPACE .BRANCH_ENV) (eq .KUBE_NAMESPACE .UAT_ENV) }}
+            - name: ALLOW_SKIP
+              value: "true"
+            - name: SKIP_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: sas-hof-email
+                  key: sas-hof-email
+            {{ end }}
             - name: NOTIFY_KEY
               valueFrom:
                 secretKeyRef:

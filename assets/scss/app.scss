@@ -295,3 +295,44 @@ p.govuk-list-label--content + ul {
     @extend .govuk-link;
   }
 }
+
+/* Links instead of regular buttons */
+.button-as-link .govuk-button {
+  border: none;
+  padding: 0 !important;
+  font-family: inherit;
+  line-height: 25px;
+  -webkit-box-shadow: 0 0 0 #003618;
+  box-shadow: 0 0 0 #003618;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-bottom: 1em;
+  color: #1d70b8;
+  font-size: 1em;
+  display: inline !important;
+  max-width: 138px;
+  margin-right: -5px;
+
+  &:not(:focus) {
+    background: none !important;
+  }
+}
+
+.button-as-link .govuk-button:active {
+  color: black;
+  line-height: 23px;
+  border-bottom-style: solid;
+  border-bottom-color: black;
+  border-bottom-width: 4px;
+  text-decoration: none;
+}
+
+// Keep keyboard focus visible, including while the button is hovered or activated.
+.button-as-link .govuk-button:focus {
+  outline: 3px solid transparent;
+  background-color: #fd0;
+  color: #0b0c0c;
+  -webkit-box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+  box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+  text-decoration: none;
+}

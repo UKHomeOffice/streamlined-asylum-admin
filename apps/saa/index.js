@@ -4,6 +4,7 @@ const config = require('../../config');
 
 const CustomValidation = require('../common/behaviours/custom-validation');
 const somethingElseFork = require('../saa/behaviours/something-else-fork');
+const CheckEmailToken = require('./behaviours/check-email-token');
 const RemoveDocument = require('./behaviours/remove-document');
 const SaveDocument = require('./behaviours/save-document');
 
@@ -66,7 +67,9 @@ const getConfiguredStartRoutes = followUpsConfig =>
  */
 const steps = {
   '/continue-to-form': {
-    next: '/which-form'
+    behaviours: [CheckEmailToken],
+    next: '/which-form',
+    backLink: false
   },
   '/which-form': {
     next: '/information-given'

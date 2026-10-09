@@ -32,7 +32,25 @@ const validUniqueApplicationNumber = uanValue => {
   return uanNoWhitespace.match(/^\d(?:-?\d){15,19}$/);
 };
 
+const normaliseEmail = email => {
+  if (!email || typeof email !== 'string') {
+    return '';
+  }
+  return email.toLowerCase();
+};
+
+const getNotifyErrorMessage = error =>
+  error?.response?.data?.errors?.[0]?.message ?? error?.message;
+
+const isTeamOnlyNotifyError = error => {
+  const message = getNotifyErrorMessage(error);
+  return message === 'Can’t send to this recipient using a team-only API key';
+};
+
 module.exports = {
   sanitiseFilename,
-  validUniqueApplicationNumber
+  validUniqueApplicationNumber,
+  normaliseEmail,
+  getNotifyErrorMessage,
+  isTeamOnlyNotifyError
 };
