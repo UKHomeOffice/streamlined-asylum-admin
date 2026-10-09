@@ -1,4 +1,6 @@
 {
   "serviceName": "Streamlined Asylum Admin",
-  "header": "Streamlined Asylum Admin"
+  "header": "Streamlined Asylum Admin",
+  "error": "Error",
+  "uploading": "Uploading your file..."
 }

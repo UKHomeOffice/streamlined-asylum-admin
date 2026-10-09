@@ -1,6 +1,7 @@
 'use strict';
 
 const env = process.env.NODE_ENV || 'production';
+const fileUploadConfig = require('./assets/js/file-upload-config');
 
 module.exports = {
   env: env,
@@ -20,6 +21,15 @@ module.exports = {
     emailTemplates: {
       userVerifyEmailTemplateId: process.env.USER_VERIFY_EMAIL_TEMPLATE_ID
     }
+  },
+  upload: {
+    ...fileUploadConfig,
+    hostname: process.env.FILE_VAULT_URL
+  },
+  keycloak: {
+    tokenUrl: process.env.KEYCLOAK_TOKEN_URL,
+    clientId: process.env.KEYCLOAK_CLIENT_ID,
+    secret: process.env.KEYCLOAK_CLIENT_SECRET
   },
   feedbackUrl: process.env.FEEDBACK_URL,
   disallowIndexing: process.env.DISALLOW_INDEXING === 'true'
