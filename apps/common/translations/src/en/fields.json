@@ -17,5 +17,8 @@
         "label": "No"
       }
     }
+  },
+  "user-email": {
+    "label": "What is your email address?"
   }
 }

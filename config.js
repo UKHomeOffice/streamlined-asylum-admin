@@ -9,6 +9,19 @@ module.exports = {
     port: process.env.REDIS_PORT || '6379',
     host: process.env.REDIS_HOST || '127.0.0.1'
   },
+  auth: {
+    tokenExpiry: 1800,
+    continueAppPath: '/changes/continue-to-form',
+    invalidTokenPath: '/changes/expired-link',
+    allowSkip: String(process.env.ALLOW_SKIP) === 'true',
+    skipEmail: process.env.SKIP_EMAIL
+  },
+  govukNotify: {
+    notifyApiKey: process.env.NOTIFY_KEY,
+    emailTemplates: {
+      userVerifyEmailTemplateId: process.env.USER_VERIFY_EMAIL_TEMPLATE_ID
+    }
+  },
   upload: {
     ...fileUploadConfig,
     hostname: process.env.FILE_VAULT_URL

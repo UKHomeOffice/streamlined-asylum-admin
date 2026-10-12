@@ -1,5 +1,11 @@
 'use strict';
 
+// Route configuration tests do not need a Redis connection.
+jest.mock(
+  '../../../../apps/saa/behaviours/check-email-token',
+  () => superclass => superclass
+);
+
 const app = require('../../../../apps/saa');
 const MultiSelectFollowUps = require('../../../../apps/saa/behaviours/multi-select-follow-ups');
 const multiSelectFollowUpsConfig = require('../../../../apps/saa/config/multi-select-follow-ups-config');
