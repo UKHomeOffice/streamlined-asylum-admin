@@ -122,6 +122,26 @@ describe('file upload client validation', () => {
     expect(fixture.input.setAttribute).not.toHaveBeenCalled();
   });
 
+  test('clears a previous error when the file selection is cancelled', () => {
+    const fixture = createDocument({ name: 'evidence.pdf', size: 0, type: 'application/pdf' });
+    global.document = fixture.document;
+
+    initFileUpload();
+    fixture.dispatchChange();
+    expect(fixture.component.classList.add).toHaveBeenCalledWith('govuk-form-group--error');
+
+    jest.clearAllMocks();
+    fixture.input.files = [];
+    fixture.dispatchChange();
+
+    expect(fixture.component.classList.remove).toHaveBeenCalledWith('govuk-form-group--error');
+    expect(fixture.input.removeAttribute).toHaveBeenCalledWith('aria-invalid');
+    expect(fixture.input.removeAttribute).toHaveBeenCalledWith('aria-describedby');
+    expect(fixture.component.classList.add).not.toHaveBeenCalled();
+    expect(fixture.form.submit).not.toHaveBeenCalled();
+    expect(fixture.spinner.style.display).toBeUndefined();
+  });
+
   test('submits a valid file and shows the uploading state', () => {
     const fixture = createDocument({ name: 'evidence.pdf', size: 100, type: 'application/pdf' });
     global.document = fixture.document;

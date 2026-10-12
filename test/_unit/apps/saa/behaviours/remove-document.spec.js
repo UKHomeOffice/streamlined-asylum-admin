@@ -1,6 +1,6 @@
 'use strict';
 
-const RemoveDocument = require('../../../apps/saa/behaviours/remove-document');
+const RemoveDocument = require('../../../../../apps/saa/behaviours/remove-document');
 
 const baseConfigure = jest.fn();
 

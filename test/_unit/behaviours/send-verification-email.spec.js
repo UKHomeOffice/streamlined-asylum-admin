@@ -243,7 +243,7 @@ describe('send verification email behaviour', () => {
 
     await behaviour.saveValues(req, res, next);
 
-    expect(next).toHaveBeenCalledWith(error);
+    expect(next).toHaveBeenCalledWith(new Error('Invalid API key'));
     expect(res.redirect).not.toHaveBeenCalled();
     expect(log.error).toHaveBeenCalledWith(
       'Verification email flow failed: Invalid API key'

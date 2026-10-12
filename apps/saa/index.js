@@ -4,9 +4,11 @@ const config = require('../../config');
 
 const CustomValidation = require('../common/behaviours/custom-validation');
 const somethingElseFork = require('../saa/behaviours/something-else-fork');
+const ContactUsByEmail = require('./behaviours/contact-us-by-email');
 const CheckEmailToken = require('./behaviours/check-email-token');
 const RemoveDocument = require('./behaviours/remove-document');
 const SaveDocument = require('./behaviours/save-document');
+const RequireSelectedSection = require('./behaviours/require-selected-section');
 
 const documentUploadStep = category => ({
   behaviours: [
@@ -90,6 +92,7 @@ const steps = {
     next: '/personal-details'
   },
   '/personal-details': {
+    behaviours: [RequireSelectedSection],
     fields: ['change-personal-details'],
     forks: [
       {
@@ -235,6 +238,7 @@ const steps = {
     next: '/do-you-need-add-remove-dependant'
   },
   '/do-you-need-add-remove-dependant': {
+    behaviours: [RequireSelectedSection],
     fields: ['add-remove-dependant'],
     forks: [
       {
@@ -290,6 +294,7 @@ const steps = {
     next: '/send-evidence-for-your-claim'
   },
   '/send-evidence-for-your-claim': {
+    behaviours: [RequireSelectedSection],
     fields: ['send-evidence-for-your-claim'],
     forks: [
       {
@@ -304,13 +309,16 @@ const steps = {
     next: '/someone-on-claim-died'
   },
   '/prepare-your-evidence': {
+    continueOnEdit: true,
     next: '/upload-supporting-evidence'
   },
   '/upload-supporting-evidence': {
+    continueOnEdit: true,
     ...documentUploadStep('documents-help-your-claim'),
     next: '/violent-upsetting-images'
   },
   '/violent-upsetting-images': {
+    continueOnEdit: true,
     fields: ['evidence-violent-or-upsetting'],
     next: '/check-your-answers-evidence'
   },
@@ -318,6 +326,7 @@ const steps = {
     next: '/someone-on-claim-died'
   },
   '/someone-on-claim-died': {
+    behaviours: [RequireSelectedSection],
     fields: ['someone-on-claim-died'],
     forks: [
       {
@@ -359,9 +368,14 @@ const steps = {
   },
   '/something-else': {
     behaviours: [somethingElseFork],
-    fields: ['something-else']
+    fields: ['something-else'],
+    next: '/confirm'
   },
-  '/contact-us-by-email': {},
+  '/contact-us-by-email': {
+    behaviours: [ContactUsByEmail],
+    backLink: 'something-else',
+    next: '/confirm'
+  },
   '/no-options': {
     backLink: 'something-else'
   },

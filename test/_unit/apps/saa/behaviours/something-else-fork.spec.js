@@ -1,4 +1,4 @@
-const somethingElseFork = require('../../../apps/saa/behaviours/something-else-fork');
+const somethingElseFork = require('../../../../../apps/saa/behaviours/something-else-fork');
 
 describe('something else fork behaviour', () => {
   const baseGetNextStep = jest.fn();
@@ -17,28 +17,25 @@ describe('something else fork behaviour', () => {
   });
 
   beforeEach(() => {
-    baseGetNextStep.mockReturnValue('/updates/no-options');
+    baseGetNextStep.mockReturnValue('/updates/default');
   });
 
   test('should go to contact us by email when something else is yes', () => {
     const req = createRequest({ 'something-else': 'yes' });
 
-    expect(behaviour.getNextStep(req, {})).toBe(
-      '/updates/contact-us-by-email'
-    );
+    expect(behaviour.getNextStep(req, {})).toBe('/updates/contact-us-by-email');
   });
 
-  test('should go to not selected options when something else is no', () => {
+  test('should go to no options when something else is no and nothing else was selected', () => {
     const req = createRequest({
+      'change-personal-details': 'no',
       'add-remove-dependant': 'no',
       'send-evidence-for-your-claim': 'no',
       'someone-on-claim-died': 'no',
       'something-else': 'no'
     });
 
-    expect(behaviour.getNextStep(req, {})).toBe(
-      '/updates/no-options'
-    );
+    expect(behaviour.getNextStep(req, {})).toBe('/updates/no-options');
   });
 
   test.each([
@@ -55,8 +52,6 @@ describe('something else fork behaviour', () => {
   test('should preserve the configured next step for another value', () => {
     const req = createRequest({ 'something-else': 'another-value' });
 
-    expect(behaviour.getNextStep(req, {})).toBe(
-      '/updates/no-options'
-    );
+    expect(behaviour.getNextStep(req, {})).toBe('/updates/default');
   });
 });
