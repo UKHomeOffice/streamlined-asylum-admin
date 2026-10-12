@@ -177,7 +177,8 @@
     "header": "Check your answers"
   },
   "about-who-has-died": {
-    "header": "Tell us about the person who has died"
+    "header": "Tell us about the person who has died",
+    "captionHeading": "Tell us someone has died"
   },
   "main-claimant-died": {
     "header": "Did they make the claim?"
@@ -198,7 +199,8 @@
     "header": "Check your answers"
   },
   "contact-us-by-email": {
-    "header": "You should contact the Home Office a different way"
+    "header": "You should contact the Home Office a different way",
+    "captionHeading": "Something else"
   },
   "no-options": {
     "header": "You have not selected any options"

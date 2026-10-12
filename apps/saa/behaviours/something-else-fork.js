@@ -1,3 +1,5 @@
+const { hasSelectedSection } = require('../../../utils');
+
 const somethingElseFork = superclass =>
   class extends superclass {
     getNextStep(req, res) {
@@ -8,14 +10,7 @@ const somethingElseFork = superclass =>
       }
 
       if (req.sessionModel.get('something-else') === 'no') {
-        const selectedSection = [
-			    'change-personal-details',
-          'add-remove-dependant',
-          'send-evidence-for-your-claim',
-          'someone-on-claim-died'
-        ].some(field => req.sessionModel.get(field) === 'yes');
-
-        if (selectedSection) {
+        if (hasSelectedSection(req.sessionModel)) {
           return `${req.baseUrl}/confirm`;
         }
 
