@@ -10,8 +10,6 @@ class BaseBehaviour {
   }
 }
 
-const Behaviour = RemoveDocument('documents-help-your-claim')(BaseBehaviour);
-
 const createRequest = query => ({
   baseUrl: '/updates',
   path: '/upload-supporting-evidence',
@@ -23,7 +21,11 @@ const createRequest = query => ({
   }
 });
 
-describe('remove document behaviour', () => {
+describe.each([
+  ['documents-help-your-claim', '/upload-supporting-evidence'],
+  ['documents-child-partner', '/evidence-child-partner']
+])('remove document behaviour for %s', (documentCategory, uploadPath) => {
+  const Behaviour = RemoveDocument(documentCategory)(BaseBehaviour);
   let behaviour;
 
   beforeEach(() => {
@@ -32,6 +34,7 @@ describe('remove document behaviour', () => {
 
   test('removes the selected document and redirects back to the step', () => {
     const req = createRequest({ delete: 'remove-me' });
+    req.path = uploadPath;
     req.sessionModel.get.mockReturnValue([
       { id: 'keep-me', name: 'keep.pdf' },
       { id: 'remove-me', name: 'remove.pdf' }
@@ -40,10 +43,11 @@ describe('remove document behaviour', () => {
 
     behaviour.configure(req, res, jest.fn());
 
-    expect(req.sessionModel.set).toHaveBeenCalledWith('documents-help-your-claim', [
+    expect(req.sessionModel.get).toHaveBeenCalledWith(documentCategory);
+    expect(req.sessionModel.set).toHaveBeenCalledWith(documentCategory, [
       { id: 'keep-me', name: 'keep.pdf' }
     ]);
-    expect(res.redirect).toHaveBeenCalledWith('/updates/upload-supporting-evidence');
+    expect(res.redirect).toHaveBeenCalledWith(`/updates${uploadPath}`);
   });
 
   test('handles deletion when the session has no documents', () => {
@@ -52,7 +56,7 @@ describe('remove document behaviour', () => {
 
     behaviour.configure(req, { redirect: jest.fn() }, jest.fn());
 
-    expect(req.sessionModel.set).toHaveBeenCalledWith('documents-help-your-claim', []);
+    expect(req.sessionModel.set).toHaveBeenCalledWith(documentCategory, []);
   });
 
   test('delegates configuration when no document is selected', () => {
