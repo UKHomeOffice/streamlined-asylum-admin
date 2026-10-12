@@ -176,7 +176,8 @@
     "header": "Check your answers"
   },
   "about-who-has-died": {
-    "header": "Tell us about the person who has died"
+    "header": "Tell us about the person who has died",
+    "captionHeading": "Tell us someone has died"
   },
   "main-claimant-died": {
     "header": "Did they make the claim?"
