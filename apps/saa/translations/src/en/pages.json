@@ -151,7 +151,8 @@
     "header": "Their country of nationality"
   },
   "evidence-child-partner": {
-    "header": "Upload evidence to support this change"
+    "header": "Upload evidence to support this change",
+    "captionHeading": "Add or remove a child or partner"
   },
   "check-your-answers-add-child-partner": {
     "header": "Check your answers"
