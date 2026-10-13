@@ -238,6 +238,9 @@
       "dependant": {
         "header": "Dependant"
       },
+      "death": {
+        "header": "Tell us someone on your claim died"
+      },
       "something-else": {
         "header": "Something else"
       }
