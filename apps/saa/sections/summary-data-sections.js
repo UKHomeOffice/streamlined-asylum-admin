@@ -27,7 +27,7 @@ module.exports = {
         step: '/main-claimant-died',
         field: 'main-claimant-died'
       }
-    ],
+    ]
   },
   evidences: {
     steps: [
