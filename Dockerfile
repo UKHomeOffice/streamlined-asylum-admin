@@ -13,7 +13,7 @@ RUN yarn install --frozen-lockfile --production
 # -----------------------------
 # Stage 2: Runtime
 # -----------------------------
-FROM quay.io/ukhomeofficedigital/hof-nodejs:24.21.0-alpine3.24-v8@sha256:a0c438317862e595f45a51e7cb234a0c7e8c67aef2b886844d788dbe21c3b4101
+FROM quay.io/ukhomeofficedigital/hof-nodejs:24.21.0-alpine3.24-v8@sha256:a0c438317862e595f45a51e7cb234a0c7e8c67aef2b886844d788dbe21c3b410
 
 USER root
 
