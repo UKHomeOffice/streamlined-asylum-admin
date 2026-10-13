@@ -136,5 +136,16 @@
     "options": {
       "none_selected": "Select a country"
     }
+  },
+  "main-claimant-died": {
+    "legend": "Did they make the claim?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
   }
 }

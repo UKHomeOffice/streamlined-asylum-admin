@@ -21,6 +21,14 @@ module.exports = {
       }
     ]
   },
+  death: {
+    steps: [
+      {
+        step: '/main-claimant-died',
+        field: 'main-claimant-died'
+      }
+    ],
+  },
   evidences: {
     steps: [
       {

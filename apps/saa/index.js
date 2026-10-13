@@ -344,6 +344,7 @@ const steps = {
     next: '/main-claimant-died'
   },
   '/main-claimant-died': {
+    fields: ['main-claimant-died'],
     next: '/name-person-who-died'
   },
   '/name-person-who-died': {
