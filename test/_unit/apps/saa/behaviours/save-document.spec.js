@@ -47,8 +47,6 @@ class BaseBehaviour {
   }
 }
 
-const Behaviour = SaveDocument('documents-help-your-claim', 'file-upload')(BaseBehaviour);
-
 const createRequest = (overrides = {}) => ({
   baseUrl: '/updates',
   path: '/upload-supporting-evidence',
@@ -63,7 +61,14 @@ const createRequest = (overrides = {}) => ({
   ...overrides
 });
 
-describe('save document behaviour', () => {
+describe.each([
+  ['documents-help-your-claim', '/upload-supporting-evidence'],
+  ['documents-child-partner', '/evidence-child-partner']
+])('save document behaviour for %s', (documentCategory, uploadPath) => {
+  const Behaviour = SaveDocument(
+    documentCategory,
+    'file-upload'
+  )(BaseBehaviour);
   let behaviour;
 
   beforeEach(() => {
@@ -95,8 +100,14 @@ describe('save document behaviour', () => {
   });
 
   test('provides the upload field error to the view', () => {
-    const error = { key: 'file-upload', type: 'fileType', message: 'File must be a document' };
-    const req = createRequest({ form: { values: {}, errors: { 'file-upload': error } } });
+    const error = {
+      key: 'file-upload',
+      type: 'fileType',
+      message: 'File must be a document'
+    };
+    const req = createRequest({
+      form: { values: {}, errors: { 'file-upload': error } }
+    });
 
     expect(behaviour.locals(req, {}).fileUploadError).toBe(error);
   });
@@ -142,7 +153,9 @@ describe('save document behaviour', () => {
       }
     });
 
-    expect(behaviour.validateField('file-upload', req).type).toBe('maxFileSize');
+    expect(behaviour.validateField('file-upload', req).type).toBe(
+      'maxFileSize'
+    );
   });
 
   test('rejects empty files', () => {
@@ -171,7 +184,9 @@ describe('save document behaviour', () => {
       }
     });
 
-    expect(behaviour.validateField('file-upload', req).type).toBe('maxFileSize');
+    expect(behaviour.validateField('file-upload', req).type).toBe(
+      'maxFileSize'
+    );
   });
 
   test('rejects unsupported file types', () => {
@@ -188,23 +203,22 @@ describe('save document behaviour', () => {
     expect(behaviour.validateField('file-upload', req).type).toBe('fileType');
   });
 
-  test.each([
-    ['evidence.exe'],
-    ['evidence'],
-    ['evidence.pdf.exe']
-  ])('rejects %s with an allowed MIME type', name => {
-    const req = createRequest({
-      files: {
-        'file-upload': {
-          name,
-          size: 100,
-          mimetype: 'application/pdf'
+  test.each([['evidence.exe'], ['evidence'], ['evidence.pdf.exe']])(
+    'rejects %s with an allowed MIME type',
+    name => {
+      const req = createRequest({
+        files: {
+          'file-upload': {
+            name,
+            size: 100,
+            mimetype: 'application/pdf'
+          }
         }
-      }
-    });
+      });
 
-    expect(behaviour.validateField('file-upload', req).type).toBe('fileType');
-  });
+      expect(behaviour.validateField('file-upload', req).type).toBe('fileType');
+    }
+  );
 
   test('accepts an allowed extension regardless of case', () => {
     const req = createRequest({
@@ -222,7 +236,10 @@ describe('save document behaviour', () => {
 
   test.each([
     ['evidence.doc', 'application/msword'],
-    ['evidence.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+    [
+      'evidence.docx',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ],
     ['evidence.pdf', 'application/pdf'],
     ['evidence.rtf', 'application/rtf'],
     ['evidence.rtf', 'text/rtf'],
@@ -245,26 +262,37 @@ describe('save document behaviour', () => {
     expect(behaviour.validateField('file-upload', req)).toBeUndefined();
   });
 
-  test('rejects uploads when the category limit is reached', () => {
-    const categoryLimit = uploadConfig.documentCategories['documents-help-your-claim'].limit;
-    const req = createRequest({
-      files: {
-        'file-upload': {
-          name: 'another.pdf',
-          size: 100,
-          mimetype: 'application/pdf'
+  test.each([5, 6])(
+    'validates an upload with %i existing files against the six-file limit',
+    documentCount => {
+      expect(uploadConfig.documentCategories[documentCategory].limit).toBe(6);
+      const req = createRequest({
+        files: {
+          'file-upload': {
+            name: 'another.pdf',
+            size: 100,
+            mimetype: 'application/pdf'
+          }
         }
-      }
-    });
-    req.sessionModel.get.mockReturnValue(
-      Array.from({ length: categoryLimit }, (_, index) => ({ id: `${index}`, name: `${index}.pdf` }))
-    );
+      });
+      req.sessionModel.get.mockReturnValue(
+        Array.from({ length: documentCount }, (_, index) => ({
+          id: `${index}`,
+          name: `${index}.pdf`
+        }))
+      );
 
-    expect(behaviour.validateField('file-upload', req)).toMatchObject({
-      type: 'supportingEvidenceLimit',
-      arguments: [categoryLimit]
-    });
-  });
+      if (documentCount === 5) {
+        expect(behaviour.validateField('file-upload', req)).toBeUndefined();
+        return;
+      }
+
+      expect(behaviour.validateField('file-upload', req)).toMatchObject({
+        type: 'fileCountLimit',
+        arguments: [6]
+      });
+    }
+  );
 
   test('rejects a duplicate filename', () => {
     const req = createRequest({
@@ -307,7 +335,10 @@ describe('save document behaviour', () => {
       mimetype: 'application/pdf'
     };
     const existingDocument = { id: 'existing', name: 'existing.pdf' };
-    const req = createRequest({ files: { 'file-upload': file } });
+    const req = createRequest({
+      path: uploadPath,
+      files: { 'file-upload': file }
+    });
     req.sessionModel.get.mockReturnValue([existingDocument]);
     const res = { redirect: jest.fn() };
     const next = jest.fn();
@@ -316,11 +347,12 @@ describe('save document behaviour', () => {
 
     expect(FileUpload).toHaveBeenCalledWith(file);
     expect(mockUploadSave).toHaveBeenCalled();
-    expect(req.sessionModel.set).toHaveBeenCalledWith('documents-help-your-claim', [
+    expect(req.sessionModel.get).toHaveBeenCalledWith(documentCategory);
+    expect(req.sessionModel.set).toHaveBeenCalledWith(documentCategory, [
       existingDocument,
       { id: 'upload-id', name: 'evidence.pdf' }
     ]);
-    expect(res.redirect).toHaveBeenCalledWith('/updates/upload-supporting-evidence');
+    expect(res.redirect).toHaveBeenCalledWith(`/updates${uploadPath}`);
     expect(next).not.toHaveBeenCalled();
   });
 
