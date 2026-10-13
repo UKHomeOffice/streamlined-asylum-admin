@@ -50,10 +50,12 @@
     "legend": "Tell us if you want to add a dependant or remove a dependant",
     "options": {
       "add-child-partner": {
-        "label": "Add a child or partner to your claim"
+        "label": "Add a child or partner to your claim",
+        "summary-label": "Add a child or partner as a dependant"
       },
       "remove-child-partner": {
-        "label": "Remove a child or partner from your claim"
+        "label": "Remove a child or partner from your claim",
+        "summary-label": "Remove a child or partner as a dependant"
       }
     }
   },
@@ -72,7 +74,8 @@
     }
   },
   "child-partner-given-name": {
-    "label": "Given name"
+    "label": "Given name",
+    "summary-label": "Their name"
   },
   "child-partner-family-name": {
     "label": "Family name"
@@ -133,8 +136,12 @@
   },
   "child-partner-nationality": {
     "label": "Country of nationality",
+    "summary-label": "Their country of nationality",
     "options": {
       "none_selected": "Select a country"
     }
+  },
+  "documents-child-partner": {
+    "summary-label": "Files uploaded"
   }
 }

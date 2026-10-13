@@ -3,7 +3,8 @@ const {
   validUniqueApplicationNumber,
   normaliseEmail,
   getNotifyErrorMessage,
-  isTeamOnlyNotifyError
+  isTeamOnlyNotifyError,
+  formatDate
 } = require('../../../utils/index');
 
 describe('SAA utilities tests', () => {
@@ -167,4 +168,24 @@ describe('validUniqueApplicationNumber', () => {
   test('should return an empty string when the email address is not a string', () => {
     expect(normaliseEmail(123)).toBe('');
   });
+});
+
+describe('formatDate', () => {
+  test.each([
+    ['2020-03-27', '27 March 2020'],
+    ['2020-03-01', '01 March 2020']
+  ])('formats %s as %s', (value, expected) => {
+    expect(formatDate(value)).toBe(expected);
+  });
+
+  test('formats a Date object', () => {
+    expect(formatDate(new Date(2020, 2, 27))).toBe('27 March 2020');
+  });
+
+  test.each([['not-a-date'], [''], [undefined], [null], [20200327], [new Date('invalid')]])(
+    'throws for an invalid date: %p',
+    value => {
+      expect(() => formatDate(value)).toThrow('Invalid date value');
+    }
+  );
 });

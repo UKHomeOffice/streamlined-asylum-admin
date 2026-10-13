@@ -155,7 +155,10 @@
     "captionHeading": "Add or remove a child or partner"
   },
   "check-your-answers-add-child-partner": {
-    "header": "Check your answers"
+    "header": "Check your answers",
+    "captionHeading": "Add or remove a child or partner",
+    "limit-exceeded": "You have added or removed the maximum of {{maxItems}} children or partners. You cannot add or remove any more.",
+    "add-remove-child-partner" : "Add or remove another child or partner"
   },
   "reason-for-removing-child-partner": {
     "captionHeading": "Add or remove a child or partner"

@@ -274,10 +274,20 @@ pre.looped-records {
 }
 
 .govuk-summary-card__title-wrapper {
+  padding: 0 !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0 !important;
+  background-color: transparent !important;
+}
+
+.govuk-summary-card {
+  border: none;
+}
+
+.govuk-summary-card__actions {
+  font-weight: normal;
 }
 
 .govuk-fieldset__heading {

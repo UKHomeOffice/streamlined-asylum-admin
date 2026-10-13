@@ -1,0 +1,24 @@
+{{#items}}
+<div class="govuk-summary-card govuk-!-margin-top-4">
+    <div class="govuk-summary-card__title-wrapper">
+        <h2 class="govuk-summary-card__title">{{joinTitle}}</h2>
+        <div class="govuk-summary-card__actions">
+            <a href="{{baseUrl}}/{{route}}/edit/{{index}}" class="govuk-link">{{#t}}buttons.change{{/t}} <span class="visuallyhidden">{{joinTitle}}</span></a>
+            {{#hasMultipleItems}}
+            <a href="{{baseUrl}}/{{route}}/delete/{{index}}" class="govuk-link govuk-!-margin-left-3">{{#t}}buttons.remove{{/t}} <span class="visuallyhidden">{{joinTitle}}</span></a>
+            {{/hasMultipleItems}}
+        </div>
+    </div>
+</div>
+
+<dl class="govuk-summary-list govuk-!-margin-top-1 govuk-!-margin-bottom-6">
+    {{#fields}}
+    {{^omitFromSummary}}
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">{{#label}}{{label}}{{/label}}{{^label}}{{#t}}fields.{{field}}{{/t}}{{/label}}</dt>
+        <dd class="govuk-summary-list__value" data-value="{{value}}">{{#parsed}}{{parsed}}{{/parsed}}{{^parsed}}{{value}}{{/parsed}}</dd>
+    </div>
+    {{/omitFromSummary}}
+    {{/fields}}
+</dl>
+{{/items}}
