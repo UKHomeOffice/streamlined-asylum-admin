@@ -35,6 +35,48 @@ const parseValue = ({ field, value, parsed }, values, ctx) => {
   return result;
 };
 
+const hasValue = value =>
+  Array.isArray(value) ? value.length > 0 : Boolean(value);
+
+const getItemTitle = (item, values, ctx) => {
+  const { itemTitle, titleField } = ctx;
+
+  if (itemTitle) {
+    // Same title on every item, e.g. when there is no titleField.
+    return ctx.translate(itemTitle);
+  }
+  if (ctx.isOptionField(titleField) && values[titleField]) {
+    return ctx.translate([
+      `fields.${titleField}.options.${values[titleField]}.summary-label`,
+      `fields.${titleField}.options.${values[titleField]}.label`
+    ]);
+  }
+  return item.joinTitle;
+};
+
+// Returns a copy so the saved field names stay unchanged for editing.
+const parseItem = (item, ctx) => {
+  const values = Object.fromEntries(
+    item.fields.map(({ field, value }) => [field, value])
+  );
+  const fields = item.fields.map(original => ({
+    ...original,
+    parsed: parseValue(original, values, ctx),
+    // summary-label is only defined when it differs from the field's label or legend.
+    label: ctx.translate([
+      `fields.${original.field}.summary-label`,
+      `fields.${original.field}.label`,
+      `fields.${original.field}.legend`
+    ]),
+    omitFromSummary:
+      !hasValue(original.value) ||
+      ctx.omitFields.has(original.field) ||
+      ctx.combinedFields.has(original.field)
+  }));
+
+  return { ...item, joinTitle: getItemTitle(item, values, ctx), fields };
+};
+
 const parseSectionSummaryFields =
   (options = {}) =>
     superclass =>
@@ -42,55 +84,22 @@ const parseSectionSummaryFields =
         locals(req, res) {
           const locals = super.locals(req, res);
           const fieldsConfig = req.form.options.fieldsConfig || {};
-          const omitFields = new Set(options.omitFields || []);
           const combineFields = options.combineFields || {};
-          const combinedFields = new Set(Object.values(combineFields).flat());
-          const [titleField] = [req.form.options.titleField || []].flat();
-          const isOptionField = field =>
-            OPTION_MIXINS.has(fieldsConfig[field]?.mixin);
+          const translate = keys => req.translate(keys);
           const ctx = {
-            isOptionField,
+            translate,
+            isOptionField: field => OPTION_MIXINS.has(fieldsConfig[field]?.mixin),
             translateOption: (field, option) =>
-              req.translate(`fields.${field}.options.${option}.label`),
+              translate(`fields.${field}.options.${option}.label`),
+            omitFields: new Set(options.omitFields || []),
             dateFields: new Set(options.dateFields || []),
-            combineFields
+            combineFields,
+            combinedFields: new Set(Object.values(combineFields).flat()),
+            titleField: [req.form.options.titleField || []].flat()[0],
+            itemTitle: options.itemTitle
           };
-          const hasValue = value =>
-            Array.isArray(value) ? value.length > 0 : Boolean(value);
 
-          // Copy items so the saved field names stay unchanged for editing.
-          locals.items = locals.items.map(item => {
-            const values = Object.fromEntries(
-              item.fields.map(({ field, value }) => [field, value])
-            );
-            let joinTitle = item.joinTitle;
-            if (options.itemTitle) {
-            // Same title on every item, e.g. when there is no titleField.
-              joinTitle = req.translate(options.itemTitle);
-            } else if (isOptionField(titleField) && values[titleField]) {
-              joinTitle = req.translate([
-                `fields.${titleField}.options.${values[titleField]}.summary-label`,
-                `fields.${titleField}.options.${values[titleField]}.label`
-              ]);
-            }
-
-            const fields = item.fields.map(original => ({
-              ...original,
-              parsed: parseValue(original, values, ctx),
-              // summary-label is only defined when it differs from the field's label or legend.
-              label: req.translate([
-                `fields.${original.field}.summary-label`,
-                `fields.${original.field}.label`,
-                `fields.${original.field}.legend`
-              ]),
-              omitFromSummary:
-              !hasValue(original.value) ||
-              omitFields.has(original.field) ||
-              combinedFields.has(original.field)
-            }));
-
-            return { ...item, joinTitle, fields };
-          });
+          locals.items = locals.items.map(item => parseItem(item, ctx));
           return locals;
         }
       };
