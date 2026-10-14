@@ -11,13 +11,23 @@ const aggregatorSaveUpdate = superclass =>
       super(options);
     }
 
-    deleteItem(req, res) {
-      const id = req.params.id;
-      let items = '';
+    // The id comes from the URL, so ignore anything that is not a position in the list (e.g. 'forEach').
+    getItemIndex(req) {
+      const index = Number(req.params.id);
+      const isInRange =
+        Number.isInteger(index) &&
+        index >= 0 &&
+        index < this.getAggregateArray(req).length;
 
-      if (id) {
-        items = this.getAggregateArray(req).filter(
-          (element, index) => index !== Number.parseInt(id, 10)
+      return isInRange ? index : null;
+    }
+
+    deleteItem(req, res) {
+      const index = this.getItemIndex(req);
+
+      if (index !== null) {
+        const items = this.getAggregateArray(req).filter(
+          (element, position) => position !== index
         );
         this.setAggregateArray(req, items);
       }
@@ -26,19 +36,20 @@ const aggregatorSaveUpdate = superclass =>
     }
 
     updateItem(req, res) {
-      const id = req.params.id;
-      const items = this.getAggregateArray(req);
+      const index = this.getItemIndex(req);
 
-      if (items[id]) {
-        req.sessionModel.set('aggregator-edit-id', id);
+      if (index !== null) {
+        const items = this.getAggregateArray(req);
+
+        req.sessionModel.set('aggregator-edit-id', index);
         req.sessionModel.set('isUpdate', true);
-        req.sessionModel.set('updatingIndex', id);
+        req.sessionModel.set('updatingIndex', index);
 
-        items[id].fields.forEach(obj => {
+        items[index].fields.forEach(obj => {
           req.sessionModel.set(obj.field, obj.value);
         });
 
-        items.splice(id, 1);
+        items.splice(index, 1);
         this.setAggregateArray(req, items);
       }
 

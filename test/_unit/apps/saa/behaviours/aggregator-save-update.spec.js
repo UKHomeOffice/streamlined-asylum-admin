@@ -274,6 +274,38 @@ describe('aggregator save update item handling', () => {
     expect(req.sessionModel.set).not.toHaveBeenCalled();
   });
 
+  describe.each(['forEach', 'length', 'constructor', '-1', '1.5', '0abc', '2'])(
+    'with an invalid id in the URL (%s)',
+    id => {
+      test('edit redirects without crashing or changing the session', () => {
+        const req = createRequest({ params: { id }, session: { addremovechildpartner: savedItems() } });
+        const res = { redirect: jest.fn() };
+
+        expect(() => behaviour.updateItem(req, res)).not.toThrow();
+        expect(req.sessionModel.set).not.toHaveBeenCalled();
+        expect(res.redirect).toHaveBeenCalledWith('/changes/do-you-need-add-remove-dependant');
+      });
+
+      test('delete redirects without removing anything', () => {
+        const req = createRequest({ params: { id }, session: { addremovechildpartner: savedItems() } });
+        const res = { redirect: jest.fn() };
+
+        behaviour.deleteItem(req, res);
+
+        expect(req.sessionModel.set).not.toHaveBeenCalled();
+        expect(res.redirect).toHaveBeenCalledWith('/changes/check-your-answers-add-child-partner');
+      });
+    }
+  );
+
+  test('saves the edit position as a number', () => {
+    const req = createRequest({ params: { id: '1' }, session: { addremovechildpartner: savedItems() } });
+
+    behaviour.updateItem(req, { redirect: jest.fn() });
+
+    expect(req.sessionModel.get('updatingIndex')).toBe(1);
+  });
+
   test.each([
     ['addItem', { 'child-partner-given-name': 'Sam' }, {}],
     ['redirectToAddStep', {}, {}],
