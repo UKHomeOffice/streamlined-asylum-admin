@@ -238,13 +238,17 @@
       "evidences": {
         "header": "Send evidence"
       },
-      "dependant": {
-        "header": "Dependant"
+      "add-or-remove-dependants": {
+        "header": "Add or remove dependants"
       },
       "something-else": {
         "header": "Something else"
       }
     },
-    "fields": {}
+    "fields": {
+      "addremovechildpartner": {
+        "label": "Add or remove a child or partner"
+      }
+    }
   }
 }

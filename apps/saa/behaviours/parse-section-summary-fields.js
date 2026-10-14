@@ -77,30 +77,66 @@ const parseItem = (item, ctx) => {
   return { ...item, joinTitle: getItemTitle(item, values, ctx), fields };
 };
 
+const buildContext = (req, options) => {
+  const fieldsConfig = req.form.options.fieldsConfig || {};
+  const combineFields = options.combineFields || {};
+  const translate = keys => req.translate(keys);
+
+  return {
+    translate,
+    isOptionField: field => OPTION_MIXINS.has(fieldsConfig[field]?.mixin),
+    translateOption: (field, option) =>
+      translate(`fields.${field}.options.${option}.label`),
+    omitFields: new Set(options.omitFields || []),
+    dateFields: new Set(options.dateFields || []),
+    combineFields,
+    combinedFields: new Set(Object.values(combineFields).flat()),
+    titleField: [
+      options.titleField || req.form.options.titleField || []
+    ].flat()[0],
+    itemTitle: options.itemTitle
+  };
+};
+
+// Final check-your-answers page: HOF's summary lists each item as labelled rows under a title row,
+// and the only Change link (on the title) goes to the aggregate's own summary page.
+const toSummaryItem = ({ joinTitle, fields }, ctx, changeLink) => ({
+  fields: [
+    {
+      field: ctx.titleField || 'aggregator-title',
+      parsed: joinTitle,
+      isAggregatorTitle: true,
+      aggregatorTitleChangeLink: changeLink
+    },
+    ...fields.map(field => ({ ...field, omitChangeLink: true }))
+  ]
+});
+
+const formatAggregateForSummary = (aggregate, req, options = {}) => {
+  const items = aggregate?.aggregatedValues || [];
+  if (!items.length) {
+    return null;
+  }
+  const ctx = buildContext(req, options);
+
+  return {
+    aggregatedValues: items.map(item =>
+      toSummaryItem(parseItem(item, ctx), ctx, options.changeLink)
+    )
+  };
+};
+
 const parseSectionSummaryFields =
   (options = {}) =>
     superclass =>
       class extends superclass {
         locals(req, res) {
           const locals = super.locals(req, res);
-          const fieldsConfig = req.form.options.fieldsConfig || {};
-          const combineFields = options.combineFields || {};
-          const translate = keys => req.translate(keys);
-          const ctx = {
-            translate,
-            isOptionField: field => OPTION_MIXINS.has(fieldsConfig[field]?.mixin),
-            translateOption: (field, option) =>
-              translate(`fields.${field}.options.${option}.label`),
-            omitFields: new Set(options.omitFields || []),
-            dateFields: new Set(options.dateFields || []),
-            combineFields,
-            combinedFields: new Set(Object.values(combineFields).flat()),
-            titleField: [req.form.options.titleField || []].flat()[0],
-            itemTitle: options.itemTitle
-          };
+          const ctx = buildContext(req, options);
 
           locals.items = locals.items.map(item => parseItem(item, ctx));
           return locals;
         }
       };
 module.exports = parseSectionSummaryFields;
+module.exports.formatAggregateForSummary = formatAggregateForSummary;

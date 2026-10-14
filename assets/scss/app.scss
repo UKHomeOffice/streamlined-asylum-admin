@@ -143,6 +143,18 @@ textarea {
   word-wrap: break-word;
 }
 
+// Keeps line breaks in aggregated answers on the final check-your-answers page (same as EPP).
+.confirm-row {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+// Divider between items of an aggregate on the final check-your-answers page.
+.confirm-separator > * {
+  border-bottom: 2px solid #0b0c0c;
+  padding: 0;
+}
+
 .list-bullet {
   list-style-type: disc;
   color: #6f777b;

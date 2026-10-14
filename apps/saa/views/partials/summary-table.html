@@ -1,0 +1,36 @@
+<div>
+    <h2 class="section-header">{{section}}</h2>
+  </div>
+  <dl>
+    {{#fields}}
+    {{^omitFromSummary}}
+      {{#isSeparator}}
+      <div class="confirm-row confirm-separator"><dt></dt><dd></dd><dd></dd></div>
+      {{/isSeparator}}
+      {{^isSeparator}}
+      <div class="confirm-row">
+        {{#isAggregatorTitle}}
+          <dt class="confirm-label">{{value}}</dt>
+          <dd class="confirm-value"></dd>
+          <dd><span><a class="govuk-link" href="{{aggregatorTitleChangeLink}}" id="{{field}}-change-{{index}}">{{#t}}buttons.change{{/t}} <span class="visuallyhidden">{{value}}</span></a></span></dd>
+        {{/isAggregatorTitle}}
+        {{^isAggregatorTitle}}
+          <dt class="confirm-label">{{label}}</dt>
+          <dd class="confirm-value" data-value="{{value}}">{{value}}</dd>
+        {{^omitChangeLink}}
+          {{#changeLink}}
+            <dd><span><a class="govuk-link" href="{{changeLink}}" id="{{field}}-change-{{index}}">{{#t}}buttons.change{{/t}} <span class="visuallyhidden">{{changeLinkDescription}} from {{value}}</span></a></span></dd>
+          {{/changeLink}}
+          {{^changeLink}}
+            <dd><span><a class="govuk-link" href="{{baseUrl}}{{step}}/edit#{{field}}" id="{{field}}-change">{{#t}}buttons.change{{/t}} <span class="visuallyhidden">{{changeLinkDescription}} from {{value}}</span></a></span></dd>
+          {{/changeLink}}
+        {{/omitChangeLink}}
+        {{#omitChangeLink}}
+          <dd> </dd>
+        {{/omitChangeLink}}
+        {{/isAggregatorTitle}}
+      </div>
+      {{/isSeparator}}
+    {{/omitFromSummary}}
+    {{/fields}}
+  </dl> 

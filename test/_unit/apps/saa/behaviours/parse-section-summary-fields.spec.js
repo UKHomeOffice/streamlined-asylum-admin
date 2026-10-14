@@ -52,8 +52,8 @@ const createItem = choice => ({
     { field: 'child-partner-nationality', value: 'France', parsed: 'France' },
     {
       field: 'documents-child-partner',
-      value: [{ id: 'doc' }],
-      parsed: [{ id: 'doc' }]
+      value: [{ id: 'doc', name: 'birth-certificate.pdf' }],
+      parsed: [{ id: 'doc', name: 'birth-certificate.pdf' }]
     }
   ]
 });
@@ -269,5 +269,64 @@ describe('parse section summary fields behaviour', () => {
     const items = new Behaviour().locals(titleReq, {}).items;
 
     expect(items.map(item => item.joinTitle)).toEqual(['Evidence', 'Evidence']);
+  });
+
+  describe('formatAggregateForSummary', () => {
+    const { formatAggregateForSummary } = ParseSummaryFields;
+    const childPartnerSummary = {
+      ...require('../../../../../apps/saa/config/aggregator-summaries').addremovechildpartner,
+      changeLink: '/changes/check-your-answers-add-child-partner'
+    };
+
+    test('starts each item with a title that links to the aggregate summary page', () => {
+      const aggregate = {
+        aggregatedValues: [createItem('add-child-partner'), createItem('remove-child-partner')]
+      };
+
+      const titles = formatAggregateForSummary(aggregate, req, childPartnerSummary)
+        .aggregatedValues.map(item => item.fields[0]);
+
+      expect(titles).toEqual(['Add', 'Remove'].map(action => ({
+        field: 'add-remove-child-partner',
+        parsed: `${action} a child or partner as a dependant`,
+        isAggregatorTitle: true,
+        aggregatorTitleChangeLink: '/changes/check-your-answers-add-child-partner'
+      })));
+    });
+
+    test('shows the same formatted answers as the item card, without their own Change links', () => {
+      const [item] = formatAggregateForSummary(
+        { aggregatedValues: [createItem('add-child-partner')] }, req, childPartnerSummary
+      ).aggregatedValues;
+      const answers = item.fields.slice(1);
+
+      expect(answers.every(field => field.omitChangeLink)).toBe(true);
+      expect(answers.filter(field => !field.omitFromSummary).map(field => field.parsed)).toEqual([
+        'My child',
+        'Sam Smith',
+        '27 March 2020',
+        'France',
+        'birth-certificate.pdf'
+      ]);
+    });
+
+    test.each([[undefined], [{ aggregatedValues: [] }]])(
+      'returns null when there are no items (%p)',
+      aggregate => {
+        expect(formatAggregateForSummary(aggregate, req, childPartnerSummary)).toBeNull();
+      }
+    );
+
+    test('does not change the saved items', () => {
+      const saved = createItem('add-child-partner');
+
+      formatAggregateForSummary({ aggregatedValues: [saved] }, req, childPartnerSummary);
+
+      expect(saved.fields[0]).toEqual({
+        field: 'add-remove-child-partner',
+        value: 'add-child-partner',
+        parsed: 'add-child-partner'
+      });
+    });
   });
 });

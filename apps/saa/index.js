@@ -13,8 +13,10 @@ const RequireSelectedSection = require('./behaviours/require-selected-section');
 const AggregateSaveUpdate = require('./behaviours/aggregator-save-update');
 const LimitAggregateItems = require('./behaviours/limit-aggregator');
 const ParseSummaryFields = require('./behaviours/parse-section-summary-fields');
+const aggregatorSummaries = require('./config/aggregator-summaries');
 const EditRouteReturn = require('./behaviours/edit-route-return');
 const EditRouteStart = require('./behaviours/edit-route-start');
+const SummaryLabels = require('./behaviours/summary-labels');
 
 const documentUploadStep = category => ({
   behaviours: [SaveDocument(category, 'file-upload'), RemoveDocument(category)],
@@ -297,16 +299,7 @@ const steps = {
     behaviours: [
       AggregateSaveUpdate,
       LimitAggregateItems,
-      ParseSummaryFields({
-        omitFields: [
-          'add-remove-child-partner',
-          'reason-removing-child-partner'
-        ],
-        dateFields: ['child-partner-date-of-birth'],
-        combineFields: {
-          'child-partner-given-name': ['child-partner-family-name']
-        }
-      }),
+      ParseSummaryFields(aggregatorSummaries.addremovechildpartner),
       EditRouteReturn
     ],
     aggregateTo: 'addremovechildpartner',
@@ -412,7 +405,7 @@ const steps = {
     next: '/something-else'
   },
   '/confirm': {
-    behaviours: [Summary, EditRouteStart],
+    behaviours: [Summary, SummaryLabels, EditRouteStart],
     sections: require('./sections/summary-data-sections')
   },
   '/something-else': {

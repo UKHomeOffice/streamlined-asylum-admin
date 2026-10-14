@@ -1,4 +1,29 @@
 // Using default labels for now. Review and update when the final CYA design is available.
+const {
+  formatAggregateForSummary
+} = require('../behaviours/parse-section-summary-fields');
+const aggregatorSummaries = require('../config/aggregator-summaries');
+
+// Read-only rows for every item of an aggregate; Change goes to that aggregate's summary page.
+const aggregateSummaryRow = name => {
+  const settings = aggregatorSummaries[name];
+  const changeLink = `/changes${settings.route}`;
+
+  return {
+    step: settings.route,
+    field: name,
+    changeLink,
+    dependsOn: settings.dependsOn,
+    addElementSeparators: true,
+    parse: (aggregate, req) =>
+      formatAggregateForSummary(aggregate, req, {
+        ...settings,
+        changeLink,
+        titleField: req.form.options.steps?.[settings.route]?.titleField
+      })
+  };
+};
+
 module.exports = {
   'personal-details': {
     steps: [
@@ -8,17 +33,13 @@ module.exports = {
       }
     ]
   },
-  dependant: {
+  'add-or-remove-dependants': {
     steps: [
       {
         step: '/do-you-need-add-remove-dependant',
         field: 'add-remove-dependant'
       },
-      {
-        step: '/child-partner-nationality',
-        field: 'child-partner-nationality',
-        dependsOn: 'add-remove-dependant'
-      }
+      aggregateSummaryRow('addremovechildpartner')
     ]
   },
   evidences: {
