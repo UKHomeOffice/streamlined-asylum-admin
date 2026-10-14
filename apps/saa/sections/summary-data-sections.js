@@ -24,8 +24,13 @@ module.exports = {
   death: {
     steps: [
       {
+        step: '/someone-on-claim-died',
+        field: 'someone-on-claim-died'
+      },
+      {
         step: '/main-claimant-died',
-        field: 'main-claimant-died'
+        field: 'main-claimant-died',
+        dependsOn: 'someone-on-claim-died'
       }
     ]
   },
