@@ -62,5 +62,15 @@
   },
   "main-claimant-died": {
     "required": "Select if they made the claim"
+  },
+  "given-name-person-who-died": {
+    "required": "Enter their given name",
+    "notUrl": "Given name must not contain a URL",
+    "maxlength": "Given name must be between 1 and 255 characters"
+  },
+  "family-name-person-who-died": {
+    "required": "Enter their family name",
+    "notUrl": "Family name must not contain a URL",
+    "maxlength": "Family name must be between 1 and 255 characters"
   }
 }
