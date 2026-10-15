@@ -13,13 +13,14 @@ const aggregatorSaveUpdate = superclass =>
 
     // The id comes from the URL, so ignore anything that is not a position in the list (e.g. 'forEach').
     getItemIndex(req) {
-      const index = Number(req.params.id);
-      const isInRange =
-        Number.isInteger(index) &&
-        index >= 0 &&
-        index < this.getAggregateArray(req).length;
+      const { id } = req.params;
+      // Digits only: Number() also turns ' ', '0x1' and '1e0' into valid positions.
+      if (!/^\d+$/.test(id ?? '')) {
+        return null;
+      }
+      const index = Number(id);
 
-      return isInRange ? index : null;
+      return index < this.getAggregateArray(req).length ? index : null;
     }
 
     deleteItem(req, res) {

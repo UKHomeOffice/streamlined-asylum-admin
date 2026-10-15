@@ -274,7 +274,7 @@ describe('aggregator save update item handling', () => {
     expect(req.sessionModel.set).not.toHaveBeenCalled();
   });
 
-  describe.each(['forEach', 'length', 'constructor', '-1', '1.5', '0abc', '2'])(
+  describe.each(['forEach', 'length', 'constructor', '-1', '1.5', '0abc', '2', ' ', '', '0x1', '1e0', '+1'])(
     'with an invalid id in the URL (%s)',
     id => {
       test('edit redirects without crashing or changing the session', () => {
