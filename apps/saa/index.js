@@ -385,7 +385,6 @@ const steps = {
   '/problem-with-service': {},
   '/session-ended': {},
   '/form-saved': {},
-  '/cannot-use-form': {},
   '/expired-link': {}
 };
 
