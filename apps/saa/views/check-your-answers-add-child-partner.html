@@ -6,9 +6,11 @@
           <p>{{#t}}pages.check-your-answers-add-child-partner.limit-exceeded{{/t}}</p>
         {{/noMoreItems}}
         {{^noMoreItems}}
-          <a href="{{baseUrl}}/{{addStep}}" class="govuk-button govuk-button--secondary" data-module="govuk-button">
-            {{#t}}pages.check-your-answers-add-child-partner.add-remove-child-partner{{/t}}
-          </a>
+          <p class="govuk-body">
+            <a href="{{baseUrl}}/{{addStep}}" class="govuk-link">
+              {{#t}}pages.check-your-answers-add-child-partner.add-remove-child-partner{{/t}}
+            </a>
+          </p>
         {{/noMoreItems}}
       </div>
       {{#input-submit}}continue{{/input-submit}}
