@@ -348,6 +348,7 @@ const steps = {
     next: '/name-person-who-died'
   },
   '/name-person-who-died': {
+    fields: ['given-name-person-who-died', 'family-name-person-who-died'],
     next: '/date-of-birth-person-who-died'
   },
   '/date-of-birth-person-who-died': {
