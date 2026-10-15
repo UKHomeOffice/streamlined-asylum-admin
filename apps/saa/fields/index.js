@@ -105,5 +105,12 @@ module.exports = {
       value: '',
       label: 'fields.child-partner-nationality.options.none_selected'
     }].concat(countries)
+  },
+  'main-claimant-died': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    isPageHeading: true
   }
 };

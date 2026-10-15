@@ -386,6 +386,7 @@ const steps = {
     next: '/main-claimant-died'
   },
   '/main-claimant-died': {
+    fields: ['main-claimant-died'],
     next: '/name-person-who-died'
   },
   '/name-person-who-died': {
@@ -426,7 +427,6 @@ const steps = {
   '/problem-with-service': {},
   '/session-ended': {},
   '/form-saved': {},
-  '/cannot-use-form': {},
   '/expired-link': {}
 };
 

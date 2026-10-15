@@ -143,5 +143,16 @@
   },
   "documents-child-partner": {
     "summary-label": "Files uploaded"
+  },
+  "main-claimant-died": {
+    "legend": "Did they make the claim?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No, they are a husband, wife, partner or child on the claim"
+      }
+    }
   }
 }
