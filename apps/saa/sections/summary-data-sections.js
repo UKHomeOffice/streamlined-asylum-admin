@@ -31,16 +31,6 @@ module.exports = {
         step: '/main-claimant-died',
         field: 'main-claimant-died',
         dependsOn: 'someone-on-claim-died'
-      },
-      {
-        step: '/name-person-who-died',
-        field: 'given-name-person-who-died',
-        dependsOn: 'someone-on-claim-died'
-      },
-      {
-        step: '/name-person-who-died',
-        field: 'family-name-person-who-died',
-        dependsOn: 'someone-on-claim-died'
       }
     ]
   },
