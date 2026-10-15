@@ -59,5 +59,8 @@
   },
   "child-partner-nationality": {
     "required": "Select their country of nationality"
+  },
+  "main-claimant-died": {
+    "required": "Select if they made the claim"
   }
 }

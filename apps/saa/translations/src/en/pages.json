@@ -181,7 +181,7 @@
     "captionHeading": "Tell us someone has died"
   },
   "main-claimant-died": {
-    "header": "Did they make the claim?"
+    "captionHeading": "Tell us someone has died"
   },
   "name-person-who-died": {
     "header": "Their name"
@@ -237,6 +237,9 @@
       },
       "dependant": {
         "header": "Dependant"
+      },
+      "death": {
+        "header": "Tell us someone on your claim died"
       },
       "something-else": {
         "header": "Something else"
