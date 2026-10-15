@@ -116,11 +116,11 @@ module.exports = {
   'given-name-person-who-died': {
     mixin: 'input-text',
     validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
-    labelClassName: 'govuk-label--m'
+    labelClassName: 'govuk-label--s'
   },
   'family-name-person-who-died': {
     mixin: 'input-text',
     validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
-    labelClassName: 'govuk-label--m'
+    labelClassName: 'govuk-label--s'
   }
 };
