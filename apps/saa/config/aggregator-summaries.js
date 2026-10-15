@@ -3,7 +3,7 @@ module.exports = {
   addremovechildpartner: {
     route: '/check-your-answers-add-child-partner',
     dependsOn: 'add-remove-dependant',
-    omitFields: ['add-remove-child-partner', 'reason-removing-child-partner'],
+    omitFields: ['add-remove-child-partner'],
     dateFields: ['child-partner-date-of-birth'],
     combineFields: {
       'child-partner-given-name': ['child-partner-family-name']

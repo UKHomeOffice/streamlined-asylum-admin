@@ -60,7 +60,8 @@
     }
   },
   "reason-removing-child-partner": {
-    "label": "Why are you removing a child, partner or dependant from your claim?"
+    "label": "Why are you removing a child, partner or dependant from your claim?",
+    "summary-label": "Why are you removing them?"
   },
   "relationship-to-child-partner": {
     "legend": "How are they related to you?",
