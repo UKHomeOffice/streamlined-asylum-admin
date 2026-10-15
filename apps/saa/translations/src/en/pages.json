@@ -184,7 +184,8 @@
     "captionHeading": "Tell us someone has died"
   },
   "name-person-who-died": {
-    "header": "Their name"
+    "header": "Their name",
+    "captionHeading": "Tell us someone has died"
   },
   "date-of-birth-person-who-died": {
     "header": "Their date of birth"

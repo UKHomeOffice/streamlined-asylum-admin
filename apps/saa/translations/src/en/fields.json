@@ -147,5 +147,11 @@
         "label": "No, they are a husband, wife, partner or child on the claim"
       }
     }
+  },
+  "given-name-person-who-died": {
+    "label": "Given name"
+  },
+  "family-name-person-who-died": {
+    "label": "Family name"
   }
 }
