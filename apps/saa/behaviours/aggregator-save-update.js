@@ -169,9 +169,22 @@ const aggregatorSaveUpdate = superclass =>
       return action || 'showItems';
     }
 
+    // When an answer is changed from /confirm, HOF adds /edit to every page it hasn't seen yet,
+    // so this page can get 'edit' with no id. Only /edit/:id means changing a saved item.
+    getRequestedAction(req) {
+      if (
+        req.params.action === 'edit' &&
+        typeof req.params.id === 'undefined'
+      ) {
+        return undefined;
+      }
+      return req.params.action;
+    }
+
     getValues(req, res, next) {
-      const action = req.params.action || this.getAction(req, res, next);
-      this.handleAction(req, res, next, action);
+      const action =
+        this.getRequestedAction(req) || this.getAction(req, res, next);
+      return this.handleAction(req, res, next, action);
     }
 
     handleAction(req, res, next, action) {

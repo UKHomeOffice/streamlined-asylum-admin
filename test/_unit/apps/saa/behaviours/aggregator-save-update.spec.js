@@ -468,6 +468,51 @@ describe('aggregator save update item handling', () => {
     spy.mockRestore();
   });
 
+  // Changing "No" to "Yes" on /confirm makes HOF route through the loop with /edit and no item id.
+  test('saves the completed item when reached with /edit and no id', () => {
+    const req = createRequest({
+      params: { action: 'edit' },
+      session: { 'child-partner-given-name': 'Sam' },
+      options: { aggregateFrom: ['child-partner-given-name'], fieldsConfig: {} }
+    });
+    const res = { redirect: jest.fn() };
+    const updateSpy = jest.spyOn(behaviour, 'updateItem');
+
+    behaviour.getValues(req, res, jest.fn());
+
+    expect(updateSpy).not.toHaveBeenCalled();
+    expect(itemsIn(req).map(item => item.fields[0].value)).toEqual(['Sam']);
+    expect(res.redirect).toHaveBeenCalledWith(
+      '/changes/check-your-answers-add-child-partner'
+    );
+    updateSpy.mockRestore();
+  });
+
+  test('still changes a saved item when /edit has an id', () => {
+    const req = createRequest({
+      params: { action: 'edit', id: '0' },
+      session: { addremovechildpartner: savedItems() }
+    });
+    const res = { redirect: jest.fn() };
+
+    behaviour.getValues(req, res, jest.fn());
+
+    expect(req.sessionModel.get('isUpdate')).toBe(true);
+    expect(req.sessionModel.get('child-partner-given-name')).toBe('A');
+    expect(res.redirect).toHaveBeenCalledWith(
+      '/changes/do-you-need-add-remove-dependant'
+    );
+  });
+
+  test.each([
+    [{ action: 'edit' }, undefined],
+    [{ action: 'edit', id: '0' }, 'edit'],
+    [{ action: 'delete', id: '0' }, 'delete'],
+    [{}, undefined]
+  ])('reads the requested action from %p as %p', (params, expected) => {
+    expect(behaviour.getRequestedAction({ params })).toBe(expected);
+  });
+
   test('accepts aggregateFrom entries given as objects', () => {
     const req = createRequest({
       options: { fieldsConfig: { name: { parse: value => `parsed ${value}` } } }
