@@ -5,6 +5,12 @@ const fileUploadConfig = require('./assets/js/file-upload-config');
 
 module.exports = {
   env: env,
+  dateLocales: 'en-GB',
+  dateFormat: {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  },
   redis: {
     port: process.env.REDIS_PORT || '6379',
     host: process.env.REDIS_HOST || '127.0.0.1'
@@ -30,6 +36,10 @@ module.exports = {
     tokenUrl: process.env.KEYCLOAK_TOKEN_URL,
     clientId: process.env.KEYCLOAK_CLIENT_ID,
     secret: process.env.KEYCLOAK_CLIENT_SECRET
+  },
+  aggregateLimits: {
+    defaultLimit: 100,
+    addOrRemoveChildPartner: 15
   },
   feedbackUrl: process.env.FEEDBACK_URL,
   disallowIndexing: process.env.DISALLOW_INDEXING === 'true'

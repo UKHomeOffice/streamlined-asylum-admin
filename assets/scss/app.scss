@@ -143,6 +143,18 @@ textarea {
   word-wrap: break-word;
 }
 
+// Keeps line breaks in aggregated answers on the final check-your-answers page
+.confirm-row {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+// Divider between items of an aggregate on the final check-your-answers page.
+.confirm-separator > * {
+  border-bottom: 2px solid #0b0c0c;
+  padding: 0;
+}
+
 .list-bullet {
   list-style-type: disc;
   color: #6f777b;
@@ -274,10 +286,20 @@ pre.looped-records {
 }
 
 .govuk-summary-card__title-wrapper {
+  padding: 0 !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0 !important;
+  background-color: transparent !important;
+}
+
+.govuk-summary-card {
+  border: none;
+}
+
+.govuk-summary-card__actions {
+  font-weight: normal;
 }
 
 .govuk-fieldset__heading {
