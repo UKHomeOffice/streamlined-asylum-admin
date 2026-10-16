@@ -133,5 +133,5 @@ module.exports = {
     ],
     labelClassName: 'govuk-label--m',
     isPageHeading: true
-  }),
+  })
 };
