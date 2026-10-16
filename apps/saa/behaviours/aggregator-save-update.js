@@ -174,7 +174,7 @@ const aggregatorSaveUpdate = superclass =>
     getRequestedAction(req) {
       if (
         req.params.action === 'edit' &&
-        typeof req.params.id === 'undefined'
+        req.params.id === undefined
       ) {
         return undefined;
       }
