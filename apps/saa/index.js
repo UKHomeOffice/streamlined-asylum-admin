@@ -17,6 +17,7 @@ const aggregatorSummaries = require('./config/aggregator-summaries');
 const EditRouteReturn = require('./behaviours/edit-route-return');
 const EditRouteStart = require('./behaviours/edit-route-start');
 const SummaryLabels = require('./behaviours/summary-labels');
+const ResetSectionSummary = require('./behaviours/reset-section-summary');
 
 const documentUploadStep = category => ({
   behaviours: [SaveDocument(category, 'file-upload'), RemoveDocument(category)],
@@ -243,7 +244,10 @@ const steps = {
     next: '/do-you-need-add-remove-dependant'
   },
   '/do-you-need-add-remove-dependant': {
-    behaviours: [RequireSelectedSection],
+    behaviours: [
+      RequireSelectedSection,
+      ResetSectionSummary(['addremovechildpartner'], 'add-remove-dependant')
+    ],
     fields: ['add-remove-dependant'],
     forks: [
       {
@@ -315,7 +319,7 @@ const steps = {
       'documents-child-partner'
     ],
     titleField: ['add-remove-child-partner'],
-    addStep: 'do-you-need-add-remove-dependant',
+    addStep: 'do-you-need-add-remove-dependant', // OR -> /add-remove-child-partner
     addStepForks: [
       {
         target: 'relationship-to-child-partner',
