@@ -122,5 +122,5 @@ module.exports = {
     mixin: 'input-text',
     validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
     labelClassName: 'govuk-label--m'
-  },
+  }
 };
