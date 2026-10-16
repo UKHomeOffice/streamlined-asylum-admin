@@ -319,7 +319,7 @@ const steps = {
       'documents-child-partner'
     ],
     titleField: ['add-remove-child-partner'],
-    addStep: 'do-you-need-add-remove-dependant', // OR -> /add-remove-child-partner
+    addStep: 'add-remove-child-partner',
     addStepForks: [
       {
         target: 'relationship-to-child-partner',
