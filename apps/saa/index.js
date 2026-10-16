@@ -80,6 +80,7 @@ const steps = {
     next: '/claimants-name'
   },
   '/claimants-name': {
+    fields: ['claimants-given-name','claimants-family-name'],
     next: '/claimant-main-language'
   },
   '/claimant-main-language': {

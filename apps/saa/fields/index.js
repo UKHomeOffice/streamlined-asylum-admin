@@ -112,5 +112,15 @@ module.exports = {
     validate: ['required'],
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
-  }
+  },
+  'claimants-given-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--m'
+  },
+  'claimants-family-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--m'
+  },
 };
