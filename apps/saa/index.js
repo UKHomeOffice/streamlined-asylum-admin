@@ -10,11 +10,17 @@ const RemoveDocument = require('./behaviours/remove-document');
 const SaveDocument = require('./behaviours/save-document');
 const RequireSelectedSection = require('./behaviours/require-selected-section');
 
+const AggregateSaveUpdate = require('./behaviours/aggregator-save-update');
+const LimitAggregateItems = require('./behaviours/limit-aggregator');
+const ParseSummaryFields = require('./behaviours/parse-section-summary-fields');
+const aggregatorSummaries = require('./config/aggregator-summaries');
+const EditRouteReturn = require('./behaviours/edit-route-return');
+const EditRouteStart = require('./behaviours/edit-route-start');
+const SummaryLabels = require('./behaviours/summary-labels');
+const ResetSectionSummary = require('./behaviours/reset-section-summary');
+
 const documentUploadStep = category => ({
-  behaviours: [
-    SaveDocument(category, 'file-upload'),
-    RemoveDocument(category)
-  ],
+  behaviours: [SaveDocument(category, 'file-upload'), RemoveDocument(category)],
   fields: ['file-upload'],
   locals: {
     documentCategory: {
@@ -238,7 +244,10 @@ const steps = {
     next: '/do-you-need-add-remove-dependant'
   },
   '/do-you-need-add-remove-dependant': {
-    behaviours: [RequireSelectedSection],
+    behaviours: [
+      RequireSelectedSection,
+      ResetSectionSummary(['addremovechildpartner'], 'add-remove-dependant')
+    ],
     fields: ['add-remove-dependant'],
     forks: [
       {
@@ -291,6 +300,43 @@ const steps = {
     next: '/check-your-answers-add-child-partner'
   },
   '/check-your-answers-add-child-partner': {
+    behaviours: [
+      AggregateSaveUpdate,
+      LimitAggregateItems,
+      ParseSummaryFields(aggregatorSummaries.addremovechildpartner),
+      EditRouteReturn
+    ],
+    aggregateTo: 'addremovechildpartner',
+    aggregateFrom: [
+      // Stored per item so editing restores the right add/remove route.
+      'add-remove-child-partner',
+      'reason-removing-child-partner',
+      'relationship-to-child-partner',
+      'child-partner-given-name',
+      'child-partner-family-name',
+      'child-partner-date-of-birth',
+      'child-partner-nationality',
+      'documents-child-partner'
+    ],
+    titleField: ['add-remove-child-partner'],
+    addStep: 'add-remove-child-partner',
+    editStepForks: [
+      {
+        target: 'relationship-to-child-partner',
+        condition: {
+          field: 'add-remove-child-partner',
+          value: 'add-child-partner'
+        }
+      },
+      {
+        target: 'reason-for-removing-child-partner',
+        condition: {
+          field: 'add-remove-child-partner',
+          value: 'remove-child-partner'
+        }
+      }
+    ],
+    aggregateLimit: config.aggregateLimits.addOrRemoveChildPartner,
     next: '/send-evidence-for-your-claim'
   },
   '/send-evidence-for-your-claim': {
@@ -365,7 +411,7 @@ const steps = {
     next: '/something-else'
   },
   '/confirm': {
-    behaviours: [Summary],
+    behaviours: [Summary, SummaryLabels, EditRouteStart],
     sections: require('./sections/summary-data-sections')
   },
   '/something-else': {
