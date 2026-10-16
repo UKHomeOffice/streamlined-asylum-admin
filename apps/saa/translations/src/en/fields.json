@@ -153,5 +153,9 @@
   },
   "family-name-person-who-died": {
     "label": "Family name"
+  },
+  "date-of-birth-person-who-died": {
+    "legend": "Their date of birth",
+    "hint": "For example, 27 3 1940"
   }
 }
