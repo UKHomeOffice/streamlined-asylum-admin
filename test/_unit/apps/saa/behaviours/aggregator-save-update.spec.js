@@ -18,7 +18,7 @@ class BaseBehaviour {
 
 const Behaviour = AggregateSaveUpdate(BaseBehaviour);
 
-const addStepForks = [
+const editStepForks = [
   {
     target: 'relationship-to-child-partner',
     condition: { field: 'add-remove-child-partner', value: 'add-child-partner' }
@@ -84,7 +84,7 @@ describe('aggregator save update behaviour', () => {
   ])('uses the add-step fork for %s', (choice, expectedStep) => {
     const req = createRequest({
       session: { 'add-remove-child-partner': choice },
-      options: { addStepForks }
+      options: { editStepForks }
     });
 
     expect(behaviour.getAddStep(req)).toBe(expectedStep);
@@ -92,7 +92,7 @@ describe('aggregator save update behaviour', () => {
   });
 
   test('falls back to addStep when no add-step fork matches', () => {
-    const req = createRequest({ options: { addStepForks } });
+    const req = createRequest({ options: { editStepForks } });
 
     expect(behaviour.getAddStep(req)).toBe('do-you-need-add-remove-dependant');
   });
@@ -108,7 +108,7 @@ describe('aggregator save update behaviour', () => {
           ]
         }
       },
-      options: { addStepForks }
+      options: { editStepForks }
     });
     const res = { redirect: jest.fn() };
 
@@ -126,31 +126,49 @@ describe('aggregator save update behaviour', () => {
   test.each([
     ['0', 'relationship-to-child-partner'],
     ['1', 'reason-for-removing-child-partner']
-  ])('routes edited item %s by its own add/remove choice', (id, expectedStep) => {
-    const req = createRequest({
-      params: { id },
-      session: {
-        'add-remove-child-partner': id === '0' ? 'remove-child-partner' : 'add-child-partner',
-        addremovechildpartner: {
-          aggregatedValues: [
-            { fields: [{ field: 'add-remove-child-partner', value: 'add-child-partner' }] },
-            { fields: [{ field: 'add-remove-child-partner', value: 'remove-child-partner' }] }
-          ]
-        }
-      },
-      options: { addStepForks }
-    });
-    const res = { redirect: jest.fn() };
+  ])(
+    'routes edited item %s by its own add/remove choice',
+    (id, expectedStep) => {
+      const req = createRequest({
+        params: { id },
+        session: {
+          'add-remove-child-partner':
+            id === '0' ? 'remove-child-partner' : 'add-child-partner',
+          addremovechildpartner: {
+            aggregatedValues: [
+              {
+                fields: [
+                  {
+                    field: 'add-remove-child-partner',
+                    value: 'add-child-partner'
+                  }
+                ]
+              },
+              {
+                fields: [
+                  {
+                    field: 'add-remove-child-partner',
+                    value: 'remove-child-partner'
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        options: { editStepForks }
+      });
+      const res = { redirect: jest.fn() };
 
-    behaviour.updateItem(req, res);
+      behaviour.updateItem(req, res);
 
-    expect(res.redirect).toHaveBeenCalledWith(`/changes/${expectedStep}`);
-  });
+      expect(res.redirect).toHaveBeenCalledWith(`/changes/${expectedStep}`);
+    }
+  );
 
   test('keeps the default addStep when the summary is empty', () => {
     const req = createRequest({
       session: { 'add-remove-child-partner': 'add-child-partner' },
-      options: { addStepForks }
+      options: { editStepForks }
     });
     const res = { redirect: jest.fn() };
 
@@ -163,15 +181,28 @@ describe('aggregator save update behaviour', () => {
 });
 
 describe('aggregator save update item handling', () => {
-  const behaviour = new Behaviour({ aggregateTo: 'items', aggregateFrom: ['field'] });
-  const aggregateFrom = ['child-partner-given-name', 'child-partner-family-name'];
+  const behaviour = new Behaviour({
+    aggregateTo: 'items',
+    aggregateFrom: ['field']
+  });
+  const aggregateFrom = [
+    'child-partner-given-name',
+    'child-partner-family-name'
+  ];
   const savedItems = () => ({
     aggregatedValues: [
-      { joinTitle: 'A', fields: [{ field: 'child-partner-given-name', value: 'A' }] },
-      { joinTitle: 'B', fields: [{ field: 'child-partner-given-name', value: 'B' }] }
+      {
+        joinTitle: 'A',
+        fields: [{ field: 'child-partner-given-name', value: 'A' }]
+      },
+      {
+        joinTitle: 'B',
+        fields: [{ field: 'child-partner-given-name', value: 'B' }]
+      }
     ]
   });
-  const itemsIn = req => req.sessionModel.get('addremovechildpartner').aggregatedValues;
+  const itemsIn = req =>
+    req.sessionModel.get('addremovechildpartner').aggregatedValues;
 
   test.each([
     [{ aggregateFrom: ['a'] }, 'options.aggregateTo is required for loops'],
@@ -182,33 +213,63 @@ describe('aggregator save update item handling', () => {
 
   test('adds a new item from the session and clears the answered fields', () => {
     const req = createRequest({
-      session: { 'child-partner-given-name': 'Sam', 'child-partner-family-name': 'Smith' },
+      session: {
+        'child-partner-given-name': 'Sam',
+        'child-partner-family-name': 'Smith'
+      },
       options: {
         aggregateFrom,
         titleField: aggregateFrom,
-        fieldsConfig: { 'child-partner-family-name': { parse: value => value.toUpperCase() } }
+        fieldsConfig: {
+          'child-partner-family-name': { parse: value => value.toUpperCase() }
+        }
       }
     });
     const res = { redirect: jest.fn() };
 
     behaviour.addItem(req, res);
 
-    expect(itemsIn(req)).toEqual([{
-      joinTitle: 'Sam Smith',
-      fields: [
-        { field: 'child-partner-given-name', parsed: 'Sam', value: 'Sam', showInSummary: true },
-        { field: 'child-partner-family-name', parsed: 'SMITH', value: 'Smith', showInSummary: true }
-      ]
-    }]);
-    expect(req.sessionModel.unset).toHaveBeenCalledWith('child-partner-given-name');
-    expect(req.sessionModel.unset).toHaveBeenCalledWith('child-partner-family-name');
-    expect(res.redirect).toHaveBeenCalledWith('/changes/check-your-answers-add-child-partner');
+    expect(itemsIn(req)).toEqual([
+      {
+        joinTitle: 'Sam Smith',
+        fields: [
+          {
+            field: 'child-partner-given-name',
+            parsed: 'Sam',
+            value: 'Sam',
+            showInSummary: true
+          },
+          {
+            field: 'child-partner-family-name',
+            parsed: 'SMITH',
+            value: 'Smith',
+            showInSummary: true
+          }
+        ]
+      }
+    ]);
+    expect(req.sessionModel.unset).toHaveBeenCalledWith(
+      'child-partner-given-name'
+    );
+    expect(req.sessionModel.unset).toHaveBeenCalledWith(
+      'child-partner-family-name'
+    );
+    expect(res.redirect).toHaveBeenCalledWith(
+      '/changes/check-your-answers-add-child-partner'
+    );
   });
 
   test('does not add an item once the limit is reached', () => {
     const req = createRequest({
-      session: { addremovechildpartner: savedItems(), 'child-partner-given-name': 'C' },
-      options: { aggregateFrom: ['child-partner-given-name'], aggregateLimit: 2, fieldsConfig: {} }
+      session: {
+        addremovechildpartner: savedItems(),
+        'child-partner-given-name': 'C'
+      },
+      options: {
+        aggregateFrom: ['child-partner-given-name'],
+        aggregateLimit: 2,
+        fieldsConfig: {}
+      }
     });
 
     behaviour.addItem(req, { redirect: jest.fn() });
@@ -231,7 +292,11 @@ describe('aggregator save update item handling', () => {
     const req = createRequest({
       params: { id: '0' },
       session: { addremovechildpartner: savedItems() },
-      options: { aggregateFrom: ['child-partner-given-name'], titleField: 'child-partner-given-name', fieldsConfig: {} }
+      options: {
+        aggregateFrom: ['child-partner-given-name'],
+        titleField: 'child-partner-given-name',
+        fieldsConfig: {}
+      }
     });
 
     behaviour.updateItem(req, { redirect: jest.fn() });
@@ -247,59 +312,94 @@ describe('aggregator save update item handling', () => {
   });
 
   test('redirects to the add step without changes when the edited item does not exist', () => {
-    const req = createRequest({ params: { id: '5' }, session: { addremovechildpartner: savedItems() } });
+    const req = createRequest({
+      params: { id: '5' },
+      session: { addremovechildpartner: savedItems() }
+    });
     const res = { redirect: jest.fn() };
 
     behaviour.updateItem(req, res);
 
     expect(itemsIn(req)).toHaveLength(2);
-    expect(res.redirect).toHaveBeenCalledWith('/changes/do-you-need-add-remove-dependant');
+    expect(res.redirect).toHaveBeenCalledWith(
+      '/changes/do-you-need-add-remove-dependant'
+    );
   });
 
   test('deletes the selected item and redirects to the summary', () => {
-    const req = createRequest({ params: { id: '0' }, session: { addremovechildpartner: savedItems() } });
+    const req = createRequest({
+      params: { id: '0' },
+      session: { addremovechildpartner: savedItems() }
+    });
     const res = { redirect: jest.fn() };
 
     behaviour.deleteItem(req, res);
 
     expect(itemsIn(req).map(item => item.joinTitle)).toEqual(['B']);
-    expect(res.redirect).toHaveBeenCalledWith('/changes/check-your-answers-add-child-partner');
+    expect(res.redirect).toHaveBeenCalledWith(
+      '/changes/check-your-answers-add-child-partner'
+    );
   });
 
   test('only redirects when deleting without an id', () => {
-    const req = createRequest({ session: { addremovechildpartner: savedItems() } });
+    const req = createRequest({
+      session: { addremovechildpartner: savedItems() }
+    });
 
     behaviour.deleteItem(req, { redirect: jest.fn() });
 
     expect(req.sessionModel.set).not.toHaveBeenCalled();
   });
 
-  describe.each(['forEach', 'length', 'constructor', '-1', '1.5', '0abc', '2', ' ', '', '0x1', '1e0', '+1'])(
-    'with an invalid id in the URL (%s)',
-    id => {
-      test('edit redirects without crashing or changing the session', () => {
-        const req = createRequest({ params: { id }, session: { addremovechildpartner: savedItems() } });
-        const res = { redirect: jest.fn() };
-
-        expect(() => behaviour.updateItem(req, res)).not.toThrow();
-        expect(req.sessionModel.set).not.toHaveBeenCalled();
-        expect(res.redirect).toHaveBeenCalledWith('/changes/do-you-need-add-remove-dependant');
+  describe.each([
+    'forEach',
+    'length',
+    'constructor',
+    '-1',
+    '1.5',
+    '0abc',
+    '2',
+    ' ',
+    '',
+    '0x1',
+    '1e0',
+    '+1'
+  ])('with an invalid id in the URL (%s)', id => {
+    test('edit redirects without crashing or changing the session', () => {
+      const req = createRequest({
+        params: { id },
+        session: { addremovechildpartner: savedItems() }
       });
+      const res = { redirect: jest.fn() };
 
-      test('delete redirects without removing anything', () => {
-        const req = createRequest({ params: { id }, session: { addremovechildpartner: savedItems() } });
-        const res = { redirect: jest.fn() };
+      expect(() => behaviour.updateItem(req, res)).not.toThrow();
+      expect(req.sessionModel.set).not.toHaveBeenCalled();
+      expect(res.redirect).toHaveBeenCalledWith(
+        '/changes/do-you-need-add-remove-dependant'
+      );
+    });
 
-        behaviour.deleteItem(req, res);
-
-        expect(req.sessionModel.set).not.toHaveBeenCalled();
-        expect(res.redirect).toHaveBeenCalledWith('/changes/check-your-answers-add-child-partner');
+    test('delete redirects without removing anything', () => {
+      const req = createRequest({
+        params: { id },
+        session: { addremovechildpartner: savedItems() }
       });
-    }
-  );
+      const res = { redirect: jest.fn() };
+
+      behaviour.deleteItem(req, res);
+
+      expect(req.sessionModel.set).not.toHaveBeenCalled();
+      expect(res.redirect).toHaveBeenCalledWith(
+        '/changes/check-your-answers-add-child-partner'
+      );
+    });
+  });
 
   test('saves the edit position as a number', () => {
-    const req = createRequest({ params: { id: '1' }, session: { addremovechildpartner: savedItems() } });
+    const req = createRequest({
+      params: { id: '1' },
+      session: { addremovechildpartner: savedItems() }
+    });
 
     behaviour.updateItem(req, { redirect: jest.fn() });
 
@@ -329,40 +429,59 @@ describe('aggregator save update item handling', () => {
   ])('handles the %s action by calling %s', (action, method) => {
     const spy = jest.spyOn(behaviour, method).mockImplementation(() => {});
 
-    expect(behaviour.handleAction(createRequest(), {}, jest.fn(), action)).toEqual({ redirected: true });
+    expect(
+      behaviour.handleAction(createRequest(), {}, jest.fn(), action)
+    ).toEqual({ redirected: true });
     expect(spy).toHaveBeenCalled();
     spy.mockRestore();
   });
 
   test('shows the items for the showItems action', () => {
-    expect(behaviour.handleAction(createRequest(), {}, jest.fn(), 'showItems')).toEqual({ redirected: false });
+    expect(
+      behaviour.handleAction(createRequest(), {}, jest.fn(), 'showItems')
+    ).toEqual({ redirected: false });
   });
 
   test('redirects to the custom add step', () => {
     const res = { redirect: jest.fn() };
 
-    behaviour.redirectToCustomAddStep(createRequest({ options: { customAddStep: 'custom-step' } }), res);
+    behaviour.redirectToCustomAddStep(
+      createRequest({ options: { customAddStep: 'custom-step' } }),
+      res
+    );
 
     expect(res.redirect).toHaveBeenCalledWith('/changes/custom-step');
   });
 
   test('uses the action from the URL when one is given', () => {
-    const spy = jest.spyOn(behaviour, 'deleteItem').mockImplementation(() => {});
+    const spy = jest
+      .spyOn(behaviour, 'deleteItem')
+      .mockImplementation(() => {});
 
-    behaviour.getValues(createRequest({ params: { action: 'delete' } }), {}, jest.fn());
+    behaviour.getValues(
+      createRequest({ params: { action: 'delete' } }),
+      {},
+      jest.fn()
+    );
 
     expect(spy).toHaveBeenCalled();
     spy.mockRestore();
   });
 
   test('accepts aggregateFrom entries given as objects', () => {
-    const req = createRequest({ options: { fieldsConfig: { name: { parse: value => `parsed ${value}` } } } });
+    const req = createRequest({
+      options: { fieldsConfig: { name: { parse: value => `parsed ${value}` } } }
+    });
 
-    expect(behaviour.parseField({ field: 'name' }, 'Sam', req)).toBe('parsed Sam');
+    expect(behaviour.parseField({ field: 'name' }, 'Sam', req)).toBe(
+      'parsed Sam'
+    );
   });
 
   test('numbers the items for the view', () => {
-    const req = createRequest({ session: { addremovechildpartner: savedItems() } });
+    const req = createRequest({
+      session: { addremovechildpartner: savedItems() }
+    });
 
     const locals = behaviour.locals(req, {});
 
@@ -374,7 +493,11 @@ describe('aggregator save update item handling', () => {
 
   test('does not allow removing the only item', () => {
     const req = createRequest({
-      session: { addremovechildpartner: { aggregatedValues: [savedItems().aggregatedValues[0]] } }
+      session: {
+        addremovechildpartner: {
+          aggregatedValues: [savedItems().aggregatedValues[0]]
+        }
+      }
     });
 
     const locals = behaviour.locals(req, {});

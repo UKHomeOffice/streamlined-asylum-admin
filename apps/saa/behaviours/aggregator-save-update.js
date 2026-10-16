@@ -135,10 +135,10 @@ const aggregatorSaveUpdate = superclass =>
       return fieldsProvided;
     }
 
-    // Optional addStepForks select the add step from session values; addStep remains the fallback.
+    // Optional editStepForks pick the first page when changing an item; addStep is the fallback.
     getAddStep(req) {
-      const { addStep, addStepForks = [] } = req.form.options;
-      const fork = addStepForks.find(
+      const { addStep, editStepForks = [] } = req.form.options;
+      const fork = editStepForks.find(
         ({ condition }) =>
           req.sessionModel.get(condition.field) === condition.value
       );

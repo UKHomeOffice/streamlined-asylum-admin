@@ -320,7 +320,7 @@ const steps = {
     ],
     titleField: ['add-remove-child-partner'],
     addStep: 'add-remove-child-partner',
-    addStepForks: [
+    editStepForks: [
       {
         target: 'relationship-to-child-partner',
         condition: {
