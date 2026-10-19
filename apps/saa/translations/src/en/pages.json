@@ -233,6 +233,9 @@
   "confirm": {
     "header": "Check your answers",
     "sections": {
+      "your-details": {
+        "header": "Your details"
+      },
       "personal-details": {
         "header": "Personal details"
       },
@@ -252,6 +255,9 @@
     "fields": {
       "addremovechildpartner": {
         "label": "Add or remove a child or partner"
+      },
+      "claimants-given-name": {
+        "label": "Name"
       }
     }
   }

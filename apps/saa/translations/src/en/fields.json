@@ -157,7 +157,8 @@
     }
   },
   "claimants-given-name": {
-    "label": "Given name"
+    "label": "Given name",
+    "summary-label": "Full name"
   },
   "claimants-family-name": {
     "label": "Family name"
