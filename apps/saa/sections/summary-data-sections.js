@@ -35,7 +35,7 @@ module.exports = {
             req.sessionModel.get('claimants-given-name'),
             req.sessionModel.get('claimants-family-name')
           ];
-          return claimaintsFullName.filter(element => element).join(' ');
+          return claimaintsFullName.filter(Boolean).join(' ');
         }
       }
     ]
