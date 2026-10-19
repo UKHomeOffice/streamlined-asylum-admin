@@ -141,5 +141,5 @@ module.exports = {
       value: '',
       label: 'fields.nationality-person-who-died.options.none_selected'
     }].concat(countries)
-  },
+  }
 };
