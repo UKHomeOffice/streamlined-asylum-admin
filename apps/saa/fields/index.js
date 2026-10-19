@@ -131,7 +131,6 @@ module.exports = {
       'before',
       { type: 'after', arguments: '1900-01-01' }
     ],
-    labelClassName: 'govuk-label--m',
     isPageHeading: true
   })
 };
