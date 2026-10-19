@@ -132,5 +132,14 @@ module.exports = {
       { type: 'after', arguments: '1900-01-01' }
     ],
     isPageHeading: true
-  })
+  }),
+  'nationality-person-who-died': {
+    mixin: 'select',
+    className: ['typeahead'],
+    validate: ['required'],
+    options: [{
+      value: '',
+      label: 'fields.nationality-person-who-died.options.none_selected'
+    }].concat(countries)
+  }
 };

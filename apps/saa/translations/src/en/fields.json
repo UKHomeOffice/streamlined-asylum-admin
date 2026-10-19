@@ -165,5 +165,12 @@
   "date-of-birth-person-who-died": {
     "legend": "Their date of birth",
     "hint": "For example, 27 3 1940"
+  },
+  "nationality-person-who-died": {
+    "label": "Country of nationality",
+    "summary-label": "Their country of nationality",
+    "options": {
+      "none_selected": "Select a country"
+    }
   }
 }
