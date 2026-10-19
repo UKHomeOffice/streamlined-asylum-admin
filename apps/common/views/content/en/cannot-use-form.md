@@ -6,7 +6,7 @@ You cannot use this form if you already have a decision on your asylum claim.
 
 You need to either:
 
-- sign in to your <a class="govuk-link" href="https://hmcts-access.service.gov.uk/enter-email">MyHMCTS account</a>
+- sign in to your <a class="govuk-link" href="https://manage-case.platform.hmcts.net/">MyHMCTS account</a>
 - contact the <a class="govuk-link" href="https://www.find-court-tribunal.service.gov.uk/courts/immigration-and-asylum-appeals-service-centre">Immigration and Asylum Appeals Service Centre</a>
 
 If you have not started an appeal yet, you can do this online or by post. Find out more on how to <a class="govuk-link" href="https://www.gov.uk/immigration-asylum-tribunal/overview">appeal a visa or immigration decision</a>.

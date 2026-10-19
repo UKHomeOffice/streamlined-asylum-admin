@@ -155,7 +155,10 @@
     "captionHeading": "Add or remove a child or partner"
   },
   "check-your-answers-add-child-partner": {
-    "header": "Check your answers"
+    "header": "Check your answers",
+    "captionHeading": "Add or remove a child or partner",
+    "limit-exceeded": "You have added or removed the maximum of {{maxItems}} children or partners. You cannot add or remove any more.",
+    "add-remove-child-partner" : "Add or remove another child or partner"
   },
   "reason-for-removing-child-partner": {
     "captionHeading": "Add or remove a child or partner"
@@ -184,10 +187,11 @@
     "captionHeading": "Tell us someone has died"
   },
   "name-person-who-died": {
-    "header": "Their name"
+    "header": "Their name",
+    "captionHeading": "Tell us someone has died"
   },
   "date-of-birth-person-who-died": {
-    "header": "Their date of birth"
+    "captionHeading": "Tell us someone has died"
   },
   "nationality-person-who-died": {
     "header": "Their country of nationality"
@@ -235,8 +239,8 @@
       "evidences": {
         "header": "Send evidence"
       },
-      "dependant": {
-        "header": "Dependant"
+      "add-or-remove-dependants": {
+        "header": "Add or remove dependants"
       },
       "death": {
         "header": "Tell us someone on your claim died"
@@ -245,6 +249,10 @@
         "header": "Something else"
       }
     },
-    "fields": {}
+    "fields": {
+      "addremovechildpartner": {
+        "label": "Add or remove a child or partner"
+      }
+    }
   }
 }
