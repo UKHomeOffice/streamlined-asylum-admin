@@ -122,5 +122,15 @@ module.exports = {
     mixin: 'input-text',
     validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
     labelClassName: 'govuk-label--s'
-  }
+  },
+  'date-of-birth-person-who-died': dateComponent('date-of-birth-person-who-died', {
+    mixin: 'input-date',
+    validate: [
+      'required',
+      'date',
+      'before',
+      { type: 'after', arguments: '1900-01-01' }
+    ],
+    isPageHeading: true
+  })
 };
