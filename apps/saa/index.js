@@ -86,6 +86,8 @@ const steps = {
     next: '/claimants-name'
   },
   '/claimants-name': {
+    behaviours: [CustomValidation],
+    fields: ['claimants-given-name', 'claimants-family-name'],
     next: '/claimant-main-language'
   },
   '/claimant-main-language': {

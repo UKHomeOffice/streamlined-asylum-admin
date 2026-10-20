@@ -156,6 +156,12 @@
       }
     }
   },
+  "claimants-given-name": {
+    "label": "Given name"
+  },
+  "claimants-family-name": {
+    "label": "Family name"
+  },
   "given-name-person-who-died": {
     "label": "Given name"
   },

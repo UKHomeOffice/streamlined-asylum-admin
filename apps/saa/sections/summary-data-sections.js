@@ -25,6 +25,21 @@ const aggregateSummaryRow = name => {
 };
 
 module.exports = {
+  'your-details': {
+    steps: [
+      {
+        step: '/claimants-name',
+        field: 'claimants-given-name',
+        parse: (value, req) => {
+          const claimaintsFullName = [
+            req.sessionModel.get('claimants-given-name'),
+            req.sessionModel.get('claimants-family-name')
+          ];
+          return claimaintsFullName.filter(Boolean).join(' ');
+        }
+      }
+    ]
+  },
   'personal-details': {
     steps: [
       {
