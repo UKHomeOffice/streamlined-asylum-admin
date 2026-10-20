@@ -26,6 +26,9 @@ const documentUploadStep = category => ({
     documentCategory: {
       name: category,
       acceptedFileExtensions: config.upload.acceptedFileExtensions,
+      limit: config.upload.limit,
+      limitValidationError: config.upload.limitValidationError,
+      allowedMimeTypes: config.upload.allowedMimeTypes,
       ...config.upload.documentCategories[category]
     }
   }

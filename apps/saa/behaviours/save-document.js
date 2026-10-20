@@ -31,16 +31,19 @@ module.exports = (documentCategory, fieldName) => superclass => class extends su
     }
 
     if (file) {
-      const categoryConfig = config.upload.documentCategories[documentCategory];
-      const allowedMimeTypes = categoryConfig.allowedMimeTypes || config.upload.allowedMimeTypes;
-      const acceptedFileExtensions = (categoryConfig.acceptedFileExtensions || config.upload.acceptedFileExtensions)
+      const categoryConfig = {
+        ...config.upload,
+        ...(config.upload.documentCategories[documentCategory] || {})
+      };
+      const allowedMimeTypes = categoryConfig.allowedMimeTypes;
+      const acceptedFileExtensions = categoryConfig.acceptedFileExtensions
         .split(',');
       const fileExtension = path.extname(file.name).toLowerCase();
 
       if (file.size === 0) {
         return validationError('emptyFile');
       }
-      if (file.size > config.upload.maxFileSizeInBytes || file.truncated) {
+      if (file.size > categoryConfig.maxFileSizeInBytes || file.truncated) {
         return validationError('maxFileSize');
       }
       if (!allowedMimeTypes.includes(file.mimetype) || !acceptedFileExtensions.includes(fileExtension)) {
