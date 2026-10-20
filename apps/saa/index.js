@@ -409,6 +409,7 @@ const steps = {
   },
   '/upload-death-certificate': {
     ...documentUploadStep('documents-death-certificate'),
+    template: 'upload-supporting-evidence',
     next: '/check-your-answers-death'
   },
   '/check-your-answers-death': {
