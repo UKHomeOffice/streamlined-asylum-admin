@@ -408,7 +408,7 @@ const steps = {
     next: '/upload-death-certificate'
   },
   '/upload-death-certificate': {
-    // provisional document category: documents-death-certificate
+    ...documentUploadStep('documents-death-certificate'),
     next: '/check-your-answers-death'
   },
   '/check-your-answers-death': {

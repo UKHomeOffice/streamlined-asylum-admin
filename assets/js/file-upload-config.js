@@ -22,6 +22,10 @@ module.exports = {
     'documents-child-partner': {
       limit: 6,
       limitValidationError: 'fileCountLimit'
+    },
+    'documents-death-certificate': {
+      limit: 6,
+      limitValidationError: 'fileCountLimit'
     }
   }
 };
