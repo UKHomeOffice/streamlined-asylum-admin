@@ -17,6 +17,6 @@ module.exports = {
   limit: 6,
   limitValidationError: 'fileCountLimit',
   documentCategories: {
-    // Add document categories overide here if required
+    // Add document categories override here if required
   }
 };
