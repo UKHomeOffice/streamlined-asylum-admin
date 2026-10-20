@@ -33,7 +33,7 @@ module.exports = (documentCategory, fieldName) => superclass => class extends su
     if (file) {
       const categoryConfig = {
         ...config.upload,
-        ...(config.upload.documentCategories[documentCategory] || {})
+        ...(config.upload.documentCategories[documentCategory])
       };
       const allowedMimeTypes = categoryConfig.allowedMimeTypes;
       const acceptedFileExtensions = categoryConfig.acceptedFileExtensions
