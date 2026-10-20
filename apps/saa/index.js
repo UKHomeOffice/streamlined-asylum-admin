@@ -404,6 +404,7 @@ const steps = {
     next: '/nationality-person-who-died'
   },
   '/nationality-person-who-died': {
+    fields: ['nationality-person-who-died'],
     next: '/upload-death-certificate'
   },
   '/upload-death-certificate': {
