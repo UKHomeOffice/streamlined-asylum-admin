@@ -115,6 +115,7 @@
     }
   },
   "someone-on-claim-died": {
+    "summary-label": "Someone on the claim has died",
     "legend": "Do you need to tell us someone on your claim has died?",
     "options": {
       "yes": {
@@ -159,6 +160,7 @@
   },
   "main-claimant-died": {
     "legend": "Did they make the claim?",
+    "summary-label": "Did they make the claim?",
     "options": {
       "yes": {
         "label": "Yes"
@@ -175,7 +177,8 @@
     "label": "Family name"
   },
   "given-name-person-who-died": {
-    "label": "Given name"
+    "label": "Given name",
+    "summary-label": "Their name"
   },
   "family-name-person-who-died": {
     "label": "Family name"
@@ -190,5 +193,8 @@
     "options": {
       "none_selected": "Select a country"
     }
+  },
+  "documents-death-certificate": {
+    "summary-label": "Files uploaded"
   }
 }
