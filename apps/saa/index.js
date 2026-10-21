@@ -39,7 +39,7 @@ const multiSelectFollowUpsConfig = require('./config/multi-select-follow-ups-con
 const multiSelectFollowUpsBehaviour = MultiSelectFollowUps(
   multiSelectFollowUpsConfig
 );
-const baseUrl = '/changes';
+const { SAA_BASE_URL: baseUrl } = require('../../utils/constants');
 
 const getConfiguredSections = option => option.sections || [];
 
@@ -375,6 +375,9 @@ const steps = {
     next: '/check-your-answers-evidence'
   },
   '/check-your-answers-evidence': {
+    behaviours: [Summary, SummaryLabels, EditRouteReturn],
+    sections: require('./sections/summary-data-evidence-help-your-claim'),
+    locals: { addStep: 'upload-supporting-evidence' },
     next: '/someone-on-claim-died'
   },
   '/someone-on-claim-died': {

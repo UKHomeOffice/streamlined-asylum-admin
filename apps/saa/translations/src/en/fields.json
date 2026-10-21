@@ -104,6 +104,7 @@
   },
   "evidence-violent-or-upsetting": {
     "legend": "Does your evidence include violent or upsetting images?",
+    "summary-label": "Violent or upsetting images",
     "options": {
       "yes": {
         "label": "Yes"
@@ -149,7 +150,12 @@
     }
   },
   "documents-child-partner": {
-    "summary-label": "Files uploaded"
+    "summary-label": "Files uploaded",
+    "changeLinkDescription": "Files uploaded"
+  },
+  "documents-help-your-claim": {
+    "summary-label": "Files uploaded",
+    "changeLinkDescription": "Files uploaded"
   },
   "main-claimant-died": {
     "legend": "Did they make the claim?",
