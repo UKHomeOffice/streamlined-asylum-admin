@@ -18,7 +18,7 @@
     "header": "Do you need to change your name?"
   },
   "reason-name-change": {
-    "header": "Why do you need to change the name?"
+    "captionHeading": "Update personal details"
   },
   "new-name": {
     "header": "Change your name"
