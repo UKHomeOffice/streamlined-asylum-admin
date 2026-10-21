@@ -177,7 +177,9 @@
     "doNotUpload": "You must not upload anything sexually explicit. We will not accept it."
   },
   "check-your-answers-evidence": {
-    "header": "Check your answers"
+    "header": "Check your answers",
+    "captionHeading": "Send evidence for your claim",
+    "add-more": "Add more evidence"
   },
   "about-who-has-died": {
     "header": "Tell us about the person who has died",
@@ -240,8 +242,8 @@
       "personal-details": {
         "header": "Personal details"
       },
-      "evidences": {
-        "header": "Send evidence"
+      "evidence": {
+        "header": "Evidence"
       },
       "add-or-remove-dependants": {
         "header": "Add or remove dependants"

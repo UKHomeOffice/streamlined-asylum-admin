@@ -3,11 +3,20 @@ const {
   formatAggregateForSummary
 } = require('../behaviours/parse-section-summary-fields');
 const aggregatorSummaries = require('../config/aggregator-summaries');
+const { SAA_BASE_URL } = require('../../../utils/constants');
+const evidenceSummary = require('./summary-data-evidence-help-your-claim');
+
+// Same rows as /check-your-answers-evidence; Change goes back to that page.
+const evidenceRows = evidenceSummary.evidence.steps.map(row => ({
+  ...row,
+  changeLink: `${SAA_BASE_URL}/check-your-answers-evidence`,
+  dependsOn: 'send-evidence-for-your-claim'
+}));
 
 // Read-only rows for every item of an aggregate; Change goes to that aggregate's summary page.
 const aggregateSummaryRow = name => {
   const settings = aggregatorSummaries[name];
-  const changeLink = `/changes${settings.route}`;
+  const changeLink = `${SAA_BASE_URL}${settings.route}`;
 
   return {
     step: settings.route,
@@ -70,12 +79,13 @@ module.exports = {
       }
     ]
   },
-  evidences: {
+  evidence: {
     steps: [
       {
         step: '/send-evidence-for-your-claim',
         field: 'send-evidence-for-your-claim'
-      }
+      },
+      ...evidenceRows
     ]
   },
   'something-else': {

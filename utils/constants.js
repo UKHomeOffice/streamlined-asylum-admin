@@ -1,5 +1,7 @@
 const NO_DIGITS_REGEX = /^\D*$/;
 
+const SAA_BASE_URL = '/changes';
+
 // yes/no fields on SAA pages that start a follow-up journey.
 const SECTION_FIELDS = [
   'change-personal-details',
@@ -10,5 +12,6 @@ const SECTION_FIELDS = [
 
 module.exports = {
   NO_DIGITS_REGEX,
+  SAA_BASE_URL,
   SECTION_FIELDS
 };
