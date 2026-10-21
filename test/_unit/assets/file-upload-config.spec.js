@@ -19,11 +19,10 @@ jest.mock('../../../apps/saa/behaviours/remove-document', () =>
 const app = require('../../../apps/saa');
 
 describe('file upload configuration', () => {
-  test('configures child/partner evidence with a six-file limit', () => {
-    expect(uploadConfig.documentCategories['documents-child-partner']).toEqual({
-      limit: 6,
-      limitValidationError: 'fileCountLimit'
-    });
+  test('uses the global six-file limit when there are no category overrides', () => {
+    expect(uploadConfig.limit).toBe(6);
+    expect(uploadConfig.limitValidationError).toBe('fileCountLimit');
+    expect(uploadConfig.documentCategories).toEqual({});
   });
 
   test('wires the child/partner evidence route to its upload category', () => {
