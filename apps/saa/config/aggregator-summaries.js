@@ -8,5 +8,15 @@ module.exports = {
     combineFields: {
       'child-partner-given-name': ['child-partner-family-name']
     }
+  },
+  reportadeath: {
+    route: '/check-your-answers-death',
+    itemTitle: 'pages.check-your-answers-death.item-title',
+    dependsOn: 'someone-on-claim-died',
+    omitFields: ['about-who-has-died'],
+    dateFields: ['date-of-birth-person-who-died'],
+    combineFields: {
+      'given-name-person-who-died': ['family-name-person-who-died']
+    }
   }
 };

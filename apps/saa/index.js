@@ -420,6 +420,25 @@ const steps = {
     next: '/check-your-answers-death'
   },
   '/check-your-answers-death': {
+    behaviours: [
+      AggregateSaveUpdate,
+      LimitAggregateItems,
+      ParseSummaryFields(aggregatorSummaries.reportadeath),
+      EditRouteReturn
+    ],
+    aggregateTo: 'reportadeath',
+    aggregateFrom: [
+      'about-who-has-died',
+      'main-claimant-died',
+      'given-name-person-who-died',
+      'family-name-person-who-died',
+      'date-of-birth-person-who-died',
+      'nationality-person-who-died',
+      'documents-death-certificate'
+    ],
+    titleField: ['about-who-has-died'],
+    addStep: 'main-claimant-died',
+    aggregateLimit: config.aggregateLimits.reportADeath,
     next: '/something-else'
   },
   '/confirm': {

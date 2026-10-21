@@ -183,7 +183,8 @@
   },
   "about-who-has-died": {
     "header": "Tell us about the person who has died",
-    "captionHeading": "Tell us someone has died"
+    "captionHeading": "Tell us someone has died",
+    "add-another-death" : "Tell us someone else has died"
   },
   "main-claimant-died": {
     "captionHeading": "Tell us someone has died"
@@ -204,6 +205,8 @@
     "header": "Upload the death certificate"
   },
   "check-your-answers-death": {
+    "item-title": "Tell us about the person who died",
+    "captionHeading": "Tell us someone has died",
     "header": "Check your answers"
   },
   "contact-us-by-email": {

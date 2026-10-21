@@ -39,7 +39,8 @@ module.exports = {
   },
   aggregateLimits: {
     defaultLimit: 100,
-    addOrRemoveChildPartner: 15
+    addOrRemoveChildPartner: 15,
+    reportADeath: 15
   },
   feedbackUrl: process.env.FEEDBACK_URL,
   disallowIndexing: process.env.DISALLOW_INDEXING === 'true'
