@@ -37,6 +37,10 @@ module.exports = {
           ];
           return claimaintsFullName.filter(Boolean).join(' ');
         }
+      },
+      {
+        step: '/claimant-main-language',
+        field: 'claimant-main-language'
       }
     ]
   },
