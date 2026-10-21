@@ -24,13 +24,13 @@
   },
   "child-partner-given-name": {
     "required": "Enter their given name",
-    "notUrl": "Given name must not contain a url",
+    "notUrl": "Given name must not contain a URL",
     "maxlength": "Given name must be between 1 and 255 characters",
     "noDigits": "Given name must not contain numbers"
   },
   "child-partner-family-name": {
     "required": "Enter their family name",
-    "notUrl": "Family name must not contain a url",
+    "notUrl": "Family name must not contain a URL",
     "maxlength": "Family name must be between 1 and 255 characters",
     "noDigits": "Family name must not contain numbers"
   },
@@ -65,6 +65,18 @@
   },
   "main-claimant-died": {
     "required": "Select if they made the claim"
+  },
+  "claimants-given-name": {
+    "required": "You must enter a given name",
+    "notUrl": "Given name must not contain a URL",
+    "maxlength": "Given name must be between 1 and 255 characters",
+    "noDigits": "Given name must not contain numbers"
+  },
+  "claimants-family-name": {
+    "required": "Enter their family name",
+    "notUrl": "Family name must not contain a URL",
+    "maxlength": "Family name must be between 1 and 255 characters",
+    "noDigits": "Family name must not contain numbers"
   },
   "given-name-person-who-died": {
     "required": "Enter their given name",

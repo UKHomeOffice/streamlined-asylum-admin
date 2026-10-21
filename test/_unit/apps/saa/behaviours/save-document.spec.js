@@ -265,7 +265,7 @@ describe.each([
   test.each([5, 6])(
     'validates an upload with %i existing files against the six-file limit',
     documentCount => {
-      expect(uploadConfig.documentCategories[documentCategory].limit).toBe(6);
+      expect(uploadConfig.limit).toBe(6);
       const req = createRequest({
         files: {
           'file-upload': {

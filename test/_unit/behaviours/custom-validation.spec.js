@@ -42,7 +42,12 @@ describe('custom validation behaviour', () => {
     );
   });
 
-  test.each(['child-partner-given-name', 'child-partner-family-name'])(
+  test.each([
+    'child-partner-given-name',
+    'child-partner-family-name',
+    'claimants-given-name',
+    'claimants-family-name'
+  ])(
     'should reject digits in %s',
     key => {
       const req = { form: { values: { [key]: 'Name2' } } };
@@ -62,7 +67,11 @@ describe('custom validation behaviour', () => {
   test.each([
     ['child-partner-given-name', 'Mary-Jane'],
     ['child-partner-family-name', "O'Connor"],
-    ['child-partner-given-name', '']
+    ['child-partner-given-name', ''],
+    ['claimants-given-name', 'Mary-Jane'],
+    ['claimants-family-name', "O'Connor"],
+    ['claimants-given-name', ''],
+    ['claimants-family-name', '']
   ])('should accept a digit-free value for %s', (key, value) => {
     const req = { form: { values: { [key]: value } } };
 

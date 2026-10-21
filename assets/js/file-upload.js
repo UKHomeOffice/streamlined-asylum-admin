@@ -59,7 +59,7 @@ const initFileUpload = () => {
       return;
     }
 
-    const categoryConfig = uploadConfig.documentCategories[input.getAttribute('document-category')];
+    const categoryConfig = uploadConfig.documentCategories[input.getAttribute('document-category')] || {};
     const allowedMimeTypes = categoryConfig.allowedMimeTypes || uploadConfig.allowedMimeTypes;
     const acceptedFileExtensions = (categoryConfig.acceptedFileExtensions || uploadConfig.acceptedFileExtensions)
       .split(',');
