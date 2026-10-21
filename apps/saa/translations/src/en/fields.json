@@ -177,7 +177,8 @@
     "label": "Family name"
   },
   "given-name-person-who-died": {
-    "label": "Given name"
+    "label": "Given name",
+    "summary-label": "Their name"
   },
   "family-name-person-who-died": {
     "label": "Family name"

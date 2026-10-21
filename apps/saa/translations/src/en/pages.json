@@ -207,6 +207,7 @@
   "check-your-answers-death": {
     "item-title": "Tell us about the person who died",
     "captionHeading": "Tell us someone has died",
+    "limit-exceeded": "You have reported the maximum of {{maxItems}} deaths. You cannot report any more.",
     "header": "Check your answers"
   },
   "contact-us-by-email": {

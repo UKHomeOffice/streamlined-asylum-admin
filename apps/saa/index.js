@@ -381,7 +381,10 @@ const steps = {
     next: '/someone-on-claim-died'
   },
   '/someone-on-claim-died': {
-    behaviours: [RequireSelectedSection],
+    behaviours: [
+      RequireSelectedSection,
+      ResetSectionSummary(['reportadeath'], 'someone-on-claim-died')
+    ],
     fields: ['someone-on-claim-died'],
     forks: [
       {
