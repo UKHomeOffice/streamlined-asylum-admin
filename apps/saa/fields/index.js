@@ -1,7 +1,18 @@
 const hof = require('hof');
 const countries = require('hof').utils.countries();
+const languages = require('../data/languages.json');
 const dateComponent = hof.components.date;
 module.exports = {
+  'claimant-main-language': {
+    mixin: 'select',
+    className: ['typeahead'],
+    validate: ['required'],
+    options: [{
+      value: '',
+      label: 'fields.claimant-main-language.options.none_selected'
+    }].concat(languages.map(language => ({ value: language, label: language }))),
+    labelClassName: 'govuk-label--m'
+  },
   'changes-to-contact-details': {
     mixin: 'checkbox-group',
     options: [

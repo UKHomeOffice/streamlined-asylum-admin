@@ -1,4 +1,10 @@
 {
+  "claimant-main-language": {
+    "label": "Main language",
+    "options": {
+      "none_selected": "Select a language"
+    }
+  },
   "changes-to-contact-details": {
     "legend": "What details do you need to change?",
     "options": {

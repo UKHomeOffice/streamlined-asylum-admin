@@ -1,4 +1,7 @@
 {
+  "claimant-main-language": {
+    "required": "You must select a main language"
+  },
   "changes-to-contact-details": {
     "required": "Select what details you need to change"
   },

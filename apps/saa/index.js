@@ -89,6 +89,7 @@ const steps = {
     next: '/claimant-main-language'
   },
   '/claimant-main-language': {
+    fields: ['claimant-main-language'],
     next: '/person-completing-form'
   },
   '/person-completing-form': {
