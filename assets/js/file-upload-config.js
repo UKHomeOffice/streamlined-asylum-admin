@@ -14,14 +14,9 @@ module.exports = {
     'text/plain',
     'application/vnd.oasis.opendocument.text'
   ],
+  limit: 6,
+  limitValidationError: 'fileCountLimit',
   documentCategories: {
-    'documents-help-your-claim': {
-      limit: 6,
-      limitValidationError: 'fileCountLimit'
-    },
-    'documents-child-partner': {
-      limit: 6,
-      limitValidationError: 'fileCountLimit'
-    }
+    // Add document categories override here if required
   }
 };
