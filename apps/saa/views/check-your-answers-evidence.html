@@ -1,0 +1,15 @@
+{{<partials-page}}
+  {{$page-content}}
+    {{#rows}}
+      {{>partials-summary-table}}
+    {{/rows}}
+    <div>
+      <p class="govuk-body">
+        <a href="{{baseUrl}}/{{addStep}}" class="govuk-link">
+            {{#t}}pages.check-your-answers-evidence.add-more{{/t}}
+        </a>
+      </p>
+    </div>
+    {{#input-submit}}continue{{/input-submit}}
+  {{/page-content}}
+{{/partials-page}}
