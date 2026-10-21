@@ -144,10 +144,12 @@
     }
   },
   "documents-child-partner": {
-    "summary-label": "Files uploaded"
+    "summary-label": "Files uploaded",
+    "changeLinkDescription": "Files uploaded"
   },
   "documents-help-your-claim": {
-    "summary-label": "Files uploaded"
+    "summary-label": "Files uploaded",
+    "changeLinkDescription": "Files uploaded"
   },
   "main-claimant-died": {
     "legend": "Did they make the claim?",
