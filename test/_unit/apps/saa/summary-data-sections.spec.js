@@ -79,3 +79,65 @@ describe('summary data sections', () => {
     expect(row.parse(undefined, { form: { options: {} } })).toBeNull();
   });
 });
+
+describe('evidence rows on the confirm page', () => {
+  const evidenceRows = sections.evidence.steps.filter(
+    entry => entry.dependsOn === 'send-evidence-for-your-claim'
+  );
+  const translations = {
+    'fields.documents-help-your-claim.summary-label': 'Files uploaded',
+    'fields.evidence-violent-or-upsetting.summary-label':
+      'Violent or upsetting images',
+    'fields[evidence-violent-or-upsetting].options.[yes]': 'Yes'
+  };
+  const createRequest = session => ({
+    baseUrl: '/changes',
+    sessionModel: { get: key => session[key] },
+    translate: keys => {
+      const list = [].concat(keys);
+      return translations[list.find(key => translations[key])] || list[list.length - 1];
+    },
+    form: {
+      options: {
+        fieldsConfig: { 'evidence-violent-or-upsetting': { mixin: 'radio-group' } },
+        steps: {}
+      }
+    }
+  });
+  const ConfirmPage = SummaryLabels(Summary(class {}));
+  const session = {
+    'send-evidence-for-your-claim': 'yes',
+    'documents-help-your-claim': [
+      { id: '1', name: 'letter.pdf' },
+      { id: '2', name: 'photo.png' }
+    ],
+    'evidence-violent-or-upsetting': 'yes'
+  };
+
+  test('lists the uploaded files and the images answer', () => {
+    expect(evidenceRows.map(entry => entry.field)).toEqual([
+      'documents-help-your-claim',
+      'evidence-violent-or-upsetting'
+    ]);
+  });
+
+  test('Change links go to the evidence check your answers page', () => {
+    const shown = new ConfirmPage()
+      .getFieldsForRow(evidenceRows, createRequest(session))
+      .map(field => `${field.label}: ${field.value} (${field.changeLink})`);
+
+    expect(shown).toEqual([
+      'Files uploaded: letter.pdf\nphoto.png (/changes/check-your-answers-evidence)',
+      'Violent or upsetting images: Yes (/changes/check-your-answers-evidence)'
+    ]);
+  });
+
+  test('hides the rows when the user does not need to send evidence', () => {
+    const fields = new ConfirmPage().getFieldsForRow(
+      evidenceRows,
+      createRequest({ ...session, 'send-evidence-for-your-claim': 'no' })
+    );
+
+    expect(fields).toEqual([]);
+  });
+});
