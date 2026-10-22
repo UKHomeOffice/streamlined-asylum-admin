@@ -40,6 +40,20 @@
       }
     }
   },
+  "reason-name-change": {
+    "legend": "Why do you need to change the name?",
+    "options": {
+      "error": {
+        "label": "An error"
+      },
+      "marriage-or-divorce": {
+        "label": "Marriage or divorce"
+      },
+      "deed-poll": {
+        "label": "Legal change by deed poll"
+      }
+    }
+  },
   "add-remove-dependant": {
     "legend": "Do you need to add or remove a child or partner as a dependant?",
     "hint": "For example, if you have had a baby, got married or divorced",

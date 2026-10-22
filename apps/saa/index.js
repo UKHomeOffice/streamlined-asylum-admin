@@ -129,6 +129,7 @@ const steps = {
     backLink: '/changes/changes-to-contact-details'
   },
   '/reason-name-change': {
+    fields: ['reason-name-change'],
     next: '/new-name'
   },
   '/new-name': {
