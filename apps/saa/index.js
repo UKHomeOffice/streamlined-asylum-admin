@@ -98,7 +98,8 @@ const steps = {
     next: '/person-completing-form'
   },
   '/person-completing-form': {
-    next: '/who-are-you'
+    // wait for this page to be complete, then merge changes
+    next: '/relationship-to-claimant'
   },
   '/who-are-you': {
     next: '/personal-details'
@@ -233,7 +234,7 @@ const steps = {
     next: '/completing-for-someone-else'
   },
   '/completing-for-someone-else': {
-    next: '/change-contact-address'
+    next: '/personal-details'
   },
   '/change-contact-address': {
     next: '/reason-contact-address-change'
