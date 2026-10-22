@@ -61,6 +61,14 @@ module.exports = {
       }
     ]
   },
+  name: {
+    steps: [      
+      {
+        step: '/do-you-need-to-change-your-name',
+        field: 'do-you-need-to-change-your-name'
+      },
+    ]
+  },
   'add-or-remove-dependants': {
     steps: [
       {

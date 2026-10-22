@@ -33,6 +33,13 @@ module.exports = {
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
   },
+  'do-you-need-to-change-your-name': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    isPageHeading: true
+  },
   'reason-name-change': {
     mixin: 'radio-group',
     options: [
