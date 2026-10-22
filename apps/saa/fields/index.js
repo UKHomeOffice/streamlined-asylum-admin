@@ -13,6 +13,13 @@ module.exports = {
     }].concat(languages.map(language => ({ value: language, label: language }))),
     labelClassName: 'govuk-label--m'
   },
+  'person-completing-form': {
+    mixin: 'radio-group',
+    options: ['for-me', 'someone-else'],
+    validate: ['required'],
+    className: ['govuk-radios'],
+    isPageHeading: true
+  },
   'changes-to-contact-details': {
     mixin: 'checkbox-group',
     options: [

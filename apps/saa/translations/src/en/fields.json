@@ -5,6 +5,17 @@
       "none_selected": "Select a language"
     }
   },
+  "person-completing-form": {
+    "legend": "Are you completing the form for you or someone else?",
+    "options": {
+      "for-me": {
+        "label": "For me"
+      },
+      "someone-else": {
+        "label": "Someone else"
+      }
+    }
+  },
   "changes-to-contact-details": {
     "legend": "What details do you need to change?",
     "options": {
