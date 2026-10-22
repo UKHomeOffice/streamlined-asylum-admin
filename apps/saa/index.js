@@ -228,6 +228,17 @@ const steps = {
     next: '/relationship-to-claimant'
   },
   '/relationship-to-claimant': {
+    fields: ['relationship-to-claimant'],
+    forks: [
+      {
+        target: '/how-you-are-helping',
+        continueOnEdit: true,
+        condition: {
+          field: 'relationship-to-claimant',
+          value: 'someone-helping-them'
+        }
+      }
+    ],
     next: '/helper-details'
   },
   '/helper-details': {
@@ -246,7 +257,7 @@ const steps = {
     next: '/how-you-are-helping'
   },
   '/how-you-are-helping': {
-    next: '/check-your-answers-address'
+    next: '/helper-details'
   },
   '/check-your-answers-address': {
     next: '/do-you-need-add-remove-dependant'
