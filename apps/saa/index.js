@@ -234,9 +234,6 @@ const steps = {
   '/new-phone-number': {
     next: '/declaration'
   },
-  '/declaration': {
-    next: '/relationship-to-claimant'
-  },
   '/relationship-to-claimant': {
     fields: ['relationship-to-claimant'],
     forks: [
@@ -470,6 +467,11 @@ const steps = {
   '/confirm': {
     behaviours: [Summary, SummaryLabels, EditRouteStart],
     sections: require('./sections/summary-data-sections')
+  },
+  '/declaration': {
+    next: '/submitted'
+  },
+  '/submitted': {
   },
   '/something-else': {
     behaviours: [somethingElseFork],
