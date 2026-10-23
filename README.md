@@ -37,3 +37,62 @@ The workflow uses `pull_request_target`, so the guard must be merged into
 `master` before it takes effect. Existing failed runs remain failed; a new
 supported PR event (such as closing and reopening the PR) is needed to evaluate
 the updated guard.
+
+## E2E Allure Reports
+
+Install dependencies with `yarn install`. Generating and opening Allure reports
+requires Java 8 or newer on your PATH (or configured through `JAVA_HOME`).
+
+```sh
+yarn allure:clean
+yarn test:e2e
+yarn allure:generate
+yarn allure:open
+```
+
+Playwright writes Allure results to `allure-results/` alongside the existing HTML
+and console reports. Run the generate command even if tests fail to inspect their
+results. Videos for failed tests are attached as evidence in the generated Allure
+report, which is written to `allure-report/`.
+
+Run `yarn allure:clean` before a new test run to avoid combining previous results.
+Both output directories are ignored by Git. For CI, retain `allure-results/` as an
+artifact and generate the report in a job with Java installed.
+
+## E2E Page Objects
+
+The evidence tests follow the LMR page-object model, with `fixtures/` named
+according to this repository's Playwright instructions:
+
+```text
+e2e-tests/
+	features/        Gherkin scenarios and existing acceptance criteria
+	fixtures/       Test-scoped page objects and evidence journey fixture
+	pages/          Page locators, browser actions and assertions
+	steps/          Step definitions using createBdd(test) from the shared fixture
+	utility-helper/ Route constants and ordered HOF journey navigation
+```
+
+`fixtures/fixtures.ts` provides `pages` and `journey` to each scenario. All step
+files import its `test` instance. Page objects extend `BasePage` to reuse common
+navigation, radio questions, errors, back links, feedback and header/footer checks.
+
+`EvidenceJourney` follows the start page, before-you-start page, claimant
+details, and claim-decision question before submitting `SAA_TEST_EMAIL` (falling
+back to `SKIP_EMAIL` or the shared test address). It follows the configured
+`token=skip` test link and enters the form before completing preceding steps in
+order. It keeps the original setup answers: Yes to sending evidence, No to
+adding/removing a dependant, and No to violent or upsetting images when
+traversing those pages. Scenario answers are not overwritten when continuing
+from the evidence question to the final check-your-answers page. The evidence
+summary (`/changes/check-your-answers-evidence`) and final application summary
+(`/changes/confirm`) remain separate page objects.
+
+Validate step bindings with `yarn test:e2e:generate`, then run journeys with
+`yarn test:e2e`. Local runs require the service's normal HOF/Redis setup, including
+a 32-byte `SESSION_SECRET`. Set `PLAYWRIGHT_BASE_URL` to test an already running
+service instead of starting one through Playwright.
+
+Existing `fixme` steps remain in place for upload controls, evidence summary
+editing and other service behaviour that is not implemented yet. The refactor
+does not enable these scenarios or change their feature wording.

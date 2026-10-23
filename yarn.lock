@@ -1836,6 +1836,25 @@ aliasify@^2.1.0:
   dependencies:
     browserify-transform-tools "~1.7.0"
 
+allure-commandline@^2.0.0:
+  version "2.46.1"
+  resolved "https://registry.npmjs.org/allure-commandline/-/allure-commandline-2.46.1.tgz#1b578c6d990f646af852f628f2a4dd82b9c22cef"
+  integrity sha512-4HTxbXR9D2+cJV9z4MO/IUa7sfYiLLXBP3/4MWSqC63ey55wBMvXAk83yZYwJ2t+jKU1Z7QW6LgCUx0BhPy9EQ==
+
+allure-js-commons@3.13.0:
+  version "3.13.0"
+  resolved "https://registry.npmjs.org/allure-js-commons/-/allure-js-commons-3.13.0.tgz#c341198fd261f67a4333395c84620004070216cd"
+  integrity sha512-NC4qcbmfpuYTstdw+EgimzhpHD2T85wzBNWRMPpu9rukkLzRlLvSmUCo5hy6vEvwQd9BUQh2yMFplJ+shIpVrA==
+  dependencies:
+    md5 "^2.3.0"
+
+allure-playwright@^3.0.0:
+  version "3.13.0"
+  resolved "https://registry.npmjs.org/allure-playwright/-/allure-playwright-3.13.0.tgz#462072f774ddea85dbc5853a2b7324bf94793b55"
+  integrity sha512-U9pLbm1+kTtGd+1Wqgb0wgsVTX730BdRc6tT0uQ8upzhEjsyjC2OnPCaMScXKPCv4uLWzORyem7d7cgnVz8fEA==
+  dependencies:
+    allure-js-commons "3.13.0"
+
 ansi-escapes@^4.3.2:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-4.3.2.tgz#6b2291d1db7d98b6521d5f1efa42d0f3a9feb65e"
@@ -2315,6 +2334,11 @@ char-regex@^1.0.2:
   resolved "https://registry.yarnpkg.com/char-regex/-/char-regex-1.0.2.tgz#d744358226217f981ed58f479b1d6bcc29545dcf"
   integrity sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==
 
+charenc@0.0.2:
+  version "0.0.2"
+  resolved "https://registry.npmjs.org/charenc/-/charenc-0.0.2.tgz#c0a1d2f3a7092e03774bfa83f14c0fc5790a8667"
+  integrity sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==
+
 chokidar@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.6.0.tgz#197c6cc669ef2a8dc5e7b4d97ee4e092c3eb0d5b"
@@ -2546,6 +2570,11 @@ cross-spawn@^7.0.2, cross-spawn@^7.0.3, cross-spawn@^7.0.6:
     path-key "^3.1.0"
     shebang-command "^2.0.0"
     which "^2.0.1"
+
+crypt@0.0.2:
+  version "0.0.2"
+  resolved "https://registry.npmjs.org/crypt/-/crypt-0.0.2.tgz#88d7ff7ec0dfb86f713dc87bbb42d044d3e6c41b"
+  integrity sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==
 
 csrf@^3.1.0:
   version "3.1.0"
@@ -4111,6 +4140,11 @@ is-boolean-object@^1.2.1:
     call-bound "^1.0.3"
     has-tostringtag "^1.0.2"
 
+is-buffer@~1.1.6:
+  version "1.1.6"
+  resolved "https://registry.npmjs.org/is-buffer/-/is-buffer-1.1.6.tgz#efaa2ea9daa0d7ab2ea13a97b2b8ad51fefbe8be"
+  integrity sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==
+
 is-callable@^1.2.7:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/is-callable/-/is-callable-1.2.7.tgz#3bc2a85ea742d9e36205dcacdd72ca1fdc51b055"
@@ -5003,6 +5037,15 @@ math-intrinsics@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/math-intrinsics/-/math-intrinsics-1.1.0.tgz#a0dd74be81e2aa5c2f27e65ce283605ee4e2b7f9"
   integrity sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==
+
+md5@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.npmjs.org/md5/-/md5-2.3.0.tgz#c3da9a6aae3a30b46b7b0c349b87b110dc3bda4f"
+  integrity sha512-T1GITYmFaKuO91vxyoQMFETst+O71VUPEU3ze5GNzDm0OWdP8v1ziTaAEPUr/3kLsY3Sftgz242A1SetQiDL7g==
+  dependencies:
+    charenc "0.0.2"
+    crypt "0.0.2"
+    is-buffer "~1.1.6"
 
 mdurl@^2.0.0:
   version "2.1.0"
