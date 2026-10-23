@@ -98,6 +98,17 @@ const steps = {
     next: '/person-completing-form'
   },
   '/person-completing-form': {
+    fields: ['person-completing-form'],
+    forks: [
+      {
+        target: '/relationship-to-claimant',
+        continueOnEdit: true,
+        condition: {
+          field: 'person-completing-form',
+          value: 'someone-else'
+        }
+      }
+    ],
     next: '/who-are-you'
   },
   '/who-are-you': {
