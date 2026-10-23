@@ -267,7 +267,7 @@ const steps = {
     next: '/contact-address'
   },
   '/contact-address': {
-    next: '/how-you-are-helping'
+    next: '/check-your-answers-address'
   },
   '/check-your-answers-address': {
     next: '/do-you-need-add-remove-dependant'
