@@ -251,6 +251,9 @@ const steps = {
     ],
     next: '/helper-details'
   },
+  '/how-you-are-helping': {
+    next: '/helper-details'
+  },
   '/helper-details': {
     next: '/completing-for-someone-else'
   },
@@ -265,9 +268,6 @@ const steps = {
   },
   '/contact-address': {
     next: '/how-you-are-helping'
-  },
-  '/how-you-are-helping': {
-    next: '/helper-details'
   },
   '/check-your-answers-address': {
     next: '/do-you-need-add-remove-dependant'
