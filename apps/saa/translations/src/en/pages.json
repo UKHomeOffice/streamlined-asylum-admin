@@ -104,9 +104,6 @@
   "declaration": {
     "header": "Declaration"
   },
-  "relationship-to-claimant": {
-    "header": "What is your relationship to the person claiming asylum?"
-  },
   "helper-details": {
     "header": "Your details"
   },

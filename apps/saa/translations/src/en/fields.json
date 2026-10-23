@@ -221,5 +221,17 @@
   },
   "documents-death-certificate": {
     "summary-label": "Files uploaded"
+  },
+  "relationship-to-claimant": {
+    "legend": "What is your relationship to the person claiming asylum?",
+    "options": {
+      "immigration-adviser": {
+        "label": "Immigration adviser"
+      },
+      "someone-helping-them": {
+        "label": "Someone helping them",
+        "hint": "For example, a friend, relative, charity worker or interpreter"
+      }
+    }
   }
 }

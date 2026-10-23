@@ -179,5 +179,12 @@ module.exports = {
       value: '',
       label: 'fields.nationality-person-who-died.options.none_selected'
     }].concat(countries)
+  },
+  'relationship-to-claimant': {
+    mixin: 'radio-group',
+    options: ['immigration-adviser', 'someone-helping-them'],
+    validate: ['required'],
+    className: ['govuk-radios'],
+    isPageHeading: true
   }
 };

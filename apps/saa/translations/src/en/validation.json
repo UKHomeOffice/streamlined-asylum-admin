@@ -102,5 +102,8 @@
   },
   "nationality-person-who-died": {
     "required": "Select a country of nationality"
+  },
+  "relationship-to-claimant": {
+    "required": "You must select your relationship"
   }
 }
