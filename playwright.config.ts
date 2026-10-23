@@ -6,16 +6,17 @@ dotenv.config({ quiet: true });
 
 //Note: The baseURL is set to the value of PLAYWRIGHT_BASE_URL from the .env file if it exists, otherwise it defaults to http://localhost:${port}.
 const port = Number(process.env.PLAYWRIGHT_PORT || 8080);
-const baseURL = process.env.PLAYWRIGHT_BASE_URL || `http://localhost:${port}`;
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || `http://127.0.0.1:${port}`;
 
 
 const testDir = defineBddConfig({
   features: 'e2e-tests/features/**/*.feature',
   steps: [
     'e2e-tests/steps/**/*.step.ts',
-    'e2e-tests/fixture/fixtures.ts',
+    'e2e-tests/fixtures/fixtures.ts',
   ],
   outputDir: '.features-gen',
+  matchKeywords: true,
 });
 
 export default defineConfig({
@@ -28,11 +29,15 @@ export default defineConfig({
   workers: process.env.CI ? 2 : 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
-  reporter: [['html', { open: 'never' }], ['list']],
+  reporter: [
+    ['html', { open: 'never' }],
+    ['list'],
+    ['allure-playwright', { resultsDir: 'allure-results' }],
+  ],
   use: {
     baseURL,
     viewport: null,
-    screenshot: 'only-on-failure',
+    screenshot: 'on',
     video: 'retain-on-failure',
     trace: 'on-first-retry',
     headless: !!process.env.CI,
@@ -41,7 +46,7 @@ export default defineConfig({
     webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-      command: 'yarn start:dev',
+      command: 'yarn start',
       port,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000
@@ -57,8 +62,8 @@ export default defineConfig({
         launchOptions: {
           args: ['--start-maximized'],
         },
-        video: 'on-first-retry', //Options => 'on', 'off', 'retain-on-failure' or 'on-first-retry'
-        screenshot: 'only-on-failure', //Options => 'on', 'off', 'only-on-failure' or 'on-first-retry'
+        video: 'retain-on-failure',
+        screenshot: 'on', //Options => 'on', 'off', 'only-on-failure' or 'on-first-retry'
       },
     },
   ],
