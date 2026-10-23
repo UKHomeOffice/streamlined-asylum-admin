@@ -184,7 +184,7 @@ module.exports = {
     mixin: 'radio-group',
     options: ['immigration-adviser', 'someone-helping-them'],
     validate: ['required'],
-    className: ['govuk-radios', 'govuk-radios--inline'],
+    className: ['govuk-radios'],
     isPageHeading: true
   }
 };
