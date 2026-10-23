@@ -229,8 +229,8 @@
         "label": "Immigration adviser"
       },
       "someone-helping-them": {
-        "hint": "For example, a friend, relative, charity worker or interpreter",
-        "label": "Someone helping them"
+        "label": "Someone helping them",
+        "hint": "For example, a friend, relative, charity worker or interpreter"
       }
     }
   }
