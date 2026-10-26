@@ -186,5 +186,18 @@ module.exports = {
     validate: ['required'],
     className: ['govuk-radios'],
     isPageHeading: true
+  },
+  'how-you-are-helping': {
+    mixin: 'radio-group',
+    options: [
+      'family-member-or-friend',
+      'interpreter',
+      'charity-worker-l1',
+      'charity-worker-l2-3',
+      'local-authority',
+      'government-organisation'
+    ],
+    validate: ['required'],
+    isPageHeading: true
   }
 };

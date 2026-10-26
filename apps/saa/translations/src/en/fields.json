@@ -233,5 +233,28 @@
         "hint": "For example, a friend, relative, charity worker or interpreter"
       }
     }
+  },
+  "how-you-are-helping": {
+    "legend": "How are you helping them?",
+    "options": {
+      "family-member-or-friend": {
+        "label": "Family member or friend"
+      },
+      "interpreter": {
+        "label": "Interpreter"
+      },
+      "charity-worker-l1": {
+        "label": "Charity worker (level 1)"
+      },
+      "charity-worker-l2-3": {
+        "label": "Charity worker (level 2 or 3)"
+      },
+      "local-authority": {
+        "label": "Local authority"
+      },
+      "government-organisation": {
+        "label": "Government organisation"
+      }
+    }
   }
 }

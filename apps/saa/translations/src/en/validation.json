@@ -105,5 +105,8 @@
   },
   "relationship-to-claimant": {
     "required": "You must select your relationship"
+  },
+  "how-you-are-helping": {
+    "required": "You must select how you are helping"
   }
 }

@@ -249,6 +249,7 @@ const steps = {
     next: '/helper-details'
   },
   '/how-you-are-helping': {
+    fields: ['how-you-are-helping'],
     next: '/helper-details'
   },
   '/helper-details': {

@@ -54,6 +54,10 @@ module.exports = {
       {
         step: '/relationship-to-claimant',
         field: 'relationship-to-claimant'
+      },
+      {
+        step: '/how-you-are-helping',
+        field: 'how-you-are-helping'
       }
     ]
   },
