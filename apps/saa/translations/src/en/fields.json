@@ -16,6 +16,17 @@
       }
     }
   },
+  "who-are-you": {
+    "legend": "Who are you?",
+    "options": {
+      "person-claiming-asylum": {
+        "label": "I am the person claiming asylum"
+      },
+      "dependant-partner-child": {
+        "label": "I am their dependant partner or child"
+      }
+    }
+  },
   "changes-to-contact-details": {
     "legend": "What details do you need to change?",
     "options": {
