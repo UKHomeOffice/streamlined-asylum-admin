@@ -50,6 +50,14 @@ module.exports = {
       {
         step: '/claimant-main-language',
         field: 'claimant-main-language'
+      },
+      {
+        step: '/relationship-to-claimant',
+        field: 'relationship-to-claimant'
+      },
+      {
+        step: '/how-you-are-helping',
+        field: 'how-you-are-helping'
       }
     ]
   },

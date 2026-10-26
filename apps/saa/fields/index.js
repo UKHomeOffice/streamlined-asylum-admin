@@ -13,6 +13,20 @@ module.exports = {
     }].concat(languages.map(language => ({ value: language, label: language }))),
     labelClassName: 'govuk-label--m'
   },
+  'person-completing-form': {
+    mixin: 'radio-group',
+    options: ['for-me', 'someone-else'],
+    validate: ['required'],
+    className: ['govuk-radios'],
+    isPageHeading: true
+  },
+  'who-are-you': {
+    mixin: 'radio-group',
+    options: ['person-claiming-asylum', 'dependant-partner-child'],
+    validate: ['required'],
+    className: ['govuk-radios'],
+    isPageHeading: true
+  },
   'changes-to-contact-details': {
     mixin: 'checkbox-group',
     options: [
@@ -179,5 +193,25 @@ module.exports = {
       value: '',
       label: 'fields.nationality-person-who-died.options.none_selected'
     }].concat(countries)
+  },
+  'relationship-to-claimant': {
+    mixin: 'radio-group',
+    options: ['immigration-adviser', 'someone-helping-them'],
+    validate: ['required'],
+    className: ['govuk-radios'],
+    isPageHeading: true
+  },
+  'how-you-are-helping': {
+    mixin: 'radio-group',
+    options: [
+      'family-member-or-friend',
+      'interpreter',
+      'charity-worker-l1',
+      'charity-worker-l2-3',
+      'local-authority',
+      'government-organisation'
+    ],
+    validate: ['required'],
+    isPageHeading: true
   }
 };

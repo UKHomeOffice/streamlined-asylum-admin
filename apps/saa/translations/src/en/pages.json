@@ -8,12 +8,6 @@
   "information-given": {
     "header": "Information you have given us"
   },
-  "person-completing-form": {
-    "header": "Person completing the form"
-  },
-  "who-are-you": {
-    "header": "Who are you?"
-  },
   "do-you-need-to-change-your-name": {
     "captionHeading": "Update personal details"
   },
@@ -107,9 +101,6 @@
   "declaration": {
     "header": "Declaration"
   },
-  "relationship-to-claimant": {
-    "header": "What is your relationship to the person claiming asylum?"
-  },
   "helper-details": {
     "header": "Your details"
   },
@@ -124,9 +115,6 @@
   },
   "contact-address": {
     "header": "Where should we send letters?"
-  },
-  "how-you-are-helping": {
-    "header": "How are you helping them?"
   },
   "check-your-answers-address": {
     "header": "Check your answers"

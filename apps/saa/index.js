@@ -98,9 +98,21 @@ const steps = {
     next: '/person-completing-form'
   },
   '/person-completing-form': {
+    fields: ['person-completing-form'],
+    forks: [
+      {
+        target: '/relationship-to-claimant',
+        continueOnEdit: true,
+        condition: {
+          field: 'person-completing-form',
+          value: 'someone-else'
+        }
+      }
+    ],
     next: '/who-are-you'
   },
   '/who-are-you': {
+    fields: ['who-are-you'],
     next: '/personal-details'
   },
   '/personal-details': {
@@ -233,17 +245,29 @@ const steps = {
   '/new-phone-number': {
     next: '/declaration'
   },
-  '/declaration': {
-    next: '/relationship-to-claimant'
-  },
   '/relationship-to-claimant': {
+    fields: ['relationship-to-claimant'],
+    forks: [
+      {
+        target: '/how-you-are-helping',
+        continueOnEdit: true,
+        condition: {
+          field: 'relationship-to-claimant',
+          value: 'someone-helping-them'
+        }
+      }
+    ],
+    next: '/helper-details'
+  },
+  '/how-you-are-helping': {
+    fields: ['how-you-are-helping'],
     next: '/helper-details'
   },
   '/helper-details': {
     next: '/completing-for-someone-else'
   },
   '/completing-for-someone-else': {
-    next: '/change-contact-address'
+    next: '/personal-details'
   },
   '/change-contact-address': {
     next: '/reason-contact-address-change'
@@ -252,9 +276,6 @@ const steps = {
     next: '/contact-address'
   },
   '/contact-address': {
-    next: '/how-you-are-helping'
-  },
-  '/how-you-are-helping': {
     next: '/check-your-answers-address'
   },
   '/check-your-answers-address': {
@@ -458,6 +479,11 @@ const steps = {
   '/confirm': {
     behaviours: [Summary, SummaryLabels, EditRouteStart],
     sections: require('./sections/summary-data-sections')
+  },
+  '/declaration': {
+    next: '/submitted'
+  },
+  '/submitted': {
   },
   '/something-else': {
     behaviours: [somethingElseFork],

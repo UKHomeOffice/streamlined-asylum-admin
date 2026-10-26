@@ -5,6 +5,28 @@
       "none_selected": "Select a language"
     }
   },
+  "person-completing-form": {
+    "legend": "Are you completing the form for you or someone else?",
+    "options": {
+      "for-me": {
+        "label": "For me"
+      },
+      "someone-else": {
+        "label": "Someone else"
+      }
+    }
+  },
+  "who-are-you": {
+    "legend": "Who are you?",
+    "options": {
+      "person-claiming-asylum": {
+        "label": "I am the person claiming asylum"
+      },
+      "dependant-partner-child": {
+        "label": "I am their dependant partner or child"
+      }
+    }
+  },
   "changes-to-contact-details": {
     "legend": "What details do you need to change?",
     "options": {
@@ -221,5 +243,40 @@
   },
   "documents-death-certificate": {
     "summary-label": "Files uploaded"
+  },
+  "relationship-to-claimant": {
+    "legend": "What is your relationship to the person claiming asylum?",
+    "options": {
+      "immigration-adviser": {
+        "label": "Immigration adviser"
+      },
+      "someone-helping-them": {
+        "label": "Someone helping them",
+        "hint": "For example, a friend, relative, charity worker or interpreter"
+      }
+    }
+  },
+  "how-you-are-helping": {
+    "legend": "How are you helping them?",
+    "options": {
+      "family-member-or-friend": {
+        "label": "Family member or friend"
+      },
+      "interpreter": {
+        "label": "Interpreter"
+      },
+      "charity-worker-l1": {
+        "label": "Charity worker (level 1)"
+      },
+      "charity-worker-l2-3": {
+        "label": "Charity worker (level 2 or 3)"
+      },
+      "local-authority": {
+        "label": "Local authority"
+      },
+      "government-organisation": {
+        "label": "Government organisation"
+      }
+    }
   }
 }
