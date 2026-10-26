@@ -46,23 +46,22 @@ describe('custom validation behaviour', () => {
     'child-partner-given-name',
     'child-partner-family-name',
     'claimants-given-name',
-    'claimants-family-name'
-  ])(
-    'should reject digits in %s',
-    key => {
-      const req = { form: { values: { [key]: 'Name2' } } };
+    'claimants-family-name',
+    'helper-given-name',
+    'helper-family-name'
+  ])('should reject digits in %s', key => {
+    const req = { form: { values: { [key]: 'Name2' } } };
 
-      const error = behaviour.validateField(key, req);
+    const error = behaviour.validateField(key, req);
 
-      expect(error).toBeInstanceOf(ValidationError);
-      expect(error).toMatchObject({
-        key,
-        type: 'noDigits',
-        arguments: [undefined]
-      });
-      expect(baseValidateField).toHaveBeenCalledWith(key, req);
-    }
-  );
+    expect(error).toBeInstanceOf(ValidationError);
+    expect(error).toMatchObject({
+      key,
+      type: 'noDigits',
+      arguments: [undefined]
+    });
+    expect(baseValidateField).toHaveBeenCalledWith(key, req);
+  });
 
   test.each([
     ['child-partner-given-name', 'Mary-Jane'],
@@ -71,7 +70,11 @@ describe('custom validation behaviour', () => {
     ['claimants-given-name', 'Mary-Jane'],
     ['claimants-family-name', "O'Connor"],
     ['claimants-given-name', ''],
-    ['claimants-family-name', '']
+    ['claimants-family-name', ''],
+    ['helper-given-name', 'Mary-Jane'],
+    ['helper-family-name', "O'Connor"],
+    ['helper-given-name', ''],
+    ['helper-family-name', '']
   ])('should accept a digit-free value for %s', (key, value) => {
     const req = { form: { values: { [key]: value } } };
 
@@ -84,6 +87,16 @@ describe('custom validation behaviour', () => {
     expect(behaviour.validateField('reference', req)).toBeUndefined();
     expect(baseValidateField).toHaveBeenCalledWith('reference', req);
   });
+
+  test.each(['helper-organisation', 'helper-email-address'])(
+    'should not apply name validation to %s',
+    key => {
+      const req = { form: { values: { [key]: 'Example123' } } };
+
+      expect(behaviour.validateField(key, req)).toBeUndefined();
+      expect(baseValidateField).toHaveBeenCalledWith(key, req);
+    }
+  );
 
   test('should reject an invalid UAN', () => {
     const key = 'claimant-unique-application-number';
