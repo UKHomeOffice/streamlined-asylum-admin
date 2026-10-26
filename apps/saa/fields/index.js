@@ -20,6 +20,13 @@ module.exports = {
     className: ['govuk-radios'],
     isPageHeading: true
   },
+  'who-are-you': {
+    mixin: 'radio-group',
+    options: ['person-claiming-asylum', 'dependant-partner-child'],
+    validate: ['required'],
+    className: ['govuk-radios'],
+    isPageHeading: true
+  },
   'changes-to-contact-details': {
     mixin: 'checkbox-group',
     options: [

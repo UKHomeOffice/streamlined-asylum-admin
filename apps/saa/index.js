@@ -112,6 +112,7 @@ const steps = {
     next: '/who-are-you'
   },
   '/who-are-you': {
+    fields: ['who-are-you'],
     next: '/personal-details'
   },
   '/personal-details': {

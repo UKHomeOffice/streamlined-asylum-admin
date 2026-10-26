@@ -5,6 +5,9 @@
   "person-completing-form": {
     "required": "Select if you are completing the form for you or someone else"
   },
+  "who-are-you": {
+    "required": "You must select who you are"
+  },
   "changes-to-contact-details": {
     "required": "Select what details you need to change"
   },
