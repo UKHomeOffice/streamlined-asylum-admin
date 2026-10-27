@@ -229,7 +229,7 @@ module.exports = {
   },
   'change-your-date-of-birth': {
     mixin: 'radio-group',
-    options: ['yes','no'],
+    options: ['yes', 'no'],
     validate: ['required'],
     isPageHeading: true
   }
