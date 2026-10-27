@@ -1,5 +1,5 @@
 import { expect, type Page } from '@playwright/test';
-import { BasePage } from './base-page';
+import { BasePage } from './saa-base-page';
 import { EVIDENCE_PAGES } from '../utility-helper/constants-lib';
 
 export class UploadSupportingEvidencePage extends BasePage {
@@ -9,9 +9,16 @@ export class UploadSupportingEvidencePage extends BasePage {
 
   async assertContentAndLayout() {
     await this.assertOnPage();
+    const mainContent = this.page.getByRole('main');
+    await expect(mainContent.getByText('Send evidence for your claim', { exact: true })).toBeVisible();
     await expect(this.page.getByLabel('Upload a file')).toBeVisible();
     await expect(this.page.getByRole('heading', { name: 'No files uploaded' })).toBeVisible();
     await expect(this.continueButton).toBeVisible();
+    await expect(mainContent).toContainText('The file must be either:');
+    await expect(mainContent).toContainText('a document (.doc, .docx, .pdf, .rtf, .txt, .odt)');
+    await expect(mainContent).toContainText('an image (.jpeg, .jpg, .png)');
+    await expect(mainContent).toContainText('Each file can be up to 25MB in size.');
+    await expect(mainContent).toContainText('You can upload a limit of 6 files.');
     await expect(this.page.locator('input[type="file"]')).toHaveAttribute(
       'accept',
       '.doc,.docx,.pdf,.rtf,.txt,.odt,.jpeg,.jpg,.png'

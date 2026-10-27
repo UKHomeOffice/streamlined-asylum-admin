@@ -1,5 +1,5 @@
 import { expect, type Page } from '@playwright/test';
-import { BasePage } from './base-page';
+import { BasePage } from './saa-base-page';
 import { EVIDENCE_PAGES } from '../utility-helper/constants-lib';
 
 export class EvidenceCheckYourAnswersPage extends BasePage {
@@ -9,6 +9,7 @@ export class EvidenceCheckYourAnswersPage extends BasePage {
 
   async assertContentAndLayout() {
     await this.assertOnPage();
+    await expect(this.page.getByText('Send evidence for your claim', { exact: true })).toBeVisible();
     await expect(this.page.getByText('Evidence', { exact: true })).toBeVisible();
     await expect(this.page.getByRole('term').filter({ hasText: 'Files uploaded' })).toBeVisible();
     await expect(this.page.getByRole('term').filter({ hasText: 'Violent or upsetting images' })).toBeVisible();

@@ -1,5 +1,5 @@
 import { type Page } from '@playwright/test';
-import { BasePage } from './base-page';
+import { BasePage } from './saa-base-page';
 import { EVIDENCE_PAGES } from '../utility-helper/constants-lib';
 
 export class SendEvidencePage extends BasePage {
@@ -8,6 +8,7 @@ export class SendEvidencePage extends BasePage {
   }
 
   async assertContentAndLayout() {
+    await this.assertOnPage();
     await this.assertUnansweredQuestion(EVIDENCE_PAGES['Send evidence for your claim'].heading);
   }
 

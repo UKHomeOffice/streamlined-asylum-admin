@@ -12,6 +12,25 @@ export const AUTH_PAGES = {
   'Email address': { path: '/email-address', heading: 'What is your email address?' },
 } as const;
 
+export const EVI_JOURNEY_PAGES = {
+  'Form entry': { path: '/changes/continue-to-form', heading: 'Continue to your form' },
+  'Which form': { path: '/changes/which-form', heading: 'Which form do you need to continue?' },
+  'Information given': { path: '/changes/information-given', heading: 'Information you have given us' },
+  'Claimant name': { path: '/changes/claimants-name', heading: 'Claimant’s name' },
+  'Claimant main language': { path: '/changes/claimant-main-language', heading: "Claimant's main language" },
+  'Person completing form': {
+    path: '/changes/person-completing-form',
+    heading: 'Are you completing the form for you or someone else?',
+  },
+  'Who are you': { path: '/changes/who-are-you', heading: 'Who are you?' },
+  'Personal details': { path: '/changes/personal-details', heading: 'Do you need to update personal details?' },
+  Dependants: {
+    path: '/changes/do-you-need-add-remove-dependant',
+    heading: 'Do you need to add or remove a child or partner as a dependant?',
+  },
+  'Something else': { path: '/changes/something-else', heading: 'Do you need to do something else?' },
+} as const;
+
 export const NO_OPTIONS_PAGE = {
   path: '/changes/no-options',
   heading: 'You have not selected any options',
