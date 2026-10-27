@@ -165,9 +165,20 @@ const steps = {
   },
   '/someone-else-new-name-evidence': {
     // provisional document category: documents-someone-else-new-name
-    next: '/whose-date-of-birth'
+    next: '/change-your-date-of-birth'
   },
-  '/whose-date-of-birth': {
+  '/change-your-date-of-birth': {
+    fields: ['change-your-date-of-birth'],
+    forks: [
+      {
+        target: '/change-someone-else-date-of-birth',
+        continueOnEdit: true,
+        condition: {
+          field: 'change-your-date-of-birth',
+          value: 'no'
+        }
+      }
+    ],
     next: '/correct-date-of-birth'
   },
   '/correct-date-of-birth': {

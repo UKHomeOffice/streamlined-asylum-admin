@@ -226,5 +226,11 @@ module.exports = {
     mixin: 'input-text',
     validate: ['required', 'email'],
     labelClassName: 'govuk-label--s'
+  },
+  'change-your-date-of-birth': {
+    mixin: 'radio-group',
+    options: ['yes','no'],
+    validate: ['required'],
+    isPageHeading: true
   }
 };
