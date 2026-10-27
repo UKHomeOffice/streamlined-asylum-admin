@@ -32,6 +32,9 @@
   "someone-else-new-name": {
     "header": "Change someone else’s name"
   },
+  "change-your-date-of-birth": {
+    "captionHeading": "Update personal details"
+  },
   "correct-date-of-birth": {
     "header": "What is your correct date of birth?"
   },
