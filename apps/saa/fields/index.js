@@ -248,6 +248,6 @@ module.exports = {
       'before',
       { type: 'after', arguments: '1900-01-01' }
     ],
-    isPageHeading: true 
-  }),
+    isPageHeading: true
+  })
 };
