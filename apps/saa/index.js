@@ -254,6 +254,13 @@ const steps = {
     next: '/helper-details'
   },
   '/helper-details': {
+    behaviours: [CustomValidation],
+    fields: [
+      'helper-given-name',
+      'helper-family-name',
+      'helper-organisation',
+      'helper-email-address'
+    ],
     next: '/completing-for-someone-else'
   },
   '/completing-for-someone-else': {

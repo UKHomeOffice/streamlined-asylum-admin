@@ -206,5 +206,25 @@ module.exports = {
     ],
     validate: ['required'],
     isPageHeading: true
+  },
+  'helper-given-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'helper-family-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'helper-organisation': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'helper-email-address': {
+    mixin: 'input-text',
+    validate: ['required', 'email'],
+    labelClassName: 'govuk-label--s'
   }
 };
