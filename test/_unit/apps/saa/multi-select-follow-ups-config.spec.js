@@ -55,7 +55,7 @@ describe('SAA multi-select follow-up route config', () => {
 
   test.each([
     ['name', '/changes/do-you-need-to-change-your-name'],
-    ['date-of-birth', '/changes/whose-date-of-birth'],
+    ['date-of-birth', '/changes/change-your-date-of-birth'],
     ['nationality', '/changes/whose-nationality-to-change'],
     ['address', '/changes/change-uk-address'],
     ['email-address', '/changes/new-email-address'],
@@ -218,7 +218,7 @@ describe('SAA multi-select follow-up route config', () => {
         activeRoutes: [
           '/do-you-need-to-change-your-name',
           '/do-you-need-to-change-someone-elses-name',
-          '/whose-date-of-birth'
+          '/change-your-date-of-birth'
         ],
         completedSections: []
       }
@@ -255,7 +255,7 @@ describe('SAA multi-select follow-up route config', () => {
       sessionValues[multiSelectFollowUpsConfig.stateKey].completedSections
     ).toEqual(['name']);
     expect(controller.getNextStep(req, {})).toBe(
-      '/changes/whose-date-of-birth'
+      '/changes/change-your-date-of-birth'
     );
   });
 });
