@@ -14,6 +14,9 @@
   "change-personal-details": {
     "required": "Select if you need to update personal details"
   },
+  "do-you-need-to-change-your-name": {
+    "required": "Select if you need to change your name"
+  },
   "reason-name-change": {
     "required": "Select why you need to change the name"
   },
@@ -123,5 +126,35 @@
   },
   "how-you-are-helping": {
     "required": "You must select how you are helping"
+  },
+  "helper-given-name": {
+    "required": "Enter your given name",
+    "notUrl": "Given name must not contain a URL",
+    "maxlength": "Given name must be between 1 and 255 characters",
+    "noDigits": "Given name must not contain numbers"
+  },
+  "helper-family-name": {
+    "required": "Enter your family name",
+    "notUrl": "Family name must not contain a URL",
+    "maxlength": "Family name must be between 1 and 255 characters",
+    "noDigits": "Family name must not contain numbers"
+  },
+  "helper-organisation": {
+    "required": "You must enter an organisation",
+    "notUrl": "Organisation must not contain a URL",
+    "maxlength": "Organisation must be between 1 and 255 characters"
+  },
+  "helper-email-address": {
+    "required": "You must enter your email address",
+    "email": "Enter a valid email address"
+  },
+  "change-your-date-of-birth": {
+    "required": "Select if you want to change your date of birth"
+  },
+   "correct-date-of-birth": {
+    "required": "Enter a date of birth",
+    "date": "Enter a valid date",
+    "before": "Date of birth must be in the past",
+    "after": "Enter a date after 01 01 1900"
   }
 }

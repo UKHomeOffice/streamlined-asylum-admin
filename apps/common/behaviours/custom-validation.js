@@ -14,15 +14,19 @@ const customValidation = superclass =>
       if (fieldError) {
         return fieldError;
       }
+      
+      const keysToValidate = [
+        'child-partner-given-name',
+        'child-partner-family-name',
+        'claimants-given-name',
+        'claimants-family-name',
+        'helper-given-name',
+        'helper-family-name',
+        'given-name',
+        'family-name'
+      ];
 
-      if (
-        key === 'child-partner-given-name' ||
-        key === 'child-partner-family-name' ||
-        key === 'claimants-given-name' ||
-        key === 'claimants-family-name' ||
-        key === 'given-name' ||
-        key === 'family-name'
-      ) {
+      if (keysToValidate.includes(key)) {
         const value = req.form.values[key];
         if (!value.match(NO_DIGITS_REGEX)) {
           return validationErrorFunc('noDigits');

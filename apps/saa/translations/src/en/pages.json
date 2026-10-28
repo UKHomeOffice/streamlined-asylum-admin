@@ -9,7 +9,7 @@
     "header": "Information you have given us"
   },
   "do-you-need-to-change-your-name": {
-    "header": "Do you need to change your name?"
+    "captionHeading": "Update personal details"
   },
   "reason-name-change": {
     "captionHeading": "Update personal details"
@@ -33,11 +33,11 @@
   "someone-else-new-name": {
     "header": "Change someone else’s name"
   },
-  "whose-date-of-birth": {
-    "header": "Do you need to change your date of birth?"
+  "change-your-date-of-birth": {
+    "captionHeading": "Update personal details"
   },
   "correct-date-of-birth": {
-    "header": "What is your correct date of birth?"
+    "captionHeading": "Update personal details"
   },
   "new-date-of-birth-evidence": {
     "header": "Upload evidence to support this change"
@@ -146,7 +146,7 @@
   "check-your-answers-add-child-partner": {
     "header": "Check your answers",
     "captionHeading": "Add or remove a child or partner",
-    "limit-exceeded": "You have added or removed the maximum of {{maxItems}} children or partners. You cannot add or remove any more.",
+    "limit-exceeded": "You have added or removed the maximum number of {{maxItems}} partners or dependents. You cannot add or remove any more.",
     "add-remove-child-partner" : "Add or remove another child or partner"
   },
   "reason-for-removing-child-partner": {
@@ -196,7 +196,7 @@
   "check-your-answers-death": {
     "item-title": "Tell us about the person who died",
     "captionHeading": "Tell us someone has died",
-    "limit-exceeded": "You have reported the maximum of {{maxItems}} deaths. You cannot report any more.",
+    "limit-exceeded": "You have added the maximum number of deaths. You cannot add any more.",
     "header": "Check your answers"
   },
   "contact-us-by-email": {
@@ -238,6 +238,9 @@
       },
       "personal-details": {
         "header": "Personal details"
+      },
+      "name": {
+        "header": "Name"
       },
       "evidence": {
         "header": "Evidence"
