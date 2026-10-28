@@ -192,6 +192,7 @@ const steps = {
     next: '/correct-date-of-birth'
   },
   '/correct-date-of-birth': {
+    fields: ['correct-date-of-birth'],
     next: '/new-date-of-birth-evidence'
   },
   '/new-date-of-birth-evidence': {
