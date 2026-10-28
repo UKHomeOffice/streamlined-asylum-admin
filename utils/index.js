@@ -40,11 +40,11 @@ const removeWhiteSpace = value => value?.replaceAll(/\s+/g, '');
 /**
  * HOF custom validator for a unique application number (UAN).
  *
- * A valid UAN has 16 to 20 digits, optionally separated by single hyphens
+ * A valid UAN has exactly 16 digits, optionally separated by single hyphens
  * (for example 1234-5678-9101-1121). Whitespace is ignored.
  *
  * @param {string|null|undefined} uanValue - The UAN entered by the user.
- * @returns {RegExpMatchArray|null} A match (truthy) when valid, otherwise null.
+ * @returns {RegExpExecArray|null} A match (truthy) when valid, otherwise null.
  */
 const validUniqueApplicationNumber = uanValue => {
   if (!uanValue) {
@@ -52,20 +52,20 @@ const validUniqueApplicationNumber = uanValue => {
   }
 
   const uanNoWhitespace = removeWhiteSpace(uanValue);
-  return uanNoWhitespace.match(/^\d(?:-?\d){15,19}$/);
+  return /^\d(?:-?\d){15}$/.exec(uanNoWhitespace);
 };
 
 /**
- * Lower-cases an email address so it can be compared and stored consistently.
+ * Trims and lower-cases an email address so it can be compared and stored consistently.
  *
  * @param {*} email - The email address to normalise.
- * @returns {string} The lower-cased email, or an empty string if it is missing or not a string.
+ * @returns {string} The normalised email, or an empty string if it is missing or not a string.
  */
 const normaliseEmail = email => {
   if (!email || typeof email !== 'string') {
     return '';
   }
-  return email.toLowerCase();
+  return email.trim().toLowerCase();
 };
 
 /**

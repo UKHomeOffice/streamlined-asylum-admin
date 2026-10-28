@@ -9,9 +9,15 @@ const SECTION_FIELDS = [
   'send-evidence-for-your-claim',
   'someone-on-claim-died'
 ];
+const API_METHODS = Object.freeze({
+  GET: 'GET',
+  POST: 'POST',
+  PATCH: 'PATCH'
+});
 
 module.exports = {
   NO_DIGITS_REGEX,
   SAA_BASE_URL,
-  SECTION_FIELDS
+  SECTION_FIELDS,
+  API_METHODS
 };

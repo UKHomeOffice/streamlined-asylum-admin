@@ -15,6 +15,7 @@
   },
   "user-email": {
     "required": "Enter your email address",
-    "email": "Enter a real email address"
+    "email": "Enter a real email address",
+    "existsUnderAnotherEmail": "An application already exists for this UAN and Date of Birth under a different email"
   }
 }
