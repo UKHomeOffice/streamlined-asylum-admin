@@ -61,6 +61,20 @@ module.exports = {
       }
     ]
   },
+  'name': {
+    steps: [
+      {
+        step: '/new-name',
+        parse: (value, req) => {
+          const newName = [
+            req.sessionModel.get('given-name'),
+            req.sessionModel.get('family-name')
+          ];
+          return newName.filter(Boolean).join(' ');
+        }
+      }
+    ]
+  },
   'personal-details': {
     steps: [
       {

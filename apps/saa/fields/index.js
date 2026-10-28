@@ -57,6 +57,16 @@ module.exports = {
     validate: ['required'],
     isPageHeading: true
   },
+  'given-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'family-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
   'add-remove-dependant': {
     mixin: 'radio-group',
     options: ['yes', 'no'],

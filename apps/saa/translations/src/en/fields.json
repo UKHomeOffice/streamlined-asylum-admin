@@ -76,6 +76,12 @@
       }
     }
   },
+  "given-name": {
+    "label": "Given name"
+  },
+  "family-name": {
+    "label": "Family name"
+  },
   "add-remove-dependant": {
     "legend": "Do you need to add or remove a child or partner as a dependant?",
     "hint": "For example, if you have had a baby, got married or divorced",

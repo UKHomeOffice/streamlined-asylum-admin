@@ -46,7 +46,9 @@ describe('custom validation behaviour', () => {
     'child-partner-given-name',
     'child-partner-family-name',
     'claimants-given-name',
-    'claimants-family-name'
+    'claimants-family-name',
+    'given-name',
+    'family-name'
   ])(
     'should reject digits in %s',
     key => {
@@ -71,7 +73,11 @@ describe('custom validation behaviour', () => {
     ['claimants-given-name', 'Mary-Jane'],
     ['claimants-family-name', "O'Connor"],
     ['claimants-given-name', ''],
-    ['claimants-family-name', '']
+    ['claimants-family-name', ''],
+    ['given-name', 'Mary-Jane'],
+    ['family-name', "O'Connor"],
+    ['given-name', ''],
+    ['family-name', '']
   ])('should accept a digit-free value for %s', (key, value) => {
     const req = { form: { values: { [key]: value } } };
 

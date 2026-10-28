@@ -9,6 +9,7 @@ const CheckEmailToken = require('./behaviours/check-email-token');
 const RemoveDocument = require('./behaviours/remove-document');
 const SaveDocument = require('./behaviours/save-document');
 const RequireSelectedSection = require('./behaviours/require-selected-section');
+const getOldName = require('./behaviours/get-old-name');
 
 const AggregateSaveUpdate = require('./behaviours/aggregator-save-update');
 const LimitAggregateItems = require('./behaviours/limit-aggregator');
@@ -145,6 +146,8 @@ const steps = {
     next: '/new-name'
   },
   '/new-name': {
+    behaviours: [CustomValidation, getOldName],
+    fields: ['given-name', 'family-name'],
     next: '/new-name-evidence'
   },
   '/new-name-evidence': {

@@ -19,7 +19,9 @@ const customValidation = superclass =>
         key === 'child-partner-given-name' ||
         key === 'child-partner-family-name' ||
         key === 'claimants-given-name' ||
-        key === 'claimants-family-name'
+        key === 'claimants-family-name' ||
+        key === 'given-name' ||
+        key === 'family-name'
       ) {
         const value = req.form.values[key];
         if (!value.match(NO_DIGITS_REGEX)) {

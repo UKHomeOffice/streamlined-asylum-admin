@@ -15,7 +15,8 @@
     "captionHeading": "Update personal details"
   },
   "new-name": {
-    "header": "Change your name"
+    "header": "Change your name",
+    "captionHeading": "Update personal details"
   },
   "new-name-evidence": {
     "header": "Upload evidence to support this change"
@@ -231,6 +232,9 @@
     "sections": {
       "your-details": {
         "header": "Your details"
+      },
+      "name": {
+        "header": "Name"
       },
       "personal-details": {
         "header": "Personal details"
