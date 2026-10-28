@@ -9,7 +9,7 @@
     "header": "Information you have given us"
   },
   "do-you-need-to-change-your-name": {
-    "header": "Do you need to change your name?"
+    "captionHeading": "Update personal details"
   },
   "reason-name-change": {
     "captionHeading": "Update personal details"
@@ -32,11 +32,11 @@
   "someone-else-new-name": {
     "header": "Change someone else’s name"
   },
-  "whose-date-of-birth": {
-    "header": "Do you need to change your date of birth?"
+  "change-your-date-of-birth": {
+    "captionHeading": "Update personal details"
   },
   "correct-date-of-birth": {
-    "header": "What is your correct date of birth?"
+    "captionHeading": "Update personal details"
   },
   "new-date-of-birth-evidence": {
     "header": "Upload evidence to support this change"
@@ -234,6 +234,9 @@
       },
       "personal-details": {
         "header": "Personal details"
+      },
+      "name": {
+        "header": "Name"
       },
       "evidence": {
         "header": "Evidence"

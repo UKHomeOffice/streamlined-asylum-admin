@@ -137,6 +137,16 @@ const steps = {
     next: '/do-you-need-add-remove-dependant'
   },
   '/do-you-need-to-change-your-name': {
+    fields: ['do-you-need-to-change-your-name'],
+    forks: [
+      {
+        target: '/do-you-need-to-change-someone-elses-name',
+        condition: {
+          field: 'do-you-need-to-change-your-name',
+          value: 'no'
+        }
+      }
+    ],
     next: '/reason-name-change',
     backLink: '/changes/changes-to-contact-details'
   },
@@ -165,12 +175,24 @@ const steps = {
   },
   '/someone-else-new-name-evidence': {
     // provisional document category: documents-someone-else-new-name
-    next: '/whose-date-of-birth'
+    next: '/change-your-date-of-birth'
   },
-  '/whose-date-of-birth': {
+  '/change-your-date-of-birth': {
+    fields: ['change-your-date-of-birth'],
+    forks: [
+      {
+        target: '/change-someone-else-date-of-birth',
+        continueOnEdit: true,
+        condition: {
+          field: 'change-your-date-of-birth',
+          value: 'no'
+        }
+      }
+    ],
     next: '/correct-date-of-birth'
   },
   '/correct-date-of-birth': {
+    fields: ['correct-date-of-birth'],
     next: '/new-date-of-birth-evidence'
   },
   '/new-date-of-birth-evidence': {

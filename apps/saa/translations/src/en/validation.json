@@ -14,6 +14,9 @@
   "change-personal-details": {
     "required": "Select if you need to update personal details"
   },
+  "do-you-need-to-change-your-name": {
+    "required": "Select if you need to change your name"
+  },
   "reason-name-change": {
     "required": "Select why you need to change the name"
   },
@@ -132,5 +135,14 @@
   "helper-email-address": {
     "required": "You must enter your email address",
     "email": "Enter a valid email address"
+  },
+  "change-your-date-of-birth": {
+    "required": "Select if you want to change your date of birth"
+  },
+   "correct-date-of-birth": {
+    "required": "Enter a date of birth",
+    "date": "Enter a valid date",
+    "before": "Date of birth must be in the past",
+    "after": "Enter a date after 01 01 1900"
   }
 }

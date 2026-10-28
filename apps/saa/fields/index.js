@@ -47,6 +47,13 @@ module.exports = {
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
   },
+  'do-you-need-to-change-your-name': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    isPageHeading: true
+  },
   'reason-name-change': {
     mixin: 'radio-group',
     options: [
@@ -226,5 +233,21 @@ module.exports = {
     mixin: 'input-text',
     validate: ['required', 'email'],
     labelClassName: 'govuk-label--s'
-  }
+  },
+  'change-your-date-of-birth': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    isPageHeading: true
+  },
+  'correct-date-of-birth': dateComponent('correct-date-of-birth', {
+    mixin: 'input-date',
+    validate: [
+      'required',
+      'date',
+      'before',
+      { type: 'after', arguments: '1900-01-01' }
+    ],
+    isPageHeading: true
+  })
 };

@@ -62,6 +62,17 @@
       }
     }
   },
+  "do-you-need-to-change-your-name": {
+    "legend": "Do you need to change your name?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
   "reason-name-change": {
     "legend": "Why do you need to change the name?",
     "options": {
@@ -280,5 +291,20 @@
   },
   "helper-email-address": {
     "label": "Email address"
+  },
+  "change-your-date-of-birth": {
+    "legend": "Do you need to change your date of birth?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
+   "correct-date-of-birth": {
+    "legend": "What is your correct date of birth?",
+    "hint": "For example, 27 3 2020"
   }
 }
