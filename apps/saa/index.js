@@ -335,6 +335,7 @@ const steps = {
     next: '/check-your-answers-add-child-partner'
   },
   '/check-your-answers-add-child-partner': {
+    backLink: false,
     behaviours: [
       AggregateSaveUpdate,
       LimitAggregateItems,
@@ -452,6 +453,7 @@ const steps = {
     next: '/check-your-answers-death'
   },
   '/check-your-answers-death': {
+    backLink: false,
     behaviours: [
       AggregateSaveUpdate,
       LimitAggregateItems,
