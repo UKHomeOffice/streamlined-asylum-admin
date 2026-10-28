@@ -141,7 +141,7 @@
   },
    "correct-date-of-birth": {
     "required": "Enter a date of birth",
-    "date": "Date of birth must include a day, month and year",
+    "date": "Enter a valid date",
     "before": "Date of birth must be in the past",
     "after": "Enter a date after 01 01 1900"
   }
