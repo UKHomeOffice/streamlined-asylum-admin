@@ -77,7 +77,7 @@ module.exports = {
            * the actual page-to-page movement inside the section.
            */
           id: 'date-of-birth',
-          start: '/whose-date-of-birth',
+          start: '/change-your-date-of-birth',
           completeOn: [
             {
               route: '/change-someone-else-date-of-birth',
@@ -95,7 +95,7 @@ module.exports = {
             }
           ],
           routes: [
-            '/whose-date-of-birth',
+            '/change-your-date-of-birth',
             '/correct-date-of-birth',
             '/new-date-of-birth-evidence',
             '/check-your-answers-date-of-birth',

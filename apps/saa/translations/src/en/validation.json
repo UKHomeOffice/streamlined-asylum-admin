@@ -135,5 +135,8 @@
   "helper-email-address": {
     "required": "You must enter your email address",
     "email": "Enter a valid email address"
+  },
+  "change-your-date-of-birth": {
+    "required": "Select if you want to change your date of birth"
   }
 }
