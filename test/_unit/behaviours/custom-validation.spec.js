@@ -46,11 +46,13 @@ describe('custom validation behaviour', () => {
     'child-partner-given-name',
     'child-partner-family-name',
     'claimants-given-name',
-    'claimants-family-name'
-  ])(
-    'should reject digits in %s',
-    key => {
-      const req = { form: { values: { [key]: 'Name2' } } };
+    'claimants-family-name',
+    'helper-given-name',
+    'helper-family-name',
+    'given-name',
+    'family-name'
+  ])('should reject digits in %s', key => {
+    const req = { form: { values: { [key]: 'Name2' } } };
 
     const error = behaviour.validateField(key, req);
 
@@ -70,7 +72,13 @@ describe('custom validation behaviour', () => {
     ['claimants-given-name', 'Mary-Jane'],
     ['claimants-family-name', "O'Connor"],
     ['claimants-given-name', ''],
-    ['claimants-family-name', '']
+    ['claimants-family-name', ''],
+    ['helper-given-name', 'Mary-Jane'],
+    ['helper-family-name', "O'Connor"],
+    ['helper-given-name', ''],
+    ['helper-family-name', ''],
+    ['given-name', ''],
+    ['family-name', '']
   ])('should accept a digit-free value for %s', (key, value) => {
     const req = { form: { values: { [key]: value } } };
 
