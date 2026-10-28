@@ -9,7 +9,7 @@
     "header": "Information you have given us"
   },
   "do-you-need-to-change-your-name": {
-    "header": "Do you need to change your name?"
+    "captionHeading": "Update personal details"
   },
   "reason-name-change": {
     "captionHeading": "Update personal details"
@@ -234,6 +234,9 @@
       },
       "personal-details": {
         "header": "Personal details"
+      },
+      "name": {
+        "header": "Name"
       },
       "evidence": {
         "header": "Evidence"

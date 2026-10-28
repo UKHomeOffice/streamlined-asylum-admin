@@ -14,6 +14,9 @@
   "change-personal-details": {
     "required": "Select if you need to update personal details"
   },
+  "do-you-need-to-change-your-name": {
+    "required": "Select if you need to change your name"
+  },
   "reason-name-change": {
     "required": "Select why you need to change the name"
   },

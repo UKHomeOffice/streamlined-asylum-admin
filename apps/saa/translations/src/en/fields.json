@@ -62,6 +62,17 @@
       }
     }
   },
+  "do-you-need-to-change-your-name": {
+    "legend": "Do you need to change your name?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
   "reason-name-change": {
     "legend": "Why do you need to change the name?",
     "options": {

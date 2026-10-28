@@ -137,6 +137,16 @@ const steps = {
     next: '/do-you-need-add-remove-dependant'
   },
   '/do-you-need-to-change-your-name': {
+    fields: ['do-you-need-to-change-your-name'],
+    forks: [
+      {
+        target: '/do-you-need-to-change-someone-elses-name',
+        condition: {
+          field: 'do-you-need-to-change-your-name',
+          value: 'no'
+        }
+      }
+    ],
     next: '/reason-name-change',
     backLink: '/changes/changes-to-contact-details'
   },
