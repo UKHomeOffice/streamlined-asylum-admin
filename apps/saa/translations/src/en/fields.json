@@ -278,5 +278,18 @@
         "label": "Government organisation"
       }
     }
+  },
+  "helper-given-name": {
+    "label": "Given name"
+  },
+  "helper-family-name": {
+    "label": "Family name"
+  },
+  "helper-organisation": {
+    "label": "Organisation",
+    "hint": "If you are family or a friend, write “family”"
+  },
+  "helper-email-address": {
+    "label": "Email address"
   }
 }

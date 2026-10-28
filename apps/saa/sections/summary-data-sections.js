@@ -58,6 +58,22 @@ module.exports = {
       {
         step: '/how-you-are-helping',
         field: 'how-you-are-helping'
+      },
+      {
+        step: '/helper-details',
+        field: 'helper-given-name'
+      },
+      {
+        step: '/helper-details',
+        field: 'helper-family-name'
+      },
+      {
+        step: '/helper-details',
+        field: 'helper-organisation'
+      },
+      {
+        step: '/helper-details',
+        field: 'helper-email-address'
       }
     ]
   },

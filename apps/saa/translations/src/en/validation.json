@@ -114,5 +114,26 @@
   },
   "how-you-are-helping": {
     "required": "You must select how you are helping"
+  },
+  "helper-given-name": {
+    "required": "Enter your given name",
+    "notUrl": "Given name must not contain a URL",
+    "maxlength": "Given name must be between 1 and 255 characters",
+    "noDigits": "Given name must not contain numbers"
+  },
+  "helper-family-name": {
+    "required": "Enter your family name",
+    "notUrl": "Family name must not contain a URL",
+    "maxlength": "Family name must be between 1 and 255 characters",
+    "noDigits": "Family name must not contain numbers"
+  },
+  "helper-organisation": {
+    "required": "You must enter an organisation",
+    "notUrl": "Organisation must not contain a URL",
+    "maxlength": "Organisation must be between 1 and 255 characters"
+  },
+  "helper-email-address": {
+    "required": "You must enter your email address",
+    "email": "Enter a valid email address"
   }
 }

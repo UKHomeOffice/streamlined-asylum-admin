@@ -15,12 +15,16 @@ const customValidation = superclass =>
         return fieldError;
       }
 
-      if (
-        key === 'child-partner-given-name' ||
-        key === 'child-partner-family-name' ||
-        key === 'claimants-given-name' ||
-        key === 'claimants-family-name'
-      ) {
+      const keysToValidate = [
+        'child-partner-given-name',
+        'child-partner-family-name',
+        'claimants-given-name',
+        'claimants-family-name',
+        'helper-given-name',
+        'helper-family-name'
+      ];
+
+      if (keysToValidate.includes(key)) {
         const value = req.form.values[key];
         if (!value.match(NO_DIGITS_REGEX)) {
           return validationErrorFunc('noDigits');
