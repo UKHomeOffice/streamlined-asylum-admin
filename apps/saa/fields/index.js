@@ -234,6 +234,21 @@ module.exports = {
     validate: ['required', 'email'],
     labelClassName: 'govuk-label--s'
   },
+  'old-email-address': {
+    mixin: 'input-text',
+    validate: ['required', 'email'],
+    labelClassName: 'govuk-label--s'
+  },
+  'new-email-address': {
+    mixin: 'input-text',
+    validate: ['required', 'email'],
+    labelClassName: 'govuk-label--s'
+  },
+  'confirm-new-email-address': {
+    mixin: 'input-text',
+    validate: ['required', 'email'],
+    labelClassName: 'govuk-label--s'
+  },
   'change-your-date-of-birth': {
     mixin: 'radio-group',
     options: ['yes', 'no'],
