@@ -200,7 +200,7 @@ const steps = {
     next: '/check-your-answers-date-of-birth'
   },
   '/check-your-answers-date-of-birth': {
-    next: '/relationship-date-of-birth'
+    next: '/change-someone-else-date-of-birth'
   },
   '/change-someone-else-date-of-birth': {
     fields: ['change-someone-else-date-of-birth'],
