@@ -221,6 +221,15 @@ const steps = {
   },
   '/someone-else-correct-date-of-birth': {
     // provisional document category: documents-someone-else-new-dob
+    next: '/someone-else-new-date-of-birth-evidence'
+  },
+  '/someone-else-new-date-of-birth-evidence': {
+    next: '/check-your-answers-someone-else-date-of-birth'
+  },
+  '/check-your-answers-someone-else-date-of-birth': {
+    next: '/nationality-change'
+  },
+  '/nationality-change': {
     next: '/whose-nationality-to-change'
   },
   '/whose-nationality-to-change': {
