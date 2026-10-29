@@ -44,6 +44,9 @@
   "check-your-answers-date-of-birth": {
     "header": "Check your answers"
   },
+  "change-someone-else-date-of-birth": {
+    "captionHeading": "Update personal details"
+  },
   "relationship-date-of-birth": {
     "header": "How are they related to you?"
   },
