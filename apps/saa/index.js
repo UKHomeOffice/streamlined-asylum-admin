@@ -202,6 +202,20 @@ const steps = {
   '/check-your-answers-date-of-birth': {
     next: '/relationship-date-of-birth'
   },
+  '/change-someone-else-date-of-birth': {
+    fields: ['change-someone-else-date-of-birth'],
+    forks: [
+      {
+        target: '/relationship-date-of-birth',
+        continueOnEdit: true,
+        condition: {
+          field: 'change-someone-else-date-of-birth',
+          value: 'yes'
+        }
+      }
+    ],
+    next: '/nationality-change'
+  },
   '/relationship-date-of-birth': {
     next: '/someone-else-correct-date-of-birth'
   },
