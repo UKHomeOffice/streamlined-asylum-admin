@@ -17,6 +17,9 @@
   "do-you-need-to-change-your-name": {
     "required": "Select if you need to change your name"
   },
+  "change-someone-elses-name": {
+    "required": "Select if you need to change someone else's name"
+  },
   "reason-name-change": {
     "required": "Select why you need to change the name"
   },

@@ -104,6 +104,10 @@ module.exports = {
       {
         step: '/do-you-need-to-change-your-name',
         field: 'do-you-need-to-change-your-name'
+      },
+      {
+        step: '/do-you-need-to-change-someone-elses-name',
+        field: 'change-someone-elses-name'
       }
     ]
   },
