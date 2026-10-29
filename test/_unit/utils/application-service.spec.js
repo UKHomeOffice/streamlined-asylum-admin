@@ -48,7 +48,8 @@ describe('application service', () => {
         data: [draft, { id: 2, submitted_at: '2026-10-01T10:00:00.000Z' }]
       });
 
-      const result = await applicationService.findApplicationsByEmail('person@example.com');
+      const result =
+        await applicationService.findApplicationsByEmail('person@example.com');
 
       expect(result).toEqual([draft]);
     });
@@ -100,13 +101,12 @@ describe('application service', () => {
   });
 
   describe('findApplicationsByUan', () => {
-    test('should request applications using the normalised UAN', async () => {
+    test('should request applications using the provided UAN', async () => {
       const records = [{ id: 1 }];
       mockRequest.mockResolvedValue({ data: records });
 
-      const result = await applicationService.findApplicationsByUan(
-        ' 1345-1233 1234-3456 '
-      );
+      const result =
+        await applicationService.findApplicationsByUan('1345123312343456');
 
       expect(mockRequest).toHaveBeenCalledWith({
         url: `${applicationsUrl}/uan/1345123312343456`,
@@ -121,7 +121,8 @@ describe('application service', () => {
         data: [draft, { id: 2, submitted_at: '2026-10-01T10:00:00.000Z' }]
       });
 
-      const result = await applicationService.findApplicationsByUan('1345123312343456');
+      const result =
+        await applicationService.findApplicationsByUan('1345123312343456');
 
       expect(result).toEqual([draft]);
     });
@@ -137,7 +138,7 @@ describe('application service', () => {
       });
     });
 
-    test.each([undefined, null, '', ' - '])(
+    test.each([undefined, null, ''])(
       'should reject a missing UAN %p without requesting',
       async uan => {
         await expect(
@@ -149,13 +150,13 @@ describe('application service', () => {
   });
 
   describe('createApplication', () => {
-    test('should create an application with normalised email and UAN and an empty session', async () => {
+    test('should create an application with normalised email, the provided UAN and an empty session', async () => {
       const record = { id: 1 };
       mockRequest.mockResolvedValue({ data: [record] });
 
       const result = await applicationService.createApplication({
         email: ' Person@Example.com ',
-        uan: '1234 5678-9012',
+        uan: '123456789012',
         dateOfBirth: '1990-01-31'
       });
 
@@ -193,10 +194,6 @@ describe('application service', () => {
       ['email', { uan: '123', dateOfBirth: '1990-01-31' }],
       ['blank email', { email: '  ', uan: '123', dateOfBirth: '1990-01-31' }],
       ['UAN', { email: 'person@example.com', dateOfBirth: '1990-01-31' }],
-      [
-        'separator-only UAN',
-        { email: 'person@example.com', uan: ' - ', dateOfBirth: '1990-01-31' }
-      ],
       ['date of birth', { email: 'person@example.com', uan: '123' }]
     ])(
       'should reject a missing %s without creating an application',
@@ -311,11 +308,11 @@ describe('application service', () => {
   describe('findOrCreateApplication', () => {
     const details = {
       email: 'person@example.com',
-      uan: '1234 5678-9012',
+      uan: '123456789012',
       dateOfBirth: '1990-01-31'
     };
 
-    test('should return a record matching the normalised UAN and date of birth without creating one', async () => {
+    test('should return a record matching the UAN and date of birth without creating one', async () => {
       const match = {
         id: 2,
         uan: '123456789012',
@@ -361,6 +358,23 @@ describe('application service', () => {
       });
       expect(mockLogger.info).toHaveBeenCalledWith(
         'Application lookup found no match; creating a record'
+      );
+    });
+
+    test('should store the supplied session when creating a record', async () => {
+      const session = { 'claimant-date-of-birth': '1990-01-31' };
+      mockRequest
+        .mockResolvedValueOnce({ data: [] })
+        .mockResolvedValueOnce({ data: [] })
+        .mockResolvedValueOnce({ data: [{ id: 10 }] });
+
+      await applicationService.findOrCreateApplication({ ...details, session });
+
+      expect(mockRequest).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          data: expect.objectContaining({ session })
+        })
       );
     });
 
@@ -436,12 +450,14 @@ describe('application service', () => {
       mockRequest
         .mockResolvedValueOnce({ data: [] })
         .mockResolvedValueOnce({
-          data: [{
-            id: 6,
-            uan: '123456789012',
-            date_of_birth: '1990-01-31',
-            submitted_at: '2026-10-01T10:00:00.000Z'
-          }]
+          data: [
+            {
+              id: 6,
+              uan: '123456789012',
+              date_of_birth: '1990-01-31',
+              submitted_at: '2026-10-01T10:00:00.000Z'
+            }
+          ]
         })
         .mockResolvedValueOnce({ data: [created] });
 
@@ -476,7 +492,7 @@ describe('application service', () => {
 
     test.each([
       ['email', { ...details, email: undefined }],
-      ['separator-only UAN', { ...details, uan: ' - ' }],
+      ['UAN', { ...details, uan: undefined }],
       ['date of birth', { ...details, dateOfBirth: undefined }]
     ])(
       'should reject a missing %s before any lookup',

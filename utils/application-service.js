@@ -25,13 +25,11 @@ const applicationsUrl = `${protocol}://${host}:${port}/applications`;
 const encodeEmail = normalisedEmail =>
   Buffer.from(normalisedEmail).toString('hex');
 
-const normaliseUan = uan => (uan ?? '').replace(/[\s-]/g, '');
-
 // Submitted records are retained for 90 days but must not block a new application.
 const isDraft = record => !record.submitted_at;
 
-const matches = (normalisedUan, dateOfBirth) => record => {
-  return record.uan === normalisedUan && record.date_of_birth === dateOfBirth;
+const matches = (uan, dateOfBirth) => record => {
+  return record.uan === uan && record.date_of_birth === dateOfBirth;
 };
 
 const assertApplicationDetails = (email, uan, dateOfBirth) => {
@@ -108,46 +106,44 @@ async function findApplicationsByEmail(email) {
 /**
  * Finds draft applications with a UAN, regardless of email.
  *
- * @param {string} uan - Unique application number, in any supported format.
+ * @param {string} uan - Digits-only UAN, as stored in the session.
  * @returns {Promise<ApplicationRecord[]>} Matching draft applications.
- * @throws {Error} When the UAN is empty after normalisation.
+ * @throws {Error} When the UAN is missing.
  * @throws {Error} When the RDS API request fails.
  */
 async function findApplicationsByUan(uan) {
-  const normalisedUan = normaliseUan(uan);
-  if (!normalisedUan) {
+  if (!uan) {
     throw new Error('UAN is required');
   }
   const records = await request({
-    url: `${applicationsUrl}/uan/${encodeURIComponent(normalisedUan)}`,
+    url: `${applicationsUrl}/uan/${encodeURIComponent(uan)}`,
     method: API_METHODS.GET
   });
   return records.filter(isDraft);
 }
 
 /**
- * Creates an application with a normalised email and UAN.
+ * Creates an application with a normalised email.
  *
  * @param {Object} details - Application details.
  * @param {string} details.email - Applicant email address.
- * @param {string} details.uan - Unique application number.
+ * @param {string} details.uan - Digits-only UAN, as stored in the session.
  * @param {string} details.dateOfBirth - Claimant date of birth.
  * @param {Object} [details.session={}] - Initial form session.
  * @returns {Promise<ApplicationRecord>} Created application.
- * @throws {Error} When the email, UAN or date of birth is empty after normalisation.
+ * @throws {Error} When the email, UAN or date of birth is missing.
  * @throws {Error} When the RDS API request fails.
  */
 async function createApplication({ email, uan, dateOfBirth, session = {} }) {
   const normalisedEmail = normaliseEmail(email);
-  const normalisedUan = normaliseUan(uan);
-  assertApplicationDetails(normalisedEmail, normalisedUan, dateOfBirth);
+  assertApplicationDetails(normalisedEmail, uan, dateOfBirth);
 
   const [record] = await request({
     url: applicationsUrl,
     method: API_METHODS.POST,
     data: {
       email: normalisedEmail,
-      uan: normalisedUan,
+      uan,
       date_of_birth: dateOfBirth,
       session
     }
@@ -208,17 +204,22 @@ async function submitApplication(
  *
  * @param {Object} details - Claimant details.
  * @param {string} details.email - Applicant email address.
- * @param {string} details.uan - Unique application number, in any supported format.
+ * @param {string} details.uan - Digits-only UAN, as stored in the session.
  * @param {string} details.dateOfBirth - Claimant date of birth.
+ * @param {Object} [details.session={}] - Form session stored if a new application is created.
  * @returns {Promise<ApplicationRecord>} Existing draft or newly created application.
  * @throws {ApplicationExistsError} When the UAN and date of birth match another email's draft.
- * @throws {Error} When the email, UAN or date of birth is empty after normalisation.
+ * @throws {Error} When the email, UAN or date of birth is missing.
  * @throws {Error} When an RDS API request fails.
  */
-async function findOrCreateApplication({ email, uan, dateOfBirth }) {
-  const normalisedUan = normaliseUan(uan);
-  assertApplicationDetails(normaliseEmail(email), normalisedUan, dateOfBirth);
-  const isMatch = matches(normalisedUan, dateOfBirth);
+async function findOrCreateApplication({
+  email,
+  uan,
+  dateOfBirth,
+  session = {}
+}) {
+  assertApplicationDetails(normaliseEmail(email), uan, dateOfBirth);
+  const isMatch = matches(uan, dateOfBirth);
 
   const existing = (await findApplicationsByEmail(email)).find(isMatch);
   if (existing) {
@@ -226,9 +227,9 @@ async function findOrCreateApplication({ email, uan, dateOfBirth }) {
     return existing;
   }
 
-  const existsUnderAnotherEmail = (
-    await findApplicationsByUan(normalisedUan)
-  ).some(isMatch);
+  const existsUnderAnotherEmail = (await findApplicationsByUan(uan)).some(
+    isMatch
+  );
 
   if (existsUnderAnotherEmail) {
     logger.info(
@@ -238,7 +239,7 @@ async function findOrCreateApplication({ email, uan, dateOfBirth }) {
   }
 
   logger.info('Application lookup found no match; creating a record');
-  return createApplication({ email, uan: normalisedUan, dateOfBirth });
+  return createApplication({ email, uan, dateOfBirth, session });
 }
 
 module.exports = {

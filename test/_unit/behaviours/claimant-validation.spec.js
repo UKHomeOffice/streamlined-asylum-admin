@@ -36,12 +36,19 @@ describe('claimant validation behaviour', () => {
   beforeEach(() => {
     behaviour = new Behaviour();
     session = {
-      'claimant-unique-application-number': '1234-5678-9012-3456',
-      'claimant-date-of-birth': '1990-01-31'
+      'claimant-unique-application-number': '1234567890123456',
+      'claimant-date-of-birth': '1990-01-31',
+      'csrf-secret': 'secret',
+      errors: { field: 'error' },
+      errorValues: { field: 'value' },
+      steps: ['/claimant-details', '/claim-decided']
     };
     req = {
       form: { values: { 'user-email': 'Person@Example.com' } },
-      sessionModel: { get: jest.fn(key => session[key]) }
+      sessionModel: {
+        get: jest.fn(key => session[key]),
+        toJSON: jest.fn(() => structuredClone(session))
+      }
     };
     res = {};
     next = jest.fn();
@@ -53,9 +60,25 @@ describe('claimant validation behaviour', () => {
 
     expect(findOrCreateApplication).toHaveBeenCalledWith({
       email: 'person@example.com',
-      uan: '1234-5678-9012-3456',
-      dateOfBirth: '1990-01-31'
+      uan: '1234567890123456',
+      dateOfBirth: '1990-01-31',
+      session: {
+        'claimant-unique-application-number': '1234567890123456',
+        'claimant-date-of-birth': '1990-01-31'
+      }
     });
+  });
+
+  test('should exclude CSRF, errors and journey steps from the saved session only', async () => {
+    await behaviour.validate(req, res, next);
+
+    const [{ session: saved }] = findOrCreateApplication.mock.calls[0];
+    expect(saved).not.toHaveProperty('csrf-secret');
+    expect(saved).not.toHaveProperty('errors');
+    expect(saved).not.toHaveProperty('errorValues');
+    expect(saved).not.toHaveProperty('steps');
+    expect(session['csrf-secret']).toBe('secret');
+    expect(session.steps).toEqual(['/claimant-details', '/claim-decided']);
   });
 
   test('should continue validation after the application is found or created', async () => {

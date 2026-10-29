@@ -2,6 +2,7 @@ const { disallowIndexing } = require('../../config');
 const CustomValidation = require('../common/behaviours/custom-validation');
 const ClaimantValidation = require('./behaviours/claimant-validation');
 const SendVerificationEmail = require('./behaviours/send-verification-email');
+const FormatUan = require('./behaviours/format-uan');
 const steps = {
   '/': {
     template: 'start'
@@ -12,7 +13,7 @@ const steps = {
   },
   '/claimant-details': {
     fields: ['claimant-unique-application-number', 'claimant-date-of-birth'],
-    behaviours: [CustomValidation],
+    behaviours: [CustomValidation, FormatUan],
     next: '/claim-decided'
   },
   '/claim-decided': {

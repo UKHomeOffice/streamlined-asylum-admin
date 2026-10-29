@@ -137,6 +137,14 @@ const formatDate = date => {
   }
 };
 
+/**
+ * Removes whitespace and hyphens so a UAN is stored and compared as digits only.
+ *
+ * @param {string|null|undefined} uan - The UAN as entered.
+ * @returns {string} The UAN without whitespace or hyphens, or an empty string if omitted.
+ */
+const normaliseUan = uan => (uan ?? '').replace(/[\s-]/g, '');
+
 module.exports = {
   sanitiseFilename,
   validUniqueApplicationNumber,
@@ -144,5 +152,6 @@ module.exports = {
   getNotifyErrorMessage,
   isTeamOnlyNotifyError,
   hasSelectedSection,
-  formatDate
+  formatDate,
+  normaliseUan
 };

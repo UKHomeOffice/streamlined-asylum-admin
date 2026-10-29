@@ -4,7 +4,8 @@ const {
   normaliseEmail,
   getNotifyErrorMessage,
   isTeamOnlyNotifyError,
-  formatDate
+  formatDate,
+  normaliseUan
 } = require('../../../utils/index');
 
 describe('SAA utilities tests', () => {
@@ -154,6 +155,22 @@ describe('validUniqueApplicationNumber', () => {
     'returns null for a missing UAN: %s',
     value => {
       expect(validUniqueApplicationNumber(value)).toBeNull();
+    }
+  );
+
+  test.each([
+    ['1234567890123456', '1234567890123456'],
+    ['1234-5678-9012-3456', '1234567890123456'],
+    ['1234 5678\t9012\n3456', '1234567890123456'],
+    [' 1234 - 5678 - 9012 - 3456 ', '1234567890123456']
+  ])('should normalise UAN %p to digits only', (value, expected) => {
+    expect(normaliseUan(value)).toBe(expected);
+  });
+
+  test.each([undefined, null, ''])(
+    'should normalise a missing UAN %p to an empty string',
+    value => {
+      expect(normaliseUan(value)).toBe('');
     }
   );
 
