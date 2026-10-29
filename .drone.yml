@@ -31,7 +31,6 @@ include_default_and_feature_branches: &include_default_and_feature_branches
     - master
     - feature/*
     - deps/*
-    - deps-*
 
 trigger:
   branch:
