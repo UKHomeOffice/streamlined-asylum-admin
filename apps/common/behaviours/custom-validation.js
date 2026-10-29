@@ -14,7 +14,6 @@ const customValidation = superclass =>
       if (fieldError) {
         return fieldError;
       }
-      
       const keysToValidate = [
         'child-partner-given-name',
         'child-partner-family-name',

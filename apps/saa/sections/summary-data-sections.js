@@ -77,7 +77,7 @@ module.exports = {
       }
     ]
   },
-  'name': {
+  name: {
     steps: [
       {
         step: '/new-name',
@@ -88,6 +88,14 @@ module.exports = {
           ];
           return newName.filter(Boolean).join(' ');
         }
+      },
+      {
+        step: '/do-you-need-to-change-your-name',
+        field: 'do-you-need-to-change-your-name'
+      },
+      {
+        step: '/do-you-need-to-change-someone-elses-name',
+        field: 'change-someone-elses-name'
       }
     ]
   },
@@ -96,18 +104,6 @@ module.exports = {
       {
         step: '/personal-details',
         field: 'change-personal-details'
-      }
-    ]
-  },
-  name: {
-    steps: [
-      {
-        step: '/do-you-need-to-change-your-name',
-        field: 'do-you-need-to-change-your-name'
-      },
-      {
-        step: '/do-you-need-to-change-someone-elses-name',
-        field: 'change-someone-elses-name'
       }
     ]
   },
