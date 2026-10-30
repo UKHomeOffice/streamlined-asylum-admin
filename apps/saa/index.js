@@ -200,13 +200,36 @@ const steps = {
     next: '/check-your-answers-date-of-birth'
   },
   '/check-your-answers-date-of-birth': {
-    next: '/relationship-date-of-birth'
+    next: '/change-someone-else-date-of-birth'
+  },
+  '/change-someone-else-date-of-birth': {
+    fields: ['change-someone-else-date-of-birth'],
+    forks: [
+      {
+        target: '/relationship-date-of-birth',
+        continueOnEdit: true,
+        condition: {
+          field: 'change-someone-else-date-of-birth',
+          value: 'yes'
+        }
+      }
+    ],
+    next: '/nationality-change'
   },
   '/relationship-date-of-birth': {
     next: '/someone-else-correct-date-of-birth'
   },
   '/someone-else-correct-date-of-birth': {
     // provisional document category: documents-someone-else-new-dob
+    next: '/someone-else-new-date-of-birth-evidence'
+  },
+  '/someone-else-new-date-of-birth-evidence': {
+    next: '/check-your-answers-someone-else-date-of-birth'
+  },
+  '/check-your-answers-someone-else-date-of-birth': {
+    next: '/nationality-change'
+  },
+  '/nationality-change': {
     next: '/whose-nationality-to-change'
   },
   '/whose-nationality-to-change': {
