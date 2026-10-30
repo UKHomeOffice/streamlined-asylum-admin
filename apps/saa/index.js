@@ -246,6 +246,7 @@ const steps = {
     next: '/new-email-address'
   },
   '/new-email-address': {
+    behaviours: [CustomValidation],
     fields: [
       'old-email-address',
       'new-email-address',

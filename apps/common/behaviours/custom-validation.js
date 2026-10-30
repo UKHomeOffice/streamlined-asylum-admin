@@ -36,6 +36,12 @@ const customValidation = superclass =>
           return validationErrorFunc('validUniqueApplicationNumber');
         }
       }
+
+      // Generic cross-field equality check, enabled via matchField: '<other-field>' in field config
+      const matchField = req.form.options?.fields?.[key]?.matchField;
+      if (matchField && req.form.values[key] !== req.form.values[matchField]) {
+        return validationErrorFunc('matchField', matchField);
+      }
       return fieldError;
     }
   };

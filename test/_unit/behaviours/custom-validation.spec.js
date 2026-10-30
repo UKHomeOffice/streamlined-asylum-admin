@@ -113,6 +113,53 @@ describe('custom validation behaviour', () => {
     expect(baseValidateField).toHaveBeenCalledWith(key, req);
   });
 
+  describe('matchField', () => {
+    const key = 'confirm-new-email-address';
+    const options = {
+      fields: { [key]: { matchField: 'new-email-address' } }
+    };
+
+    test('should reject a value that does not match the configured field', () => {
+      const req = {
+        form: {
+          options,
+          values: { 'new-email-address': 'new@example.com', [key]: 'other@example.com' }
+        }
+      };
+
+      const error = behaviour.validateField(key, req);
+
+      expect(error).toBeInstanceOf(ValidationError);
+      expect(error).toMatchObject({
+        key,
+        type: 'matchField',
+        arguments: ['new-email-address']
+      });
+    });
+
+    test('should accept a value that matches the configured field', () => {
+      const req = {
+        form: {
+          options,
+          values: { 'new-email-address': 'new@example.com', [key]: 'new@example.com' }
+        }
+      };
+
+      expect(behaviour.validateField(key, req)).toBeUndefined();
+    });
+
+    test('should not apply when matchField is not configured', () => {
+      const req = {
+        form: {
+          options: { fields: { [key]: {} } },
+          values: { 'new-email-address': 'new@example.com', [key]: 'other@example.com' }
+        }
+      };
+
+      expect(behaviour.validateField(key, req)).toBeUndefined();
+    });
+  });
+
   test('should accept a valid UAN', () => {
     const key = 'claimant-unique-application-number';
     const req = { form: { values: { [key]: '1234-5678-9012-3456' } } };

@@ -247,6 +247,7 @@ module.exports = {
   'confirm-new-email-address': {
     mixin: 'input-text',
     validate: ['required', 'email'],
+    matchField: 'new-email-address',
     labelClassName: 'govuk-label--s'
   },
   'change-your-date-of-birth': {
