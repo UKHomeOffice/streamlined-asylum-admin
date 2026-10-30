@@ -1,6 +1,8 @@
 const { disallowIndexing } = require('../../config');
 const CustomValidation = require('../common/behaviours/custom-validation');
+const ClaimantValidation = require('./behaviours/claimant-validation');
 const SendVerificationEmail = require('./behaviours/send-verification-email');
+const FormatUan = require('./behaviours/format-uan');
 const steps = {
   '/': {
     template: 'start'
@@ -11,7 +13,7 @@ const steps = {
   },
   '/claimant-details': {
     fields: ['claimant-unique-application-number', 'claimant-date-of-birth'],
-    behaviours: [CustomValidation],
+    behaviours: [CustomValidation, FormatUan],
     next: '/claim-decided'
   },
   '/claim-decided': {
@@ -29,9 +31,7 @@ const steps = {
     next: '/email-address'
   },
   '/email-address': {
-    // Once the schema is finalised, on each common form submission reaching check-your-email,
-    // create a new record if no record matches the combination of email, UAN and date of birth.
-    behaviours: [SendVerificationEmail],
+    behaviours: [ClaimantValidation, SendVerificationEmail],
     fields: ['user-email'],
     next: '/check-your-email'
   },

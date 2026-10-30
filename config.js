@@ -28,6 +28,11 @@ module.exports = {
       userVerifyEmailTemplateId: process.env.USER_VERIFY_EMAIL_TEMPLATE_ID
     }
   },
+  saveService: {
+    protocol: process.env.DATASERVICE_USE_HTTPS === 'false' ? 'http' : 'https',
+    port: process.env.DATASERVICE_SERVICE_PORT_HTTPS || '10443',
+    host: process.env.DATASERVICE_SERVICE_HOST || '127.0.0.1'
+  },
   upload: {
     ...fileUploadConfig,
     hostname: process.env.FILE_VAULT_URL

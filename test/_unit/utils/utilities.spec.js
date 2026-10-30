@@ -4,7 +4,8 @@ const {
   normaliseEmail,
   getNotifyErrorMessage,
   isTeamOnlyNotifyError,
-  formatDate
+  formatDate,
+  normaliseUan
 } = require('../../../utils/index');
 
 describe('SAA utilities tests', () => {
@@ -127,11 +128,11 @@ describe('isTeamOnlyNotifyError', () => {
 
 describe('validUniqueApplicationNumber', () => {
   test.each([
-    '1234567890123456',
-    '1234-5678-9012-3456',
+    '1212121212121212',
+    '1212-1212-1212-1212',
+    '1     2    12121212121212',
     '12 34\t-5678\n-9012 -3456',
-    '12345678901234567890',
-    '1234 - 5678 - 9012 - 3456 - 7890'
+    '1234 - 5678 - 9012 - 3456'
   ])('accepts a valid UAN: %s', value => {
     expect(validUniqueApplicationNumber(value)?.[0]).toBe(
       value.replace(/\s+/g, '')
@@ -140,7 +141,9 @@ describe('validUniqueApplicationNumber', () => {
 
   test.each([
     '123456789012345', // 15 digits
-    '123456789012345678901', // 21 digits
+    '12345678901234567', // 17 digits
+    '1234-5678-9012-3456-7', // 17 digits with hyphens
+    '12345678901234567890', // 20 digits
     '1234--5678-9012-3456',
     '-1234-5678-9012-3456',
     '1234-5678-9012-345x'
@@ -155,8 +158,34 @@ describe('validUniqueApplicationNumber', () => {
     }
   );
 
+  test.each([
+    ['1234567890123456', '1234567890123456'],
+    ['1234-5678-9012-3456', '1234567890123456'],
+    ['1234 5678\t9012\n3456', '1234567890123456'],
+    [' 1234 - 5678 - 9012 - 3456 ', '1234567890123456']
+  ])('should normalise UAN %p to digits only', (value, expected) => {
+    expect(normaliseUan(value)).toBe(expected);
+  });
+
+  test.each([undefined, null, ''])(
+    'should normalise a missing UAN %p to an empty string',
+    value => {
+      expect(normaliseUan(value)).toBe('');
+    }
+  );
+
   test('should lower case an email address', () => {
     expect(normaliseEmail('PERSON@EXAMPLE.COM')).toBe('person@example.com');
+  });
+
+  test('should trim surrounding whitespace from an email address', () => {
+    expect(normaliseEmail('  Person@Example.com\t\n')).toBe(
+      'person@example.com'
+    );
+  });
+
+  test('should return an empty string for a whitespace-only email address', () => {
+    expect(normaliseEmail('   ')).toBe('');
   });
 
   test('should return an empty string when an email address is not provided', () => {
@@ -182,10 +211,14 @@ describe('formatDate', () => {
     expect(formatDate(new Date(2020, 2, 27))).toBe('27 March 2020');
   });
 
-  test.each([['not-a-date'], [''], [undefined], [null], [20200327], [new Date('invalid')]])(
-    'throws for an invalid date: %p',
-    value => {
-      expect(() => formatDate(value)).toThrow('Invalid date value');
-    }
-  );
+  test.each([
+    ['not-a-date'],
+    [''],
+    [undefined],
+    [null],
+    [20200327],
+    [new Date('invalid')]
+  ])('throws for an invalid date: %p', value => {
+    expect(() => formatDate(value)).toThrow('Invalid date value');
+  });
 });
