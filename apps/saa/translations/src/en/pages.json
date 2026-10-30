@@ -90,10 +90,12 @@
     "header": "UK address where you live now"
   },
   "new-email-address": {
-    "header": "Change your email address"
+    "header": "Change your email address",
+    "captionHeading": "Update personal details"
   },
   "check-your-answers-email": {
-    "header": "Check your answers"
+    "header": "Check your answers",
+    "captionHeading": "Update personal details"
   },
   "your-phone-number": {
     "header": "Is the new phone number your own?"
@@ -243,6 +245,9 @@
       },
       "evidence": {
         "header": "Evidence"
+      },
+      "email-address": {
+        "header": "Change your email address"
       },
       "add-or-remove-dependants": {
         "header": "Add or remove dependants"

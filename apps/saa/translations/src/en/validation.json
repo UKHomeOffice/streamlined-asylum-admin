@@ -136,6 +136,19 @@
     "required": "You must enter your email address",
     "email": "Enter a valid email address"
   },
+  "old-email-address": {
+    "required": "Enter your old email address",
+    "email": "Enter a real old email address"
+  },
+  "new-email-address": {
+    "required": "Enter your new email address",
+    "email": "Enter a real new email address"
+  },
+  "confirm-new-email-address": {
+    "required": "Confirm your new email address",
+    "email": "Enter a real new email address",
+    "matchField": "Email must be the same"
+  },
   "change-your-date-of-birth": {
     "required": "Select if you want to change your date of birth"
   },

@@ -269,9 +269,17 @@ const steps = {
     next: '/new-email-address'
   },
   '/new-email-address': {
+    behaviours: [CustomValidation],
+    fields: [
+      'old-email-address',
+      'new-email-address',
+      'confirm-new-email-address'
+    ],
     next: '/check-your-answers-email'
   },
   '/check-your-answers-email': {
+    behaviours: [Summary, SummaryLabels, EditRouteReturn],
+    sections: require('./sections/summary-data-email-address'),
     next: '/your-phone-number'
   },
   '/your-phone-number': {
