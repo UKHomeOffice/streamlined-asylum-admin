@@ -100,6 +100,8 @@ async function findApplicationsByEmail(email) {
     url: `${applicationsUrl}/email/${encodeEmail(normalisedEmail)}`,
     method: API_METHODS.GET
   });
+
+  logger.info(JSON.stringify(records, null, 2));
   return records.filter(isDraft);
 }
 
