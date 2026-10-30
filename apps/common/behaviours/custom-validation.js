@@ -14,14 +14,15 @@ const customValidation = superclass =>
       if (fieldError) {
         return fieldError;
       }
-
       const keysToValidate = [
         'child-partner-given-name',
         'child-partner-family-name',
         'claimants-given-name',
         'claimants-family-name',
         'helper-given-name',
-        'helper-family-name'
+        'helper-family-name',
+        'given-name',
+        'family-name'
       ];
 
       if (keysToValidate.includes(key)) {

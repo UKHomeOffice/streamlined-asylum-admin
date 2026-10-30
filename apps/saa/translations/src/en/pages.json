@@ -15,7 +15,8 @@
     "captionHeading": "Update personal details"
   },
   "new-name": {
-    "header": "Change your name"
+    "header": "Change your name",
+    "captionHeading": "Update personal details"
   },
   "new-name-evidence": {
     "header": "Upload evidence to support this change"
@@ -24,7 +25,7 @@
     "header": "Check your answers"
   },
   "do-you-need-to-change-someone-elses-name": {
-    "header": "Do you need to change someone else’s name?"
+    "captionHeading": "Update personal details"
   },
   "relationship-name-change": {
     "header": "How are they related to you?"
@@ -234,6 +235,9 @@
     "sections": {
       "your-details": {
         "header": "Your details"
+      },
+      "name": {
+        "header": "Name"
       },
       "personal-details": {
         "header": "Personal details"

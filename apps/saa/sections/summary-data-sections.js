@@ -77,19 +77,33 @@ module.exports = {
       }
     ]
   },
+  name: {
+    steps: [
+      {
+        step: '/new-name',
+        parse: (value, req) => {
+          const newName = [
+            req.sessionModel.get('given-name'),
+            req.sessionModel.get('family-name')
+          ];
+          return newName.filter(Boolean).join(' ');
+        }
+      },
+      {
+        step: '/do-you-need-to-change-your-name',
+        field: 'do-you-need-to-change-your-name'
+      },
+      {
+        step: '/do-you-need-to-change-someone-elses-name',
+        field: 'change-someone-elses-name'
+      }
+    ]
+  },
   'personal-details': {
     steps: [
       {
         step: '/personal-details',
         field: 'change-personal-details'
-      }
-    ]
-  },
-  name: {
-    steps: [
-      {
-        step: '/do-you-need-to-change-your-name',
-        field: 'do-you-need-to-change-your-name'
       }
     ]
   },

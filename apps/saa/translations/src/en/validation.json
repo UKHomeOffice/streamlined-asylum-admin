@@ -17,8 +17,23 @@
   "do-you-need-to-change-your-name": {
     "required": "Select if you need to change your name"
   },
+  "change-someone-elses-name": {
+    "required": "Select if you need to change someone else's name"
+  },
   "reason-name-change": {
     "required": "Select why you need to change the name"
+  },
+  "given-name": {
+    "required": "Enter your new given name",
+    "notUrl": "Given name must not contain a URL",
+    "maxlength": "Given name must be between 1 and 255 characters",
+    "noDigits": "Given name must not contain numbers"
+  },
+  "family-name": {
+    "required": "Enter your new family name",
+    "notUrl": "Family name must not contain a URL",
+    "maxlength": "Family name must be between 1 and 255 characters",
+    "noDigits": "Family name must not contain numbers"
   },
   "add-remove-dependant": {
     "required": "Select if you need to add or remove a child or partner as a dependant"

@@ -4,11 +4,13 @@ const config = require('../../config');
 
 const CustomValidation = require('../common/behaviours/custom-validation');
 const somethingElseFork = require('../saa/behaviours/something-else-fork');
+const changeSomeoneElsesNameFork = require('./behaviours/change-someone-elses-name-fork');
 const ContactUsByEmail = require('./behaviours/contact-us-by-email');
 const CheckEmailToken = require('./behaviours/check-email-token');
 const RemoveDocument = require('./behaviours/remove-document');
 const SaveDocument = require('./behaviours/save-document');
 const RequireSelectedSection = require('./behaviours/require-selected-section');
+const getOldName = require('./behaviours/get-old-name');
 
 const AggregateSaveUpdate = require('./behaviours/aggregator-save-update');
 const LimitAggregateItems = require('./behaviours/limit-aggregator');
@@ -134,7 +136,7 @@ const steps = {
     fields: ['changes-to-contact-details'],
     // Entry point: calculate active follow-up sections from the checkbox field.
     behaviours: [multiSelectFollowUpsBehaviour],
-    next: '/do-you-need-add-remove-dependant'
+    next: '/provide-photo-identity'
   },
   '/do-you-need-to-change-your-name': {
     fields: ['do-you-need-to-change-your-name'],
@@ -155,6 +157,8 @@ const steps = {
     next: '/new-name'
   },
   '/new-name': {
+    behaviours: [CustomValidation, getOldName],
+    fields: ['given-name', 'family-name'],
     next: '/new-name-evidence'
   },
   '/new-name-evidence': {
@@ -165,7 +169,9 @@ const steps = {
     next: '/do-you-need-to-change-someone-elses-name'
   },
   '/do-you-need-to-change-someone-elses-name': {
-    next: '/relationship-name-change'
+    behaviours: [multiSelectFollowUpsBehaviour, changeSomeoneElsesNameFork],
+    fields: ['change-someone-elses-name'],
+    next: '/change-your-date-of-birth'
   },
   '/relationship-name-change': {
     next: '/someone-else-new-name'
@@ -560,7 +566,10 @@ const steps = {
 getConfiguredCompletionRoutes(multiSelectFollowUpsConfig)
   .filter((route, index, routes) => routes.indexOf(route) === index)
   .forEach(route => {
-    if (!steps[route]) {
+    if (
+      !steps[route] ||
+      (steps[route].behaviours || []).includes(multiSelectFollowUpsBehaviour)
+    ) {
       return;
     }
 

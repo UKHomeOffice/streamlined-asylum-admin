@@ -25,7 +25,7 @@
 module.exports = {
   field: 'changes-to-contact-details',
   entryPoint: '/changes-to-contact-details',
-  exitPoint: '/do-you-need-add-remove-dependant',
+  exitPoint: '/provide-photo-identity',
   stateKey: 'contact-detail-updates',
   options: [
     {
@@ -44,7 +44,7 @@ module.exports = {
             {
               route: '/do-you-need-to-change-someone-elses-name',
               condition: {
-                field: 'do-you-need-to-change-someone-elses-name',
+                field: 'change-someone-elses-name',
                 value: 'no'
               }
             },

@@ -19,6 +19,16 @@ const uniqueSectionStartRoutes = multiSelectFollowUpsConfig.options
   .filter((route, index, routes) => routes.indexOf(route) === index);
 
 describe('SAA multi-select follow-up route config', () => {
+  test('attaches the name-change navigation behaviour to the relevant page', () => {
+    const step = app.steps['/do-you-need-to-change-someone-elses-name'];
+
+    expect(step.behaviours).toContain(
+      require('../../../../apps/saa/behaviours/change-someone-elses-name-fork')
+    );
+    expect(step.forks).toBeUndefined();
+    expect(step.next).toBe('/change-your-date-of-birth');
+  });
+
   test('allows each dynamic section start to be reached from the multi-select entry point', () => {
     uniqueSectionStartRoutes.forEach(route => {
       expect(app.steps[route].prereqs).toContain(
@@ -188,74 +198,91 @@ describe('SAA multi-select follow-up route config', () => {
     expect(controller.getNextStep(req, {})).toBe('/changes/your-phone-number');
   });
 
-  test('completes the name section when someone else name change is answered no', () => {
-    class BaseController {
-      constructor(options) {
-        this.options = options;
-      }
-
-      saveValues(req, res, callback) {
-        req.sessionModel.set(req.form.values);
-        callback();
-      }
-
-      getNextStep(req) {
-        return req.baseUrl + this.options.next;
-      }
-    }
-
-    const Controller = MultiSelectFollowUps(multiSelectFollowUpsConfig)(
-      BaseController
-    );
-    const controller = new Controller({
-      route: '/do-you-need-to-change-someone-elses-name',
-      next: '/relationship-name-change'
-    });
-    const sessionValues = {
-      [multiSelectFollowUpsConfig.stateKey]: {
-        selections: ['name', 'date-of-birth'],
-        activeSections: ['name', 'date-of-birth'],
-        activeRoutes: [
-          '/do-you-need-to-change-your-name',
-          '/do-you-need-to-change-someone-elses-name',
-          '/change-your-date-of-birth'
-        ],
-        completedSections: []
-      }
-    };
-    const req = {
-      baseUrl: app.baseUrl,
-      params: {},
-      form: {
-        values: {
-          'do-you-need-to-change-someone-elses-name': 'no'
+  test.each([
+    [['name', 'date-of-birth'], 'yes', 'no', '/change-your-date-of-birth'],
+    [['name', 'nationality'], 'yes', 'no', '/whose-nationality-to-change'],
+    [['name', 'address'], 'yes', 'no', '/change-uk-address'],
+    [['name', 'email-address'], 'yes', 'no', '/new-email-address'],
+    [['name', 'phone-number'], 'yes', 'no', '/your-phone-number'],
+    [
+      ['nationality', 'name', 'date-of-birth'],
+      'yes',
+      'no',
+      '/change-your-date-of-birth'
+    ],
+    [['name'], 'yes', 'no', '/provide-photo-identity'],
+    [['name', 'nationality'], 'no', 'no', '/no-changes-made'],
+    [['name', 'nationality'], 'no', 'yes', '/relationship-name-change'],
+    [['name', 'nationality'], 'yes', 'yes', '/relationship-name-change']
+  ])(
+    'routes selections %p with name answers %s/%s to %s',
+    (selections, ownNameAnswer, someoneElsesNameAnswer, nextRoute) => {
+      class BaseController {
+        constructor(options) {
+          this.options = options;
         }
-      },
-      sessionModel: {
-        get(key) {
-          return sessionValues[key];
-        },
-        set(key, value) {
-          if (typeof key === 'object') {
-            Object.assign(sessionValues, key);
-            return;
-          }
 
-          sessionValues[key] = value;
-        },
-        unset() {}
+        saveValues(req, res, callback) {
+          req.sessionModel.set(req.form.values);
+          callback();
+        }
+
+        getNextStep(req) {
+          return req.baseUrl + this.options.next;
+        }
       }
-    };
 
-    controller.saveValues(req, {}, err => {
-      expect(err).toBeUndefined();
-    });
+      const route = '/do-you-need-to-change-someone-elses-name';
+      const step = app.steps[route];
+      const Controller = step.behaviours.reduce(
+        (Superclass, behaviour) => behaviour(Superclass),
+        BaseController
+      );
+      const controller = new Controller({
+        ...step,
+        route
+      });
+      const sessionValues = {
+        'do-you-need-to-change-your-name': ownNameAnswer,
+        [multiSelectFollowUpsConfig.field]: selections,
+        [multiSelectFollowUpsConfig.stateKey]: MultiSelectFollowUps.createState(
+          multiSelectFollowUpsConfig,
+          {},
+          selections
+        )
+      };
+      const req = {
+        baseUrl: app.baseUrl,
+        params: {},
+        form: {
+          values: {
+            'change-someone-elses-name': someoneElsesNameAnswer
+          }
+        },
+        sessionModel: {
+          get(key) {
+            return sessionValues[key];
+          },
+          set(key, value) {
+            if (typeof key === 'object') {
+              Object.assign(sessionValues, key);
+              return;
+            }
 
-    expect(
-      sessionValues[multiSelectFollowUpsConfig.stateKey].completedSections
-    ).toEqual(['name']);
-    expect(controller.getNextStep(req, {})).toBe(
-      '/changes/change-your-date-of-birth'
-    );
-  });
+            sessionValues[key] = value;
+          },
+          unset() {}
+        }
+      };
+
+      controller.saveValues(req, {}, err => {
+        expect(err).toBeUndefined();
+      });
+
+      expect(
+        sessionValues[multiSelectFollowUpsConfig.stateKey].completedSections
+      ).toEqual(someoneElsesNameAnswer === 'no' ? ['name'] : []);
+      expect(controller.getNextStep(req, {})).toBe(app.baseUrl + nextRoute);
+    }
+  );
 });

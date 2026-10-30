@@ -73,6 +73,17 @@
       }
     }
   },
+  "change-someone-elses-name": {
+    "legend": "Do you need to change someone else’s name?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
   "reason-name-change": {
     "legend": "Why do you need to change the name?",
     "options": {
@@ -86,6 +97,12 @@
         "label": "Legal change by deed poll"
       }
     }
+  },
+  "given-name": {
+    "label": "Given name"
+  },
+  "family-name": {
+    "label": "Family name"
   },
   "add-remove-dependant": {
     "legend": "Do you need to add or remove a child or partner as a dependant?",
