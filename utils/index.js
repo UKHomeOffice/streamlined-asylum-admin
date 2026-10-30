@@ -143,7 +143,7 @@ const formatDate = date => {
  * @param {string|null|undefined} uan - The UAN as entered.
  * @returns {string} The UAN without whitespace or hyphens, or an empty string if omitted.
  */
-const normaliseUan = uan => (uan ?? '').replace(/[\s-]/g, '');
+const normaliseUan = uan => (uan ?? '').replaceAll(/[\s-]/g, '');
 
 module.exports = {
   sanitiseFilename,
