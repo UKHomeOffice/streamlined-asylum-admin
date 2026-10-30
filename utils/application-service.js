@@ -3,7 +3,7 @@
 const { randomUUID } = require('node:crypto');
 const { model: Model } = require('hof');
 const { API_METHODS } = require('./constants');
-const { normaliseEmail } = require('./index');
+const { normaliseEmail, formatDate } = require('./index');
 const config = require('../config');
 const { protocol, host, port } = config.saveService;
 
@@ -28,18 +28,47 @@ const encodeEmail = normalisedEmail =>
 // Submitted records are retained for 90 days but must not block a new application.
 const isDraft = record => !record.submitted_at;
 
+/**
+ * Checks if a record matches the given UAN and date of birth.
+ * Also compares dates with and without leading zeros using the `formatDate` helper
+ * (e.g. 2020-1-1 and 2020-01-01) are treated as the same date during comparison.
+ * This prevents duplicate records being created for the same user.
+ *
+ * @param {string} uan - Unique application number.
+ * @param {string} dateOfBirth - Date of birth in the format YYYY-MM-DD.
+ * @returns {function(ApplicationRecord): boolean} Predicate function.
+ */
+
 const matches = (uan, dateOfBirth) => record => {
-  return record.uan === uan && record.date_of_birth === dateOfBirth;
+  return (
+    record.uan === uan &&
+    (record.date_of_birth === dateOfBirth ||
+      formatDate(record.date_of_birth) === formatDate(dateOfBirth))
+  );
 };
 
+/**
+ * Asserts that the required application details are provided.
+ *
+ * @param {string} email - Applicant email address.
+ * @param {string} uan - Unique application number.
+ * @param {string} dateOfBirth - Date of birth in the format YYYY-MM-DD.
+ * @throws {Error} When any of the required details are missing.
+ */
 const assertApplicationDetails = (email, uan, dateOfBirth) => {
   if (!email || !uan || !dateOfBirth) {
     throw new Error('Missing required application details');
   }
 };
 
+/**
+ * Asserts that the application ID is provided.
+ *
+ * @param {number} id - Application identifier.
+ * @throws {Error} When the ID is null or undefined
+ */
 const assertApplicationId = id => {
-  if (id === undefined || id === null || id === '') {
+  if (id === undefined || id === null) {
     throw new Error('Application id is required');
   }
 };

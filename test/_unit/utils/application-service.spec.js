@@ -243,7 +243,7 @@ describe('application service', () => {
       );
     });
 
-    test.each([undefined, null, ''])(
+    test.each([undefined, null])(
       'should reject a missing id %p without requesting',
       async id => {
         await expect(
@@ -294,7 +294,7 @@ describe('application service', () => {
       );
     });
 
-    test.each([undefined, null, ''])(
+    test.each([undefined, null])(
       'should reject a missing id %p without requesting',
       async id => {
         await expect(
