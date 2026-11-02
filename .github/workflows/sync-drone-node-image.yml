@@ -15,68 +15,9 @@ concurrency:
 
 jobs:
   sync:
-    if: >-
-      github.actor == 'dependabot[bot]' &&
-      github.event.pull_request.user.login == 'dependabot[bot]' &&
-      github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          persist-credentials: false
-
-      - name: Copy hof-nodejs image from Dockerfile to .drone.yml
-        run: |
-          image=$(grep -m1 -oE 'quay\.io/ukhomeofficedigital/hof-nodejs:[^[:space:]]+' Dockerfile)
-          if ! echo "$image" | grep -qE '^quay\.io/ukhomeofficedigital/hof-nodejs:[A-Za-z0-9._-]+@sha256:[a-f0-9]{64}$'; then
-            echo "Unexpected hof-nodejs image reference in Dockerfile: '$image'"
-            exit 1
-          fi
-          sed -i -E "s|^(node_image_name: &node_image_name ).*$|\1${image}|" .drone.yml
-          grep -qF "node_image_name: &node_image_name ${image}" .drone.yml
-
-      - name: Check for changes
-        id: changes
-        run: |
-          if git diff --quiet -- .drone.yml; then
-            echo ".drone.yml already up to date"
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Generate GitHub App token
-        id: app-token
-        if: steps.changes.outputs.changed == 'true'
-        uses: actions/create-github-app-token@v3
-        with:
-          app-id: ${{ secrets.DEPENDABOT_APPROVER_APP_ID }}
-          private-key: ${{ secrets.DEPENDABOT_APPROVER_PRIVATE_KEY }}
-          permission-contents: write
-
-      # createCommitOnBranch commits are signed by GitHub, so they show as Verified.
-      - name: Create signed commit
-        if: steps.changes.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          REPOSITORY: ${{ github.repository }}
-          BRANCH: ${{ github.event.pull_request.head.ref }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          jq -n \
-            --arg repo "$REPOSITORY" \
-            --arg branch "$BRANCH" \
-            --arg head "$HEAD_SHA" \
-            --arg contents "$(base64 -w0 .drone.yml)" \
-            '{
-              query: "mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { url } } }",
-              variables: {
-                input: {
-                  branch: { repositoryNameWithOwner: $repo, branchName: $branch },
-                  expectedHeadOid: $head,
-                  message: { headline: "deps: sync hof-nodejs image in .drone.yml" },
-                  fileChanges: { additions: [{ path: ".drone.yml", contents: $contents }] }
-                }
-              }
-            }' | gh api graphql --input -
+    permissions:
+      contents: read
+    uses: UKHomeOffice/hof-github-actions/.github/workflows/sync-drone-node-image.yml@main
+    secrets:
+      app-id: ${{ secrets.DEPENDABOT_APPROVER_APP_ID }}
+      private-key: ${{ secrets.DEPENDABOT_APPROVER_PRIVATE_KEY }}
