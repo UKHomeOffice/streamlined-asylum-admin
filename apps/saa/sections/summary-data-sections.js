@@ -81,6 +81,7 @@ module.exports = {
     steps: [
       {
         step: '/new-name',
+        field: 'given-name',
         parse: (value, req) => {
           const newName = [
             req.sessionModel.get('given-name'),
