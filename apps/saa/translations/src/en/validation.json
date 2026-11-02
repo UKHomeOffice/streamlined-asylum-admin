@@ -147,7 +147,7 @@
   "confirm-new-email-address": {
     "required": "Confirm your new email address",
     "email": "Enter a real new email address",
-    "matchField": "Email must be the same"
+    "matchField": "Email address must be the same"
   },
   "change-your-date-of-birth": {
     "required": "Select if you want to change your date of birth"
