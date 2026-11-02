@@ -466,6 +466,107 @@ describe('application service', () => {
       ).resolves.toBe(created);
     });
 
+    test('should recover a matching draft created concurrently under the same normalised email', async () => {
+      const record = {
+        id: 10,
+        email: ' Person@Example.com ',
+        uan: details.uan,
+        date_of_birth: '1990-1-31'
+      };
+      mockRequest
+        .mockResolvedValueOnce({ data: [] })
+        .mockResolvedValueOnce({ data: [] })
+        .mockRejectedValueOnce(
+          Object.assign(new Error('Conflict'), { status: 409 })
+        )
+        .mockResolvedValueOnce({ data: [record] });
+
+      await expect(
+        applicationService.findOrCreateApplication(details)
+      ).resolves.toBe(record);
+      expect(mockRequest).toHaveBeenCalledTimes(4);
+      expect(mockRequest).toHaveBeenLastCalledWith({
+        url: `${applicationsUrl}/uan/${details.uan}`,
+        method: 'GET'
+      });
+    });
+
+    test('should reject a matching draft created concurrently under a different email', async () => {
+      mockRequest
+        .mockResolvedValueOnce({ data: [] })
+        .mockResolvedValueOnce({ data: [] })
+        .mockRejectedValueOnce(
+          Object.assign(new Error('Conflict'), { status: 409 })
+        )
+        .mockResolvedValueOnce({
+          data: [
+            {
+              id: 10,
+              email: 'other@example.com',
+              uan: details.uan,
+              date_of_birth: details.dateOfBirth
+            }
+          ]
+        });
+
+      await expect(
+        applicationService.findOrCreateApplication(details)
+      ).rejects.toBeInstanceOf(applicationService.ApplicationExistsError);
+      expect(mockRequest).toHaveBeenCalledTimes(4);
+    });
+
+    test.each([
+      ['no draft', []],
+      ['a different UAN', [{ uan: '999', date_of_birth: details.dateOfBirth }]],
+      [
+        'a different date of birth',
+        [{ uan: details.uan, date_of_birth: '2000-01-01' }]
+      ],
+      [
+        'a submitted match',
+        [
+          {
+            uan: details.uan,
+            date_of_birth: details.dateOfBirth,
+            submitted_at: '2026-10-01T10:00:00.000Z'
+          }
+        ]
+      ]
+    ])(
+      'should preserve the create error when recovery finds %s',
+      async (description, records) => {
+        mockRequest
+          .mockResolvedValueOnce({ data: [] })
+          .mockResolvedValueOnce({ data: [] })
+          .mockRejectedValueOnce(
+            Object.assign(new Error('Unavailable'), { status: 503 })
+          )
+          .mockResolvedValueOnce({ data: records });
+
+        await expect(
+          applicationService.findOrCreateApplication(details)
+        ).rejects.toThrow('RDS API POST failed with status 503');
+        expect(mockRequest).toHaveBeenCalledTimes(4);
+      }
+    );
+
+    test('should propagate a failed recovery lookup without retrying creation', async () => {
+      mockRequest
+        .mockResolvedValueOnce({ data: [] })
+        .mockResolvedValueOnce({ data: [] })
+        .mockRejectedValueOnce(
+          Object.assign(new Error('Conflict'), { status: 409 })
+        )
+        .mockRejectedValueOnce(
+          Object.assign(new Error('Unavailable'), { status: 503 })
+        );
+
+      await expect(
+        applicationService.findOrCreateApplication(details)
+      ).rejects.toThrow('RDS API GET failed with status 503');
+      expect(mockRequest).toHaveBeenCalledTimes(4);
+    });
+
     test('should not create a record when the UAN lookup fails', async () => {
       mockRequest
         .mockResolvedValueOnce({ data: [] })

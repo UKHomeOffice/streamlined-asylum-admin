@@ -268,7 +268,18 @@ async function findOrCreateApplication({
   }
 
   logger.info('Application lookup found no match; creating a record');
-  return createApplication({ email, uan, dateOfBirth, session });
+  try {
+    return await createApplication({ email, uan, dateOfBirth, session });
+  } catch (error) {
+    const record = (await findApplicationsByUan(uan)).find(isMatch);
+    if (!record) {
+      throw error;
+    }
+    if (normaliseEmail(record.email) !== normaliseEmail(email)) {
+      throw new ApplicationExistsError();
+    }
+    return record;
+  }
 }
 
 module.exports = {

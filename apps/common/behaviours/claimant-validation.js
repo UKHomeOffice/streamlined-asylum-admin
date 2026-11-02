@@ -25,7 +25,10 @@ const candidateValidation = SuperClass =>
           email: userEmail,
           uan,
           dateOfBirth: dob,
-          session: getSessionSnapshot(req.sessionModel)
+          session: {
+            ...getSessionSnapshot(req.sessionModel),
+            'user-email': userEmail
+          }
         });
       } catch (e) {
         if (e instanceof ApplicationExistsError) {

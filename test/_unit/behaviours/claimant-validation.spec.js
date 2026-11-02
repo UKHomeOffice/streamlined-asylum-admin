@@ -64,9 +64,25 @@ describe('claimant validation behaviour', () => {
       dateOfBirth: '1990-01-31',
       session: {
         'claimant-unique-application-number': '1234567890123456',
-        'claimant-date-of-birth': '1990-01-31'
+        'claimant-date-of-birth': '1990-01-31',
+        'user-email': 'person@example.com'
       }
     });
+  });
+
+  test('should save the normalised submitted email instead of a previous session email', async () => {
+    session['user-email'] = 'previous@example.com';
+    req.form.values['user-email'] = ' Person@Example.com ';
+
+    await behaviour.validate(req, res, next);
+
+    expect(findOrCreateApplication).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'person@example.com',
+        session: expect.objectContaining({ 'user-email': 'person@example.com' })
+      })
+    );
+    expect(session['user-email']).toBe('previous@example.com');
   });
 
   test('should exclude CSRF, errors and journey steps from the saved session only', async () => {
