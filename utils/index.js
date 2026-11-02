@@ -30,32 +30,6 @@ const sanitiseFilename = filename => {
 };
 
 /**
- * Removes all whitespace from a string.
- *
- * @param {string|null|undefined} value - The value to clean.
- * @returns {string|undefined} The value without whitespace, or undefined if omitted.
- */
-const removeWhiteSpace = value => value?.replaceAll(/\s+/g, '');
-
-/**
- * HOF custom validator for a unique application number (UAN).
- *
- * A valid UAN has exactly 16 digits, optionally separated by single hyphens
- * (for example 1234-5678-9101-1121). Whitespace is ignored.
- *
- * @param {string|null|undefined} uanValue - The UAN entered by the user.
- * @returns {RegExpExecArray|null} A match (truthy) when valid, otherwise null.
- */
-const validUniqueApplicationNumber = uanValue => {
-  if (!uanValue) {
-    return null;
-  }
-
-  const uanNoWhitespace = removeWhiteSpace(uanValue);
-  return /^\d(?:-?\d){15}$/.exec(uanNoWhitespace);
-};
-
-/**
  * Trims and lower-cases an email address so it can be compared and stored consistently.
  *
  * @param {*} email - The email address to normalise.
@@ -137,21 +111,11 @@ const formatDate = date => {
   }
 };
 
-/**
- * Removes whitespace and hyphens so a UAN is stored and compared as digits only.
- *
- * @param {string|null|undefined} uan - The UAN as entered.
- * @returns {string} The UAN without whitespace or hyphens, or an empty string if omitted.
- */
-const normaliseUan = uan => (uan ?? '').replaceAll(/[\s-]/g, '');
-
 module.exports = {
   sanitiseFilename,
-  validUniqueApplicationNumber,
   normaliseEmail,
   getNotifyErrorMessage,
   isTeamOnlyNotifyError,
   hasSelectedSection,
-  formatDate,
-  normaliseUan
+  formatDate
 };

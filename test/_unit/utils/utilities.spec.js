@@ -1,11 +1,9 @@
 const {
   sanitiseFilename,
-  validUniqueApplicationNumber,
   normaliseEmail,
   getNotifyErrorMessage,
   isTeamOnlyNotifyError,
-  formatDate,
-  normaliseUan
+  formatDate
 } = require('../../../utils/index');
 
 describe('SAA utilities tests', () => {
@@ -126,54 +124,7 @@ describe('isTeamOnlyNotifyError', () => {
   });
 });
 
-describe('validUniqueApplicationNumber', () => {
-  test.each([
-    '1212121212121212',
-    '1212-1212-1212-1212',
-    '1     2    12121212121212',
-    '12 34\t-5678\n-9012 -3456',
-    '1234 - 5678 - 9012 - 3456'
-  ])('accepts a valid UAN: %s', value => {
-    expect(validUniqueApplicationNumber(value)?.[0]).toBe(
-      value.replace(/\s+/g, '')
-    );
-  });
-
-  test.each([
-    '123456789012345', // 15 digits
-    '12345678901234567', // 17 digits
-    '1234-5678-9012-3456-7', // 17 digits with hyphens
-    '12345678901234567890', // 20 digits
-    '1234--5678-9012-3456',
-    '-1234-5678-9012-3456',
-    '1234-5678-9012-345x'
-  ])('rejects an invalid UAN: %s', value => {
-    expect(validUniqueApplicationNumber(value)).toBeNull();
-  });
-
-  test.each([undefined, null, ''])(
-    'returns null for a missing UAN: %s',
-    value => {
-      expect(validUniqueApplicationNumber(value)).toBeNull();
-    }
-  );
-
-  test.each([
-    ['1234567890123456', '1234567890123456'],
-    ['1234-5678-9012-3456', '1234567890123456'],
-    ['1234 5678\t9012\n3456', '1234567890123456'],
-    [' 1234 - 5678 - 9012 - 3456 ', '1234567890123456']
-  ])('should normalise UAN %p to digits only', (value, expected) => {
-    expect(normaliseUan(value)).toBe(expected);
-  });
-
-  test.each([undefined, null, ''])(
-    'should normalise a missing UAN %p to an empty string',
-    value => {
-      expect(normaliseUan(value)).toBe('');
-    }
-  );
-
+describe('normaliseEmail', () => {
   test('should lower case an email address', () => {
     expect(normaliseEmail('PERSON@EXAMPLE.COM')).toBe('person@example.com');
   });

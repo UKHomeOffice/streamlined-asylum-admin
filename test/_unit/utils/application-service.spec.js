@@ -20,27 +20,31 @@ const applicationService = require('../../../utils/application-service');
 
 describe('application service', () => {
   const applicationsUrl = 'https://data-service:10443/applications';
-  const emailHex = Buffer.from('person@example.com').toString('hex');
 
   afterEach(() => {
     jest.useRealTimers();
   });
 
   describe('findApplicationsByEmail', () => {
-    test('should request applications using the hex-encoded normalised email', async () => {
-      const records = [{ id: 1 }];
-      mockRequest.mockResolvedValue({ data: records });
+    test.each([
+      [' Person@Example.com ', 'person%40example.com'],
+      [' Person+Tag@Example.com ', 'person%2Btag%40example.com'],
+      [' Person/Tag%@Example.com ', 'person%2Ftag%25%40example.com']
+    ])(
+      'should request applications using the URL-encoded normalised email: %s',
+      async (email, encodedEmail) => {
+        const records = [{ id: 1 }];
+        mockRequest.mockResolvedValue({ data: records });
 
-      const result = await applicationService.findApplicationsByEmail(
-        ' Person@Example.com '
-      );
+        const result = await applicationService.findApplicationsByEmail(email);
 
-      expect(mockRequest).toHaveBeenCalledWith({
-        url: `${applicationsUrl}/email/${emailHex}`,
-        method: 'GET'
-      });
-      expect(result).toEqual(records);
-    });
+        expect(mockRequest).toHaveBeenCalledWith({
+          url: `${applicationsUrl}/email/${encodedEmail}`,
+          method: 'GET'
+        });
+        expect(result).toEqual(records);
+      }
+    );
 
     test('should return only draft applications', async () => {
       const draft = { id: 1, submitted_at: null };
@@ -64,7 +68,7 @@ describe('application service', () => {
       }
     );
 
-    test('should log error details without the URL or body and throw a status-only error', async () => {
+    test('should log details without URL or body and throw with the upstream message', async () => {
       mockRequest.mockRejectedValue(
         Object.assign(new Error('Request failed'), {
           response: { status: 503, data: { error: 'unavailable' } }
@@ -73,7 +77,9 @@ describe('application service', () => {
 
       await expect(
         applicationService.findApplicationsByEmail('person@example.com')
-      ).rejects.toThrow('RDS API GET failed with status 503');
+      ).rejects.toThrow(
+        new Error('RDS API GET failed with status 503: Request failed')
+      );
       expect(mockLogger.error).toHaveBeenCalledWith('RDS API error', {
         method: 'GET',
         message: 'Request failed',
@@ -91,7 +97,9 @@ describe('application service', () => {
 
       await expect(
         applicationService.findApplicationsByEmail('person@example.com')
-      ).rejects.toThrow('RDS API GET failed with status 400');
+      ).rejects.toThrow(
+        new Error('RDS API GET failed with status 400: Bad request')
+      );
       expect(mockLogger.error).toHaveBeenCalledWith('RDS API error', {
         method: 'GET',
         message: 'Bad request',
@@ -315,6 +323,7 @@ describe('application service', () => {
     test('should return a record matching the UAN and date of birth without creating one', async () => {
       const match = {
         id: 2,
+        email: details.email,
         uan: '123456789012',
         date_of_birth: '1990-01-31'
       };
@@ -326,9 +335,75 @@ describe('application service', () => {
 
       expect(result).toBe(match);
       expect(mockRequest).toHaveBeenCalledTimes(1);
+      expect(mockRequest).toHaveBeenCalledWith({
+        url: `${applicationsUrl}/uan/${details.uan}`,
+        method: 'GET'
+      });
       expect(mockLogger.info).toHaveBeenCalledWith(
         'Application lookup matched an existing record'
       );
+    });
+
+    test('should return the matching normalised email among UAN and DOB candidates', async () => {
+      const match = {
+        id: 2,
+        email: ' Person@Example.com ',
+        uan: details.uan,
+        date_of_birth: '1990-1-31'
+      };
+      mockRequest.mockResolvedValueOnce({
+        data: [{ ...match, id: 1, email: 'other@example.com' }, match]
+      });
+
+      const result = await applicationService.findOrCreateApplication({
+        ...details,
+        email: ' PERSON@EXAMPLE.COM '
+      });
+
+      expect(result).toBe(match);
+      expect(mockRequest).toHaveBeenCalledTimes(1);
+    });
+
+    test.each([undefined, null, ''])(
+      'should ignore a record with a falsy UAN %p and create a draft',
+      async uan => {
+        const created = { id: 3 };
+        mockRequest
+          .mockResolvedValueOnce({
+            data: [
+              {
+                id: 1,
+                email: details.email,
+                uan,
+                date_of_birth: details.dateOfBirth
+              }
+            ]
+          })
+          .mockResolvedValueOnce({ data: [created] });
+
+        await expect(
+          applicationService.findOrCreateApplication(details)
+        ).resolves.toBe(created);
+        expect(mockRequest).toHaveBeenCalledTimes(2);
+        expect(mockRequest).toHaveBeenLastCalledWith(
+          expect.objectContaining({ method: 'POST' })
+        );
+      }
+    );
+
+    test('should match a stored Date object against a date string', async () => {
+      const match = {
+        id: 2,
+        email: details.email,
+        uan: details.uan,
+        date_of_birth: new Date('1990-01-31T00:00:00.000Z')
+      };
+      mockRequest.mockResolvedValueOnce({ data: [match] });
+
+      await expect(
+        applicationService.findOrCreateApplication(details)
+      ).resolves.toBe(match);
+      expect(mockRequest).toHaveBeenCalledTimes(1);
     });
 
     test('should create a record when the UAN matches but the date of birth does not', async () => {
@@ -339,7 +414,6 @@ describe('application service', () => {
         date_of_birth: '2000-01-01'
       };
       mockRequest
-        .mockResolvedValueOnce({ data: [otherDob] })
         .mockResolvedValueOnce({ data: [otherDob] })
         .mockResolvedValueOnce({ data: [created] });
 
@@ -365,7 +439,6 @@ describe('application service', () => {
       const session = { 'claimant-date-of-birth': '1990-01-31' };
       mockRequest
         .mockResolvedValueOnce({ data: [] })
-        .mockResolvedValueOnce({ data: [] })
         .mockResolvedValueOnce({ data: [{ id: 10 }] });
 
       await applicationService.findOrCreateApplication({ ...details, session });
@@ -384,41 +457,46 @@ describe('application service', () => {
         .mockResolvedValueOnce({
           data: [{ id: 1, uan: '999999999999', date_of_birth: '1990-01-31' }]
         })
-        .mockResolvedValueOnce({ data: [] })
         .mockResolvedValueOnce({ data: [created] });
 
       const result = await applicationService.findOrCreateApplication(details);
 
       expect(result).toBe(created);
-      expect(mockRequest).toHaveBeenCalledTimes(3);
+      expect(mockRequest).toHaveBeenCalledTimes(2);
     });
 
-    test('should create a record when no records exist for the email', async () => {
+    test('should create a record when no drafts exist for the UAN', async () => {
       const created = { id: 4 };
       mockRequest
         .mockResolvedValueOnce({ data: [] })
-        .mockResolvedValueOnce({ data: [] })
         .mockResolvedValueOnce({ data: [created] });
 
       const result = await applicationService.findOrCreateApplication(details);
 
       expect(result).toBe(created);
-      expect(mockRequest).toHaveBeenNthCalledWith(2, {
+      expect(mockRequest).toHaveBeenNthCalledWith(1, {
         url: `${applicationsUrl}/uan/123456789012`,
         method: 'GET'
       });
-      expect(mockRequest).toHaveBeenCalledTimes(3);
+      expect(mockRequest).toHaveBeenCalledTimes(2);
     });
 
     test('should throw without creating when the UAN and DOB match under another email', async () => {
-      mockRequest.mockResolvedValueOnce({ data: [] }).mockResolvedValueOnce({
-        data: [{ id: 6, uan: '123456789012', date_of_birth: '1990-01-31' }]
+      mockRequest.mockResolvedValueOnce({
+        data: [
+          {
+            id: 6,
+            email: 'other@example.com',
+            uan: '123456789012',
+            date_of_birth: '1990-01-31'
+          }
+        ]
       });
 
       await expect(
         applicationService.findOrCreateApplication(details)
       ).rejects.toBeInstanceOf(applicationService.ApplicationExistsError);
-      expect(mockRequest).toHaveBeenCalledTimes(2);
+      expect(mockRequest).toHaveBeenCalledTimes(1);
       expect(mockLogger.info).toHaveBeenCalledWith(
         'Application exists for this UAN and DOB under a different email'
       );
@@ -434,7 +512,6 @@ describe('application service', () => {
       const created = { id: 8 };
       mockRequest
         .mockResolvedValueOnce({ data: [submitted] })
-        .mockResolvedValueOnce({ data: [submitted] })
         .mockResolvedValueOnce({ data: [created] });
 
       const result = await applicationService.findOrCreateApplication(details);
@@ -448,11 +525,11 @@ describe('application service', () => {
     test('should not block a new draft when another email has only a submitted match', async () => {
       const created = { id: 9 };
       mockRequest
-        .mockResolvedValueOnce({ data: [] })
         .mockResolvedValueOnce({
           data: [
             {
               id: 6,
+              email: 'other@example.com',
               uan: '123456789012',
               date_of_birth: '1990-01-31',
               submitted_at: '2026-10-01T10:00:00.000Z'
@@ -475,7 +552,6 @@ describe('application service', () => {
       };
       mockRequest
         .mockResolvedValueOnce({ data: [] })
-        .mockResolvedValueOnce({ data: [] })
         .mockRejectedValueOnce(
           Object.assign(new Error('Conflict'), { status: 409 })
         )
@@ -484,7 +560,7 @@ describe('application service', () => {
       await expect(
         applicationService.findOrCreateApplication(details)
       ).resolves.toBe(record);
-      expect(mockRequest).toHaveBeenCalledTimes(4);
+      expect(mockRequest).toHaveBeenCalledTimes(3);
       expect(mockRequest).toHaveBeenLastCalledWith({
         url: `${applicationsUrl}/uan/${details.uan}`,
         method: 'GET'
@@ -493,7 +569,6 @@ describe('application service', () => {
 
     test('should reject a matching draft created concurrently under a different email', async () => {
       mockRequest
-        .mockResolvedValueOnce({ data: [] })
         .mockResolvedValueOnce({ data: [] })
         .mockRejectedValueOnce(
           Object.assign(new Error('Conflict'), { status: 409 })
@@ -512,7 +587,7 @@ describe('application service', () => {
       await expect(
         applicationService.findOrCreateApplication(details)
       ).rejects.toBeInstanceOf(applicationService.ApplicationExistsError);
-      expect(mockRequest).toHaveBeenCalledTimes(4);
+      expect(mockRequest).toHaveBeenCalledTimes(3);
     });
 
     test.each([
@@ -537,7 +612,6 @@ describe('application service', () => {
       async (description, records) => {
         mockRequest
           .mockResolvedValueOnce({ data: [] })
-          .mockResolvedValueOnce({ data: [] })
           .mockRejectedValueOnce(
             Object.assign(new Error('Unavailable'), { status: 503 })
           )
@@ -546,13 +620,12 @@ describe('application service', () => {
         await expect(
           applicationService.findOrCreateApplication(details)
         ).rejects.toThrow('RDS API POST failed with status 503');
-        expect(mockRequest).toHaveBeenCalledTimes(4);
+        expect(mockRequest).toHaveBeenCalledTimes(3);
       }
     );
 
     test('should propagate a failed recovery lookup without retrying creation', async () => {
       mockRequest
-        .mockResolvedValueOnce({ data: [] })
         .mockResolvedValueOnce({ data: [] })
         .mockRejectedValueOnce(
           Object.assign(new Error('Conflict'), { status: 409 })
@@ -564,42 +637,32 @@ describe('application service', () => {
       await expect(
         applicationService.findOrCreateApplication(details)
       ).rejects.toThrow('RDS API GET failed with status 503');
-      expect(mockRequest).toHaveBeenCalledTimes(4);
+      expect(mockRequest).toHaveBeenCalledTimes(3);
     });
 
     test('should not create a record when the UAN lookup fails', async () => {
-      mockRequest
-        .mockResolvedValueOnce({ data: [] })
-        .mockRejectedValueOnce(
-          Object.assign(new Error('Server error'), { status: 502 })
-        );
-
-      await expect(
-        applicationService.findOrCreateApplication(details)
-      ).rejects.toThrow('RDS API GET failed with status 502');
-      expect(mockRequest).toHaveBeenCalledTimes(2);
-    });
-
-    test('should not create a record when the email lookup fails', async () => {
-      mockRequest.mockRejectedValue(
-        Object.assign(new Error('Server error'), { status: 500 })
+      mockRequest.mockRejectedValueOnce(
+        Object.assign(new Error('Server error'), { status: 502 })
       );
 
       await expect(
         applicationService.findOrCreateApplication(details)
-      ).rejects.toThrow('RDS API GET failed with status 500');
+      ).rejects.toThrow('RDS API GET failed with status 502');
       expect(mockRequest).toHaveBeenCalledTimes(1);
     });
 
-    test.each([
-      ['email', { ...details, email: undefined }],
-      ['UAN', { ...details, uan: undefined }],
-      ['date of birth', { ...details, dateOfBirth: undefined }]
-    ])(
-      'should reject a missing %s before any lookup',
-      async (field, invalidDetails) => {
+    test.each(
+      ['email', 'uan', 'dateOfBirth'].flatMap(field =>
+        [undefined, null, ''].map(value => [field, value])
+      )
+    )(
+      'should reject a falsy %s value %p before any lookup',
+      async (field, value) => {
         await expect(
-          applicationService.findOrCreateApplication(invalidDetails)
+          applicationService.findOrCreateApplication({
+            ...details,
+            [field]: value
+          })
         ).rejects.toThrow('Missing required application details');
         expect(mockRequest).not.toHaveBeenCalled();
       }

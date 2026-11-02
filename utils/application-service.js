@@ -22,9 +22,6 @@ const applicationsUrl = `${protocol}://${host}:${port}/applications`;
  * @property {string} [submission_reference] - Reference issued on submission.
  */
 
-const encodeEmail = normalisedEmail =>
-  Buffer.from(normalisedEmail).toString('hex');
-
 // Submitted records are retained for 90 days but must not block a new application.
 const isDraft = record => !record.submitted_at;
 
@@ -41,6 +38,8 @@ const isDraft = record => !record.submitted_at;
 
 const matches = (uan, dateOfBirth) => record => {
   return (
+    record.uan &&
+    uan &&
     record.uan === uan &&
     (record.date_of_birth === dateOfBirth ||
       formatDate(record.date_of_birth) === formatDate(dateOfBirth))
@@ -97,7 +96,7 @@ const describeError = error => ({
  *
  * @param {{url: string, method: string, data?: Object}} options - Request options.
  * @returns {Promise<*>} Response body.
- * @throws {Error} Status-only error; method, status and message are logged.
+ * @throws {Error} Error including the request method, status and upstream message; also logged.
  */
 async function request(options) {
   try {
@@ -107,7 +106,7 @@ async function request(options) {
     const details = describeError(error);
     logger.error('RDS API error', { method: options.method, ...details });
     throw new Error(
-      `RDS API ${options.method} failed with status ${details.status}`
+      `RDS API ${options.method} failed with status ${details.status}: ${details.message}`
     );
   }
 }
@@ -126,7 +125,7 @@ async function findApplicationsByEmail(email) {
     throw new Error('Email address is required');
   }
   const records = await request({
-    url: `${applicationsUrl}/email/${encodeEmail(normalisedEmail)}`,
+    url: `${applicationsUrl}/email/${encodeURIComponent(normalisedEmail)}`,
     method: API_METHODS.GET
   });
   return records.filter(isDraft);
@@ -247,20 +246,21 @@ async function findOrCreateApplication({
   dateOfBirth,
   session = {}
 }) {
-  assertApplicationDetails(normaliseEmail(email), uan, dateOfBirth);
+  const normalisedEmail = normaliseEmail(email);
+  assertApplicationDetails(normalisedEmail, uan, dateOfBirth);
   const isMatch = matches(uan, dateOfBirth);
 
-  const existing = (await findApplicationsByEmail(email)).find(isMatch);
+  // One UAN lookup covers both same-email matches and different-email conflicts.
+  const candidates = (await findApplicationsByUan(uan)).filter(isMatch);
+  const existing = candidates.find(
+    record => normaliseEmail(record.email) === normalisedEmail
+  );
   if (existing) {
     logger.info('Application lookup matched an existing record');
     return existing;
   }
 
-  const existsUnderAnotherEmail = (await findApplicationsByUan(uan)).some(
-    isMatch
-  );
-
-  if (existsUnderAnotherEmail) {
+  if (candidates.length) {
     logger.info(
       'Application exists for this UAN and DOB under a different email'
     );
@@ -275,7 +275,7 @@ async function findOrCreateApplication({
     if (!record) {
       throw error;
     }
-    if (normaliseEmail(record.email) !== normaliseEmail(email)) {
+    if (normaliseEmail(record.email) !== normalisedEmail) {
       throw new ApplicationExistsError();
     }
     return record;
