@@ -144,5 +144,8 @@
     "date": "Enter a valid date",
     "before": "Date of birth must be in the past",
     "after": "Enter a date after 01 01 1900"
+  },
+  "change-someone-else-date-of-birth": {
+    "required": "Select if you want to change someone else's date of birth"
   }
 }

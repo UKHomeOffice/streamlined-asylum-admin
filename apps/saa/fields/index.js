@@ -249,5 +249,12 @@ module.exports = {
       { type: 'after', arguments: '1900-01-01' }
     ],
     isPageHeading: true
-  })
+  }),
+  'change-someone-else-date-of-birth': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    isPageHeading: true
+  }
 };
