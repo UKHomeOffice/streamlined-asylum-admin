@@ -222,7 +222,11 @@ const steps = {
   '/someone-else-correct-date-of-birth': {
     behaviours: [CustomValidation],
     // provisional document category: documents-someone-else-new-dob
-    fields: ['someone-else-correct-date-of-birth-given-name', 'someone-else-correct-date-of-birth-family-name', 'someone-else-correct-date-of-birth'],
+    fields: [
+      'someone-else-correct-date-of-birth-given-name',
+      'someone-else-correct-date-of-birth-family-name',
+      'someone-else-correct-date-of-birth'
+    ],
     next: '/someone-else-new-date-of-birth-evidence'
   },
   '/someone-else-new-date-of-birth-evidence': {
