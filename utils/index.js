@@ -6,6 +6,8 @@ const PRETTY_DATE_FORMATTER = new Intl.DateTimeFormat(
   config.dateFormat
 );
 
+const logger = require('hof/lib/logger')({ env: config.env });
+
 /**
  * Redacts the middle of a filename while preserving its first two characters,
  * final two basename characters, and extension.
@@ -137,6 +139,31 @@ const formatDate = date => {
   }
 };
 
+/**
+ * Formats a UAN for display by separating groups of four digits with hyphens.
+ *
+ * @param {string} uan - A non-empty, digits-only UAN, already normalised and validated.
+ * @returns {string} The display UAN, for example "1234-5678-9012-3456".
+ */
+const formatUanForDisplay = uan => uan.match(/.{1,4}/g).join('-');
+
+/**
+ * Logs an internal error message and throws an Error for the caller to handle.
+ * Logging is skipped if the logger does not provide an error method.
+ *
+ * @param {string} message - The internal log message; avoid sensitive data.
+ * @param {string} [publicMessage] - The thrown message, falling back to message if empty or omitted.
+ * @param {object} [meta] - Optional log metadata, not included in the thrown message.
+ * @returns {never} Always throws.
+ * @throws {Error} An error containing publicMessage or message.
+ */
+function logAndThrow(message, publicMessage, meta) {
+  if (logger && typeof logger.error === 'function') {
+    meta ? logger.error(message, meta) : logger.error(message);
+  }
+  throw new Error(publicMessage || message);
+}
+
 module.exports = {
   sanitiseFilename,
   validUniqueApplicationNumber,
@@ -144,5 +171,7 @@ module.exports = {
   getNotifyErrorMessage,
   isTeamOnlyNotifyError,
   hasSelectedSection,
-  formatDate
+  formatDate,
+  formatUanForDisplay,
+  logAndThrow
 };

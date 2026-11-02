@@ -18,6 +18,7 @@ const EditRouteReturn = require('./behaviours/edit-route-return');
 const EditRouteStart = require('./behaviours/edit-route-start');
 const SummaryLabels = require('./behaviours/summary-labels');
 const ResetSectionSummary = require('./behaviours/reset-section-summary');
+const ResumeFormSession = require('./behaviours/resume-form-session');
 
 const documentUploadStep = category => ({
   behaviours: [SaveDocument(category, 'file-upload'), RemoveDocument(category)],
@@ -83,9 +84,13 @@ const steps = {
     backLink: false
   },
   '/which-form': {
-    next: '/information-given'
+    behaviours: [ResumeFormSession],
+    next: '/information-given',
+    backLink: false
   },
   '/information-given': {
+    behaviours: [Summary, SummaryLabels],
+    sections: require('./sections/summary-data-sections'),
     next: '/claimants-name'
   },
   '/claimants-name': {

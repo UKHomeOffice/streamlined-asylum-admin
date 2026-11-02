@@ -19,12 +19,13 @@ jest.mock('hof/components/notify/notify', () =>
   }))
 );
 
-jest.mock('hof/lib/logger', () =>
-  jest.fn(() => ({
+jest.mock('hof/lib/logger', () => {
+  const log = {
     log: jest.fn(),
     error: jest.fn()
-  }))
-);
+  };
+  return jest.fn(() => log);
+});
 
 jest.mock('../../../utils/save-token', () => ({
   save: jest.fn()
@@ -102,7 +103,8 @@ describe('send verification email behaviour', () => {
       'verify-template-id',
       'person@example.com',
       {
-        link: 'https://example.com/check-your-email?token=token'
+        link: 'https://example.com/check-your-email?token=token',
+        host: 'https://example.com'
       }
     );
     expect(log.log).toHaveBeenCalledWith(

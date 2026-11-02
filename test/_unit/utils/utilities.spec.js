@@ -1,10 +1,17 @@
+const mockLogger = { error: jest.fn() };
+
+jest.mock('hof/lib/logger', () => jest.fn(() => mockLogger));
+
+const loggerFactory = require('hof/lib/logger');
 const {
   sanitiseFilename,
   validUniqueApplicationNumber,
   normaliseEmail,
   getNotifyErrorMessage,
   isTeamOnlyNotifyError,
-  formatDate
+  formatDate,
+  formatUanForDisplay,
+  logAndThrow
 } = require('../../../utils/index');
 
 describe('SAA utilities tests', () => {
@@ -170,6 +177,82 @@ describe('validUniqueApplicationNumber', () => {
   });
 });
 
+describe('formatUanForDisplay', () => {
+  test.each([
+    ['1234567890123456', '1234-5678-9012-3456'],
+    ['12345678901234567890', '1234-5678-9012-3456-7890'],
+    ['0000123456789012', '0000-1234-5678-9012']
+  ])('should format UAN %s as %s', (value, expected) => {
+    expect(formatUanForDisplay(value)).toBe(expected);
+  });
+
+  test.each(['1', '123', '1234'])(
+    'should leave a single group unchanged: %s',
+    value => {
+      expect(formatUanForDisplay(value)).toBe(value);
+    }
+  );
+
+  test('should preserve a final group shorter than four digits', () => {
+    expect(formatUanForDisplay('12345678901234567')).toBe(
+      '1234-5678-9012-3456-7'
+    );
+  });
+});
+
+describe('logAndThrow', () => {
+  beforeEach(() => {
+    mockLogger.error.mockReset();
+    loggerFactory.mockReturnValue(mockLogger);
+  });
+
+  test('should log the internal message once and throw the public message', () => {
+    expect(() => logAndThrow('Internal failure', 'Unable to continue')).toThrow(
+      new Error('Unable to continue')
+    );
+    expect(mockLogger.error).toHaveBeenCalledTimes(1);
+    expect(mockLogger.error).toHaveBeenCalledWith('Internal failure');
+  });
+
+  test('should include metadata only in the log', () => {
+    const meta = { applicationId: 'application-a' };
+
+    expect(() =>
+      logAndThrow('Internal failure', 'Unable to continue', meta)
+    ).toThrow(new Error('Unable to continue'));
+    expect(mockLogger.error).toHaveBeenCalledTimes(1);
+    expect(mockLogger.error).toHaveBeenCalledWith('Internal failure', meta);
+  });
+
+  test.each([undefined, ''])(
+    'should fall back to the internal message when the public message is %p',
+    publicMessage => {
+      expect(() => logAndThrow('Internal failure', publicMessage)).toThrow(
+        new Error('Internal failure')
+      );
+      expect(mockLogger.error).toHaveBeenCalledWith('Internal failure');
+    }
+  );
+
+  test.each([undefined, null, {}, { error: 'not a function' }])(
+    'should still throw when error logging is unavailable: %p',
+    logger => {
+      loggerFactory.mockReturnValueOnce(logger);
+
+      jest.isolateModules(() => {
+        const {
+          logAndThrow: isolatedLogAndThrow
+        } = require('../../../utils/index');
+
+        expect(() =>
+          isolatedLogAndThrow('Internal failure', 'Unable to continue')
+        ).toThrow(new Error('Unable to continue'));
+      });
+      expect(mockLogger.error).not.toHaveBeenCalled();
+    }
+  );
+});
+
 describe('formatDate', () => {
   test.each([
     ['2020-03-27', '27 March 2020'],
@@ -182,10 +265,14 @@ describe('formatDate', () => {
     expect(formatDate(new Date(2020, 2, 27))).toBe('27 March 2020');
   });
 
-  test.each([['not-a-date'], [''], [undefined], [null], [20200327], [new Date('invalid')]])(
-    'throws for an invalid date: %p',
-    value => {
-      expect(() => formatDate(value)).toThrow('Invalid date value');
-    }
-  );
+  test.each([
+    ['not-a-date'],
+    [''],
+    [undefined],
+    [null],
+    [20200327],
+    [new Date('invalid')]
+  ])('throws for an invalid date: %p', value => {
+    expect(() => formatDate(value)).toThrow('Invalid date value');
+  });
 });
