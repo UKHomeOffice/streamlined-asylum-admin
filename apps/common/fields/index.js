@@ -25,6 +25,8 @@ module.exports = {
   },
   'user-email': {
     validate: ['required', 'email'],
+    'ignore-defaults': true,
+    formatter: ['trim', 'lowercase'],
     labelClassName: 'visuallyhidden'
   }
 };
