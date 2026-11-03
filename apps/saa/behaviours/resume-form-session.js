@@ -34,6 +34,13 @@ const resumeFormSession = superclass =>
         }
         const drafts = await findApplicationsByEmail(userEmail);
 
+        if (drafts.length === 0) {
+          logAndThrow(
+            'No applications found for the verified email',
+            'No applications could be found'
+          );
+        }
+
         if (req.method === 'GET' && drafts.length === 1) {
           this.loadApplication(req, drafts[0]);
           this.emit('complete', req, res);

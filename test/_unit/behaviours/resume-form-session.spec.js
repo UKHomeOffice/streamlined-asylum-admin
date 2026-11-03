@@ -253,7 +253,7 @@ describe('resume form session behaviour', () => {
     );
   });
 
-  test.each([0, 2])(
+  test.each([2])(
     'should configure the GET selection page for %p drafts',
     async count => {
       const drafts = Array.from({ length: count }, (value, index) =>
@@ -272,6 +272,37 @@ describe('resume form session behaviour', () => {
       );
       expect(baseConfigure).toHaveBeenCalledWith(req, res, next);
       expect(req.sessionModel.set).not.toHaveBeenCalled();
+      expect(res.redirect).not.toHaveBeenCalled();
+    }
+  );
+
+  test.each(['GET', 'POST'])(
+    'should pass empty draft results to error handling on %s without configuring radios',
+    async method => {
+      req.method = method;
+      const original = structuredClone(session);
+      findApplicationsByEmail.mockResolvedValue([]);
+
+      await behaviour.configure(req, res, next);
+
+      expect(findApplicationsByEmail).toHaveBeenCalledWith(
+        'person@example.com'
+      );
+      expect(logAndThrow).toHaveBeenCalledWith(
+        'No applications found for the verified email',
+        'No applications could be found'
+      );
+      expect(next).toHaveBeenCalledTimes(1);
+      expect(next).toHaveBeenCalledWith(
+        new Error('No applications could be found')
+      );
+      expect(req.drafts).toBeUndefined();
+      expect(req.form.options.fields).not.toHaveProperty('application-id');
+      expect(baseConfigure).not.toHaveBeenCalled();
+      expect(req.sessionModel.unset).not.toHaveBeenCalled();
+      expect(req.sessionModel.set).not.toHaveBeenCalled();
+      expect(session).toEqual(original);
+      expect(behaviour.emit).not.toHaveBeenCalled();
       expect(res.redirect).not.toHaveBeenCalled();
     }
   );
