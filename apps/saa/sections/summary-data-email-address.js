@@ -12,6 +12,11 @@ module.exports = {
         step: '/new-email-address',
         field: 'new-email-address',
         changeLink: `${SAA_BASE_URL}/new-email-address`
+      },
+      {
+        step: '/new-email-address',
+        field: 'confirm-new-email-address',
+        changeLink: `${SAA_BASE_URL}/new-email-address`
       }
     ]
   }
