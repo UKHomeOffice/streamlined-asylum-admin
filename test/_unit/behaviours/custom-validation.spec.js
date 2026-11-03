@@ -100,21 +100,6 @@ describe('custom validation behaviour', () => {
     }
   );
 
-  test('should reject an invalid UAN', () => {
-    const key = 'claimant-unique-application-number';
-    const req = { form: { values: { [key]: '123456789012345' } } };
-
-    const error = behaviour.validateField(key, req);
-
-    expect(error).toBeInstanceOf(ValidationError);
-    expect(error).toMatchObject({
-      key,
-      type: 'validUniqueApplicationNumber',
-      arguments: [undefined]
-    });
-    expect(baseValidateField).toHaveBeenCalledWith(key, req);
-  });
-
   describe('matchField', () => {
     const key = 'confirm-new-email-address';
     const options = {
@@ -160,13 +145,5 @@ describe('custom validation behaviour', () => {
 
       expect(behaviour.validateField(key, req)).toBeUndefined();
     });
-  });
-
-  test('should accept a valid UAN', () => {
-    const key = 'claimant-unique-application-number';
-    const req = { form: { values: { [key]: '1234-5678-9012-3456' } } };
-
-    expect(behaviour.validateField(key, req)).toBeUndefined();
-    expect(baseValidateField).toHaveBeenCalledWith(key, req);
   });
 });

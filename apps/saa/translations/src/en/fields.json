@@ -336,5 +336,16 @@
   "someone-else-correct-date-of-birth": {
     "legend": "Date of birth",
     "hint": "For example, 27 3 2020"
+  },
+  "relationship-date-of-birth": {
+    "legend": "How are they related to you?",
+    "options": {
+      "my-child": {
+        "label": "My child"
+      },
+      "spouse-or-partner": {
+        "label": "My husband, wife, civil partner, or unmarried partner that I have lived with for 2 years or more"
+      }
+    }
   }
 }
