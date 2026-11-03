@@ -276,5 +276,12 @@ module.exports = {
     mixin: 'input-text',
     validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
     labelClassName: 'govuk-label--s'
+  },
+  'relationship-date-of-birth': {
+    mixin: 'radio-group',
+    options: ['my-child', 'my-partner-or-child-2-years'],
+    validate: ['required'],
+    className: ['govuk-radios'],
+    isPageHeading: true
   }
 };
