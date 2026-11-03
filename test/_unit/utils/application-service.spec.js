@@ -391,6 +391,33 @@ describe('application service', () => {
       }
     );
 
+    test.each([undefined, null, ''])(
+      'should ignore a record with a falsy date of birth %p and create a draft',
+      async dateOfBirth => {
+        const created = { id: 3 };
+        mockRequest
+          .mockResolvedValueOnce({
+            data: [
+              {
+                id: 1,
+                email: details.email,
+                uan: details.uan,
+                date_of_birth: dateOfBirth
+              }
+            ]
+          })
+          .mockResolvedValueOnce({ data: [created] });
+
+        await expect(
+          applicationService.findOrCreateApplication(details)
+        ).resolves.toBe(created);
+        expect(mockRequest).toHaveBeenCalledTimes(2);
+        expect(mockRequest).toHaveBeenLastCalledWith(
+          expect.objectContaining({ method: 'POST' })
+        );
+      }
+    );
+
     test('should match a stored Date object against a date string', async () => {
       const match = {
         id: 2,
@@ -597,6 +624,10 @@ describe('application service', () => {
         'a different date of birth',
         [{ uan: details.uan, date_of_birth: '2000-01-01' }]
       ],
+      ...[undefined, null, ''].map(dateOfBirth => [
+        `a falsy date of birth ${JSON.stringify(dateOfBirth)}`,
+        [{ uan: details.uan, date_of_birth: dateOfBirth }]
+      ]),
       [
         'a submitted match',
         [

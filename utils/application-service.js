@@ -41,6 +41,8 @@ const matches = (uan, dateOfBirth) => record => {
     record.uan &&
     uan &&
     record.uan === uan &&
+    record.date_of_birth &&
+    dateOfBirth &&
     (record.date_of_birth === dateOfBirth ||
       formatDate(record.date_of_birth) === formatDate(dateOfBirth))
   );
