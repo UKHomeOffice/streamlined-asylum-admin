@@ -256,5 +256,32 @@ module.exports = {
     validate: ['required'],
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
+  },
+  'someone-else-correct-date-of-birth': dateComponent('someone-else-correct-date-of-birth', {
+    mixin: 'input-date',
+    validate: [
+      'required',
+      'date',
+      'before',
+      { type: 'after', arguments: '1900-01-01' }
+    ],
+    legend: { className: 'govuk-label--s' }
+  }),
+  'someone-else-correct-date-of-birth-given-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'someone-else-correct-date-of-birth-family-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'relationship-date-of-birth': {
+    mixin: 'radio-group',
+    options: ['my-child', 'spouse-or-partner'],
+    validate: ['required'],
+    className: ['govuk-radios'],
+    isPageHeading: true
   }
 };

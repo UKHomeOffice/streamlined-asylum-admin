@@ -1,5 +1,4 @@
 const { NO_DIGITS_REGEX } = require('../../../utils/constants');
-const { validUniqueApplicationNumber } = require('../../../utils');
 const customValidation = superclass =>
   class extends superclass {
     validateField(key, req) {
@@ -21,19 +20,15 @@ const customValidation = superclass =>
         'claimants-given-name',
         'claimants-family-name',
         'helper-given-name',
-        'helper-family-name'
+        'helper-family-name',
+        'someone-else-correct-date-of-birth-given-name',
+        'someone-else-correct-date-of-birth-family-name'
       ];
 
       if (keysToValidate.includes(key)) {
         const value = req.form.values[key];
         if (!value.match(NO_DIGITS_REGEX)) {
           return validationErrorFunc('noDigits');
-        }
-      }
-      if (key === 'claimant-unique-application-number') {
-        const value = req.form.values[key];
-        if (!validUniqueApplicationNumber(value)) {
-          return validationErrorFunc('validUniqueApplicationNumber');
         }
       }
       return fieldError;

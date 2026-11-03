@@ -49,10 +49,11 @@
     "captionHeading": "Update personal details"
   },
   "relationship-date-of-birth": {
-    "header": "How are they related to you?"
+    "captionHeading": "Update personal details"
   },
   "someone-else-correct-date-of-birth": {
-    "header": "Change someone else’s date of birth"
+    "header": "Change someone else’s date of birth",
+    "captionHeading": "Update personal details"
   },
   "whose-nationality-to-change": {
     "header": "Do you need to change your nationality?"

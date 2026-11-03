@@ -48,7 +48,9 @@ describe('custom validation behaviour', () => {
     'claimants-given-name',
     'claimants-family-name',
     'helper-given-name',
-    'helper-family-name'
+    'helper-family-name',
+    'someone-else-correct-date-of-birth-given-name',
+    'someone-else-correct-date-of-birth-family-name'
   ])('should reject digits in %s', key => {
     const req = { form: { values: { [key]: 'Name2' } } };
 
@@ -97,27 +99,4 @@ describe('custom validation behaviour', () => {
       expect(baseValidateField).toHaveBeenCalledWith(key, req);
     }
   );
-
-  test('should reject an invalid UAN', () => {
-    const key = 'claimant-unique-application-number';
-    const req = { form: { values: { [key]: '123456789012345' } } };
-
-    const error = behaviour.validateField(key, req);
-
-    expect(error).toBeInstanceOf(ValidationError);
-    expect(error).toMatchObject({
-      key,
-      type: 'validUniqueApplicationNumber',
-      arguments: [undefined]
-    });
-    expect(baseValidateField).toHaveBeenCalledWith(key, req);
-  });
-
-  test('should accept a valid UAN', () => {
-    const key = 'claimant-unique-application-number';
-    const req = { form: { values: { [key]: '1234-5678-9012-3456' } } };
-
-    expect(behaviour.validateField(key, req)).toBeUndefined();
-    expect(baseValidateField).toHaveBeenCalledWith(key, req);
-  });
 });

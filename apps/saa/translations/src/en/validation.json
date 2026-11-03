@@ -142,7 +142,7 @@
   "change-your-date-of-birth": {
     "required": "Select if you want to change your date of birth"
   },
-   "correct-date-of-birth": {
+  "correct-date-of-birth": {
     "required": "Enter a date of birth",
     "date": "Enter a valid date",
     "before": "Date of birth must be in the past",
@@ -150,5 +150,26 @@
   },
   "change-someone-else-date-of-birth": {
     "required": "Select if you want to change someone else's date of birth"
+  },
+  "someone-else-correct-date-of-birth-given-name": {
+    "required": "Enter their given name",
+    "noDigits": "Given name must not contain numbers",
+    "maxlength": "Given name must be between 1 and 255 characters",
+    "notUrl": "Given name must not contain a URL"
+  },
+  "someone-else-correct-date-of-birth-family-name": {
+    "required": "Enter their family name",
+    "noDigits": "Family name must not contain numbers",
+    "maxlength": "Family name must be between 1 and 255 characters",
+    "notUrl": "Family name must not contain a URL"
+  },
+  "someone-else-correct-date-of-birth": {
+    "required": "Enter a date of birth",
+    "date": "Enter a valid date",
+    "before": "Date of birth must be in the past",
+    "after": "Enter a date after 01 01 1900"
+  },
+  "relationship-date-of-birth": {
+    "required": "Select how they are related to you"
   }
 }
