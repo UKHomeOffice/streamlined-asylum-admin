@@ -20,7 +20,9 @@ const customValidation = superclass =>
         'claimants-given-name',
         'claimants-family-name',
         'helper-given-name',
-        'helper-family-name'
+        'helper-family-name',
+        'someone-else-correct-date-of-birth-given-name',
+        'someone-else-correct-date-of-birth-family-name'
       ];
 
       if (keysToValidate.includes(key)) {

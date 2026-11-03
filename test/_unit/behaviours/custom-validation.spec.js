@@ -48,7 +48,9 @@ describe('custom validation behaviour', () => {
     'claimants-given-name',
     'claimants-family-name',
     'helper-given-name',
-    'helper-family-name'
+    'helper-family-name',
+    'someone-else-correct-date-of-birth-given-name',
+    'someone-else-correct-date-of-birth-family-name'
   ])('should reject digits in %s', key => {
     const req = { form: { values: { [key]: 'Name2' } } };
 
