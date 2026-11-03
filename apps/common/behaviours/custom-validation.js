@@ -22,7 +22,9 @@ const customValidation = superclass =>
         'helper-given-name',
         'helper-family-name',
         'given-name',
-        'family-name'
+        'family-name',
+        'someone-else-correct-date-of-birth-given-name',
+        'someone-else-correct-date-of-birth-family-name'
       ];
 
       if (keysToValidate.includes(key)) {

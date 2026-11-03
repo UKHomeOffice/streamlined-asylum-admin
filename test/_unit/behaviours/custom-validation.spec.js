@@ -50,7 +50,9 @@ describe('custom validation behaviour', () => {
     'helper-given-name',
     'helper-family-name',
     'given-name',
-    'family-name'
+    'family-name',
+    'someone-else-correct-date-of-birth-given-name',
+    'someone-else-correct-date-of-birth-family-name'
   ])('should reject digits in %s', key => {
     const req = { form: { values: { [key]: 'Name2' } } };
 

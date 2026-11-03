@@ -321,7 +321,7 @@
       }
     }
   },
-   "correct-date-of-birth": {
+  "correct-date-of-birth": {
     "legend": "What is your correct date of birth?",
     "hint": "For example, 27 3 2020"
   },
@@ -335,5 +335,15 @@
         "label": "No"
       }
     }
+  },
+  "someone-else-correct-date-of-birth-given-name": {
+    "label": "Given name"
+  },
+  "someone-else-correct-date-of-birth-family-name": {
+    "label": "Family name"
+  },
+  "someone-else-correct-date-of-birth": {
+    "legend": "Date of birth",
+    "hint": "For example, 27 3 2020"
   }
 }

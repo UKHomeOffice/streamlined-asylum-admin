@@ -52,7 +52,8 @@
     "header": "How are they related to you?"
   },
   "someone-else-correct-date-of-birth": {
-    "header": "Change someone else’s date of birth"
+    "header": "Change someone else’s date of birth",
+    "captionHeading": "Update personal details"
   },
   "whose-nationality-to-change": {
     "header": "Do you need to change your nationality?"
