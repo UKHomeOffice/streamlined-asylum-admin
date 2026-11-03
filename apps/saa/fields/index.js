@@ -279,7 +279,7 @@ module.exports = {
   },
   'relationship-date-of-birth': {
     mixin: 'radio-group',
-    options: ['my-child', 'my-partner-or-child-2-years'],
+    options: ['my-child', 'spouse-or-partner'],
     validate: ['required'],
     className: ['govuk-radios'],
     isPageHeading: true
