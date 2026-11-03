@@ -211,7 +211,12 @@ describe('SAA multi-select follow-up route config', () => {
       '/change-your-date-of-birth'
     ],
     [['name'], 'yes', 'no', '/provide-photo-identity'],
-    [['name', 'nationality'], 'no', 'no', '/no-changes-made'],
+    [['name'], 'no', 'no', '/no-changes-made'],
+    [['name', 'date-of-birth'], 'no', 'no', '/change-your-date-of-birth'],
+    [['name', 'nationality'], 'no', 'no', '/whose-nationality-to-change'],
+    [['name', 'address'], 'no', 'no', '/change-uk-address'],
+    [['name', 'email-address'], 'no', 'no', '/new-email-address'],
+    [['name', 'phone-number'], 'no', 'no', '/your-phone-number'],
     [['name', 'nationality'], 'no', 'yes', '/relationship-name-change'],
     [['name', 'nationality'], 'yes', 'yes', '/relationship-name-change']
   ])(
