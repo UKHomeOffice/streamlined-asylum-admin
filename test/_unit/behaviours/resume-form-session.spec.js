@@ -37,9 +37,14 @@ const ResumeFormSession = require('../../../apps/saa/behaviours/resume-form-sess
 describe('resume form session behaviour', () => {
   const baseConfigure = jest.fn();
   const baseSaveValues = jest.fn();
+  const baseGetValues = jest.fn();
   class BaseBehaviour {
     configure(req, res, next) {
       return baseConfigure(req, res, next);
+    }
+
+    getValues(req, res, next) {
+      return baseGetValues(req, res, next);
     }
 
     saveValues(req, res, next) {
@@ -87,6 +92,12 @@ describe('resume form session behaviour', () => {
     findApplicationsByEmail.mockResolvedValue([]);
     baseConfigure.mockReset();
     baseSaveValues.mockReset();
+    baseGetValues.mockReset();
+    baseGetValues.mockImplementation((request, response, callback) => {
+      const values = request.sessionModel.toJSON();
+      delete values.errorValues;
+      callback(null, { ...values, ...request.sessionModel.get('errorValues') });
+    });
   });
 
   const draft = (id, createdAt) => ({
@@ -94,6 +105,72 @@ describe('resume form session behaviour', () => {
     created_at: createdAt,
     uan: '1234567890123456',
     date_of_birth: '1990-01-31'
+  });
+
+  test('should retain the selected radio when returning after loading an application', async () => {
+    const drafts = [
+      { ...draft(1, '2026-11-03T12:00:00Z'), session: { answer: 'saved' } },
+      { ...draft(2, '2026-11-02T12:00:00Z'), session: {} }
+    ];
+    findApplicationsByEmail.mockResolvedValue(drafts);
+    req.method = 'POST';
+    await behaviour.configure(req, res, next);
+    req.form.values['application-id'] = '1';
+    behaviour.saveValues(req, res, next);
+
+    req.method = 'GET';
+    await behaviour.configure(req, res, next);
+    const callback = jest.fn();
+    behaviour.getValues(req, res, callback);
+
+    const [error, values] = callback.mock.calls[0];
+    expect(error).toBeNull();
+    expect(values['application-id']).toBe(
+      req.form.options.fields['application-id'].options[0].value
+    );
+    expect(session['application-id']).toBe(1);
+    expect(session.answer).toBe('saved');
+  });
+
+  test.each([0, '9', undefined, null])(
+    'should normalise display ID %p without changing the session',
+    id => {
+      session['application-id'] = id;
+      const original = structuredClone(session);
+
+      behaviour.getValues(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(
+        null,
+        expect.objectContaining({
+          'application-id': id === undefined || id === null ? id : String(id)
+        })
+      );
+      expect(session).toEqual(original);
+    }
+  );
+
+  test('should preserve the validation-error selection instead of the loaded application ID', () => {
+    session.errorValues = { 'application-id': '2' };
+
+    behaviour.getValues(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(
+      null,
+      expect.objectContaining({ 'application-id': '2' })
+    );
+    expect(session['application-id']).toBe(9);
+  });
+
+  test('should forward superclass getValues errors', () => {
+    const error = new Error('Values unavailable');
+    baseGetValues.mockImplementation((request, response, callback) =>
+      callback(error)
+    );
+
+    behaviour.getValues(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(error);
   });
 
   test('should show most recently created drafts first without changing the input order', () => {

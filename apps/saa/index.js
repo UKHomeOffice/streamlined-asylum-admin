@@ -89,7 +89,7 @@ const steps = {
     backLink: false
   },
   '/information-given': {
-    behaviours: [Summary, SummaryLabels],
+    behaviours: [Summary, SummaryLabels, EditRouteStart],
     sections: require('./sections/summary-data-sections'),
     next: '/claimants-name'
   },

@@ -48,6 +48,22 @@ const resumeFormSession = superclass =>
       return super.configure(req, res, next);
     }
 
+    getValues(req, res, next) {
+      return super.getValues(req, res, (err, values) => {
+        if (err) {
+          return next(err);
+        }
+        const displayValues = { ...values };
+        if (
+          displayValues[FIELD_APP_ID] !== undefined &&
+          displayValues[FIELD_APP_ID] !== null
+        ) {
+          displayValues[FIELD_APP_ID] = String(displayValues[FIELD_APP_ID]);
+        }
+        return next(null, displayValues);
+      });
+    }
+
     saveValues(req, res, next) {
       try {
         const selected = req.form.values[FIELD_APP_ID];

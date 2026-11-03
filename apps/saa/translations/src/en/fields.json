@@ -1,4 +1,7 @@
 {
+  "application-id": {
+    "legend": "Which form do you need to continue?"
+  },
   "claimant-main-language": {
     "label": "Main language",
     "options": {
