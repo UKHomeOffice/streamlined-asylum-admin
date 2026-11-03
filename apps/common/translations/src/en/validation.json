@@ -1,7 +1,7 @@
 {
   "claimant-unique-application-number": {
     "required": "Enter a unique application number",
-    "validUniqueApplicationNumber": "Unique application number must have between 16 and 20 numbers, like 1234-5678-9101-1121",
+    "regex": "Unique application number must have between 16 and 20 numbers, like 1234-5678-9101-1121",
     "notUrl": "Unique application number must not contain a URL"
   },
   "claimant-date-of-birth": {
@@ -15,6 +15,7 @@
   },
   "user-email": {
     "required": "Enter your email address",
-    "email": "Enter a real email address"
+    "email": "Enter a real email address",
+    "existsUnderAnotherEmail": "An application already exists for this UAN and Date of Birth under a different email"
   }
 }
