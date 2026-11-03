@@ -21,3 +21,5 @@ test/data/test_*
 playwright-report/*
 test-results/*
 .features-gen/*
+allure-results/
+allure-report/
