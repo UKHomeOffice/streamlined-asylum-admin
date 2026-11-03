@@ -223,6 +223,7 @@ const steps = {
     next: '/nationality-change'
   },
   '/relationship-date-of-birth': {
+    fields: ['relationship-date-of-birth'],
     next: '/someone-else-correct-date-of-birth'
   },
   '/someone-else-correct-date-of-birth': {
