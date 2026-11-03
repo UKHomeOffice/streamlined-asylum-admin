@@ -25,7 +25,7 @@
 module.exports = {
   field: 'changes-to-contact-details',
   entryPoint: '/changes-to-contact-details',
-  exitPoint: '/provide-photo-identity',
+  exitPoint: '/do-you-need-add-remove-dependant',
   stateKey: 'contact-detail-updates',
   options: [
     {

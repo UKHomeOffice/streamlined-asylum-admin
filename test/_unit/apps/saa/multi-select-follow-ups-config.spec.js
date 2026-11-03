@@ -210,7 +210,7 @@ describe('SAA multi-select follow-up route config', () => {
       'no',
       '/change-your-date-of-birth'
     ],
-    [['name'], 'yes', 'no', '/provide-photo-identity'],
+    [['name'], 'yes', 'no', '/do-you-need-add-remove-dependant'],
     [['name'], 'no', 'no', '/no-changes-made'],
     [['name', 'date-of-birth'], 'no', 'no', '/change-your-date-of-birth'],
     [['name', 'nationality'], 'no', 'no', '/whose-nationality-to-change'],
