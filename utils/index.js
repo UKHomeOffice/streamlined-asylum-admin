@@ -9,6 +9,23 @@ const PRETTY_DATE_FORMATTER = new Intl.DateTimeFormat(
 const logger = require('hof/lib/logger')({ env: config.env });
 
 /**
+ * Logs an internal error message and throws an Error for the caller to handle.
+ * Logging is skipped if the logger does not provide an error method.
+ *
+ * @param {string} message - The internal log message; avoid sensitive data.
+ * @param {string} [publicMessage] - The thrown message, falling back to message if empty or omitted.
+ * @param {object} [meta] - Optional log metadata, not included in the thrown message.
+ * @returns {never} Always throws.
+ * @throws {Error} An error containing publicMessage or message.
+ */
+function logAndThrow(message, publicMessage, meta) {
+  if (logger && typeof logger.error === 'function') {
+    meta ? logger.error(message, meta) : logger.error(message);
+  }
+  throw new Error(publicMessage || message);
+}
+
+/**
  * Redacts the middle of a filename while preserving its first two characters,
  * final two basename characters, and extension.
  *
@@ -114,37 +131,31 @@ const formatDate = date => {
 };
 
 /**
- * Formats a UAN for display by separating groups of four digits with hyphens.
+ * Removes whitespace and hyphen separators, then groups a UAN for display.
  *
- * @param {string} uan - A non-empty, digits-only UAN, already normalised and validated.
+ * @param {*} uan - A UAN string, optionally separated by whitespace or hyphens.
  * @returns {string} The display UAN, for example "1234-5678-9012-3456".
+ * @throws {Error} If the input is not a string or is empty after removing separators.
  */
-const formatUanForDisplay = uan => uan.match(/.{1,4}/g).join('-');
-
-/**
- * Logs an internal error message and throws an Error for the caller to handle.
- * Logging is skipped if the logger does not provide an error method.
- *
- * @param {string} message - The internal log message; avoid sensitive data.
- * @param {string} [publicMessage] - The thrown message, falling back to message if empty or omitted.
- * @param {object} [meta] - Optional log metadata, not included in the thrown message.
- * @returns {never} Always throws.
- * @throws {Error} An error containing publicMessage or message.
- */
-function logAndThrow(message, publicMessage, meta) {
-  if (logger && typeof logger.error === 'function') {
-    meta ? logger.error(message, meta) : logger.error(message);
+const formatUanForDisplay = uan => {
+  const cleaned =
+    typeof uan === 'string' ? uan.replace(/[\s\u2013\u2014-]+/g, '') : '';
+  if (!cleaned) {
+    logAndThrow(
+      'Cannot format UAN: expected a non-empty string',
+      'Invalid UAN'
+    );
   }
-  throw new Error(publicMessage || message);
-}
+  return cleaned.match(/.{1,4}/g).join('-');
+};
 
 module.exports = {
+  logAndThrow,
   sanitiseFilename,
   normaliseEmail,
   getNotifyErrorMessage,
   isTeamOnlyNotifyError,
   hasSelectedSection,
   formatDate,
-  formatUanForDisplay,
-  logAndThrow
+  formatUanForDisplay
 };

@@ -159,6 +159,43 @@ describe('normaliseEmail', () => {
 
 describe('formatUanForDisplay', () => {
   test.each([
+    undefined,
+    null,
+    1234,
+    false,
+    {},
+    [],
+    '',
+    '   ',
+    '--',
+    ' \t-\u2013\u2014\n '
+  ])('should reject unusable input %p with a clear error', value => {
+    expect(() => formatUanForDisplay(value)).toThrow(
+      new Error('Invalid UAN')
+    );
+    expect(mockLogger.error).toHaveBeenCalledTimes(1);
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      'Cannot format UAN: expected a non-empty string'
+    );
+  });
+
+  test.each([
+    '1212-       1212  - 1212 1212',
+    '1212-1212-1212-1212',
+    ' 1212\t1212\n1212 1212 ',
+    '--1212--1212--1212--1212--',
+    '1212\u20131212\u20141212-1212'
+  ])('should clean separators before formatting %s', value => {
+    expect(formatUanForDisplay(value)).toBe('1212-1212-1212-1212');
+  });
+
+  test('should not silently remove unexpected letters', () => {
+    expect(formatUanForDisplay('1234-abcd-5678-9012')).toBe(
+      '1234-abcd-5678-9012'
+    );
+  });
+
+  test.each([
     ['1234567890123456', '1234-5678-9012-3456'],
     ['12345678901234567890', '1234-5678-9012-3456-7890'],
     ['0000123456789012', '0000-1234-5678-9012']
