@@ -292,6 +292,15 @@
   "helper-email-address": {
     "label": "Email address"
   },
+  "old-email-address": {
+    "label": "Old email address"
+  },
+  "new-email-address": {
+    "label": "New email address"
+  },
+  "confirm-new-email-address": {
+    "label": "Confirm new email address"
+  },
   "change-your-date-of-birth": {
     "legend": "Do you need to change your date of birth?",
     "options": {
