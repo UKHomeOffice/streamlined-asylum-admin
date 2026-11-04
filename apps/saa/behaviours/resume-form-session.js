@@ -8,6 +8,7 @@ const {
   formatUanForDisplay,
   logAndThrow
 } = require('../../../utils');
+const { REQUEST_METHODS } = require('../../../utils/constants');
 const config = require('../../../config');
 
 const FIELD_APP_ID = 'application-id';
@@ -41,7 +42,7 @@ const resumeFormSession = superclass =>
           );
         }
 
-        if (req.method === 'GET' && drafts.length === 1) {
+        if (req.method === REQUEST_METHODS.GET && drafts.length === 1) {
           this.loadApplication(req, drafts[0]);
           this.emit('complete', req, res);
           return res.redirect(this.getNextStep(req, res));
