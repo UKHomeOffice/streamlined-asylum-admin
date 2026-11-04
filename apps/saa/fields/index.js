@@ -54,6 +54,13 @@ module.exports = {
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
   },
+  'change-someone-elses-name': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    isPageHeading: true
+  },
   'reason-name-change': {
     mixin: 'radio-group',
     options: [
@@ -63,6 +70,16 @@ module.exports = {
     ],
     validate: ['required'],
     isPageHeading: true
+  },
+  'given-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'family-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
   },
   'add-remove-dependant': {
     mixin: 'radio-group',
