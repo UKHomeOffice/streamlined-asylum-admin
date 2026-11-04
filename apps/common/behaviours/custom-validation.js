@@ -13,7 +13,6 @@ const customValidation = superclass =>
       if (fieldError) {
         return fieldError;
       }
-
       const keysToValidate = [
         'child-partner-given-name',
         'child-partner-family-name',
@@ -21,6 +20,8 @@ const customValidation = superclass =>
         'claimants-family-name',
         'helper-given-name',
         'helper-family-name',
+        'given-name',
+        'family-name',
         'someone-else-correct-date-of-birth-given-name',
         'someone-else-correct-date-of-birth-family-name'
       ];

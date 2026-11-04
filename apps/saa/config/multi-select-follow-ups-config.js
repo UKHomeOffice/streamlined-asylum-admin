@@ -44,7 +44,7 @@ module.exports = {
             {
               route: '/do-you-need-to-change-someone-elses-name',
               condition: {
-                field: 'do-you-need-to-change-someone-elses-name',
+                field: 'change-someone-elses-name',
                 value: 'no'
               }
             },
