@@ -32,29 +32,6 @@ module.exports = {
       'errors',
       'errorValues'
     ],
-    saveExemptions:[]
-  },
-  govukNotify: {
-    notifyApiKey: process.env.NOTIFY_KEY,
-    emailTemplates: {
-      userVerifyEmailTemplateId: process.env.USER_VERIFY_EMAIL_TEMPLATE_ID
-    }
-  },
-  saveService: {
-    protocol: process.env.DATASERVICE_USE_HTTPS === 'false' ? 'http' : 'https',
-    port: process.env.DATASERVICE_SERVICE_PORT_HTTPS || '10443',
-    host: process.env.DATASERVICE_SERVICE_HOST || '127.0.0.1'
-  },
-  sessionDefaults: {
-    preservedKeys: ['csrf-secret', 'user-email', 'valid-token'],
-    preservedSteps: ['/continue-to-form', '/which-form'],
-    excludedSnapshotKeys: [
-      'csrf-secret',
-      'user-email',
-      'valid-token',
-      'errors',
-      'errorValues'
-    ],
     saveExemptions: [
       '/continue-to-form',
       '/form-saved',
@@ -109,6 +86,17 @@ module.exports = {
       '/submitted',
       '/expired-link'
     ]
+  },
+  govukNotify: {
+    notifyApiKey: process.env.NOTIFY_KEY,
+    emailTemplates: {
+      userVerifyEmailTemplateId: process.env.USER_VERIFY_EMAIL_TEMPLATE_ID
+    }
+  },
+  saveService: {
+    protocol: process.env.DATASERVICE_USE_HTTPS === 'false' ? 'http' : 'https',
+    port: process.env.DATASERVICE_SERVICE_PORT_HTTPS || '10443',
+    host: process.env.DATASERVICE_SERVICE_HOST || '127.0.0.1'
   },
   upload: {
     ...fileUploadConfig,
