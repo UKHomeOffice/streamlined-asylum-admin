@@ -20,6 +20,8 @@ const EditRouteReturn = require('./behaviours/edit-route-return');
 const EditRouteStart = require('./behaviours/edit-route-start');
 const SummaryLabels = require('./behaviours/summary-labels');
 const ResetSectionSummary = require('./behaviours/reset-section-summary');
+const SaveFormSession = require('./behaviours/save-form-session');
+const SaveAndExit = require('./behaviours/save-and-exit');
 
 const documentUploadStep = category => ({
   behaviours: [SaveDocument(category, 'file-upload'), RemoveDocument(category)],
@@ -548,8 +550,7 @@ const steps = {
   '/declaration': {
     next: '/submitted'
   },
-  '/submitted': {
-  },
+  '/submitted': {},
   '/something-else': {
     behaviours: [somethingElseFork],
     fields: ['something-else'],
@@ -563,11 +564,11 @@ const steps = {
   '/no-options': {
     backLink: 'something-else'
   },
-  '/page-not-found': {},
   '/service-unavailable': {},
-  '/problem-with-service': {},
   '/session-ended': {},
-  '/form-saved': {},
+  '/form-saved': {
+    behaviours: [SaveAndExit]
+  },
   '/expired-link': {}
 };
 
@@ -629,5 +630,6 @@ module.exports = {
   fields: 'apps/saa/fields',
   views: 'apps/saa/views',
   translations: 'apps/saa/translations',
-  steps: steps
+  steps: steps,
+  behaviours: [SaveFormSession]
 };
