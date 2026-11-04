@@ -84,6 +84,17 @@
       }
     }
   },
+  "relationship-name-change": {
+    "legend": "How are they related to you?",
+    "options": {
+      "my-child": {
+        "label": "My child"
+      },
+      "husband-wife-partner": {
+        "label": "My husband, wife, civil partner, or unmarried partner that I have lived with for 2 years or more"
+      }
+    }
+  },
   "reason-name-change": {
     "legend": "Why do you need to change the name?",
     "options": {

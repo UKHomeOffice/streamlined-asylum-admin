@@ -174,6 +174,7 @@ const steps = {
     next: '/relationship-name-change'
   },
   '/relationship-name-change': {
+    fields: ['relationship-name-change'],
     next: '/someone-else-new-name'
   },
   '/someone-else-new-name': {

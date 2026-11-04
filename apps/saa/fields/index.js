@@ -61,6 +61,12 @@ module.exports = {
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
   },
+  'relationship-name-change': {
+    mixin: 'radio-group',
+    options: ['my-child', 'husband-wife-partner'],
+    validate: ['required'],
+    isPageHeading: true
+  },
   'reason-name-change': {
     mixin: 'radio-group',
     options: [

@@ -20,6 +20,9 @@
   "change-someone-elses-name": {
     "required": "Select if you need to change someone else's name"
   },
+  "relationship-name-change": {
+    "required": "Select how they are related to you"
+  },
   "reason-name-change": {
     "required": "Select why you need to change the name"
   },
