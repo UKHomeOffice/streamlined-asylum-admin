@@ -182,6 +182,13 @@ const steps = {
     next: '/someone-else-new-name'
   },
   '/someone-else-new-name': {
+    behaviours: [CustomValidation],
+    fields: [
+      'someone-else-old-given-name',
+      'someone-else-old-family-name',
+      'someone-else-new-given-name',
+      'someone-else-new-family-name'
+    ],
     next: '/someone-else-new-name-evidence'
   },
   '/someone-else-new-name-evidence': {

@@ -1,0 +1,11 @@
+{{<partials-page}}
+  {{$page-content}}
+    <h2 class="govuk-heading-m">{{#t}}pages.someone-else-new-name.old-name{{/t}}</h2>
+    {{#renderField}}someone-else-old-given-name{{/renderField}}
+    {{#renderField}}someone-else-old-family-name{{/renderField}}
+    <h2 class="govuk-heading-m">{{#t}}pages.someone-else-new-name.new-name{{/t}}</h2>
+    {{#renderField}}someone-else-new-given-name{{/renderField}}
+    {{#renderField}}someone-else-new-family-name{{/renderField}}
+    {{#input-submit}}continue{{/input-submit}}
+  {{/page-content}}
+{{/partials-page}}

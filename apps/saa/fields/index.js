@@ -83,6 +83,26 @@ module.exports = {
     validate: ['required'],
     isPageHeading: true
   },
+  'someone-else-old-given-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'someone-else-old-family-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'someone-else-new-given-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'someone-else-new-family-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
   'given-name': {
     mixin: 'input-text',
     validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],

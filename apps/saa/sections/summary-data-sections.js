@@ -115,6 +115,26 @@ module.exports = {
         step: '/reason-someone-else-name-change',
         field: 'reason-someone-else-name-change',
         dependsOn: 'change-someone-elses-name'
+      },
+      {
+        step: '/someone-else-new-name',
+        field: 'someone-else-old-given-name',
+        dependsOn: 'change-someone-elses-name'
+      },
+      {
+        step: '/someone-else-new-name',
+        field: 'someone-else-old-family-name',
+        dependsOn: 'change-someone-elses-name'
+      },
+      {
+        step: '/someone-else-new-name',
+        field: 'someone-else-new-given-name',
+        dependsOn: 'change-someone-elses-name'
+      },
+      {
+        step: '/someone-else-new-name',
+        field: 'someone-else-new-family-name',
+        dependsOn: 'change-someone-elses-name'
       }
     ]
   },

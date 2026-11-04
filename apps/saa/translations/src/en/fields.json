@@ -123,6 +123,22 @@
       }
     }
   },
+  "someone-else-old-given-name": {
+    "label": "Given name",
+    "summary-label": "Old given name"
+  },
+  "someone-else-old-family-name": {
+    "label": "Family name",
+    "summary-label": "Old family name"
+  },
+  "someone-else-new-given-name": {
+    "label": "Given name",
+    "summary-label": "New given name"
+  },
+  "someone-else-new-family-name": {
+    "label": "Family name",
+    "summary-label": "New family name"
+  },
   "given-name": {
     "label": "Given name",
     "summary-label": "New name"
