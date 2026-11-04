@@ -20,6 +20,7 @@ const EditRouteReturn = require('./behaviours/edit-route-return');
 const EditRouteStart = require('./behaviours/edit-route-start');
 const SummaryLabels = require('./behaviours/summary-labels');
 const ResetSectionSummary = require('./behaviours/reset-section-summary');
+const ResumeFormSession = require('./behaviours/resume-form-session');
 const SaveFormSession = require('./behaviours/save-form-session');
 const SaveAndExit = require('./behaviours/save-and-exit');
 
@@ -87,9 +88,13 @@ const steps = {
     backLink: false
   },
   '/which-form': {
-    next: '/information-given'
+    behaviours: [ResumeFormSession],
+    next: '/information-given',
+    backLink: false
   },
   '/information-given': {
+    behaviours: [Summary, SummaryLabels, EditRouteStart],
+    sections: require('./sections/summary-data-sections'),
     next: '/claimants-name'
   },
   '/claimants-name': {
@@ -204,7 +209,8 @@ const steps = {
     next: '/new-date-of-birth-evidence'
   },
   '/new-date-of-birth-evidence': {
-    // provisional document category: documents-new-dob
+    ...documentUploadStep('documents-new-dob'),
+    template: 'upload-dob-evidence',
     next: '/check-your-answers-date-of-birth'
   },
   '/check-your-answers-date-of-birth': {

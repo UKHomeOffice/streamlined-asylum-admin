@@ -1,4 +1,13 @@
 {
+  "application-id": {
+    "legend": "Which form do you need to continue?"
+  },
+  "claim-decided": {
+    "summary-label": "Claim decided"
+  },
+  "user-email": {
+    "summary-label": "Email address"
+  },
   "claimant-main-language": {
     "label": "Main language",
     "options": {

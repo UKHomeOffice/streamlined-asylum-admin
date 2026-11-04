@@ -1,6 +1,7 @@
 const { disallowIndexing } = require('../../config');
 const ClaimantValidation = require('./behaviours/claimant-validation');
 const SendVerificationEmail = require('./behaviours/send-verification-email');
+const FormatUanForDisplay = require('./behaviours/format-uan-for-display');
 const steps = {
   '/': {
     template: 'start'
@@ -10,6 +11,7 @@ const steps = {
     backLink: ' ' // workaround to allow the back link to route to the root of the app
   },
   '/claimant-details': {
+    behaviours: [FormatUanForDisplay],
     fields: ['claimant-unique-application-number', 'claimant-date-of-birth'],
     next: '/claim-decided'
   },
