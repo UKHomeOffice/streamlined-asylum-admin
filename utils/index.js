@@ -139,7 +139,7 @@ const formatDate = date => {
  */
 const formatUanForDisplay = uan => {
   const cleaned =
-    typeof uan === 'string' ? uan.replace(/[\s\u2013\u2014-]+/g, '') : '';
+    typeof uan === 'string' ? uan.replaceAll(/[\s\u2013\u2014-]+/g, '') : '';
   if (!cleaned) {
     logAndThrow(
       'Cannot format UAN: expected a non-empty string',
