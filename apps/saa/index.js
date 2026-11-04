@@ -175,6 +175,10 @@ const steps = {
   },
   '/relationship-name-change': {
     fields: ['relationship-name-change'],
+    next: '/reason-someone-else-name-change'
+  },
+  '/reason-someone-else-name-change': {
+    fields: ['reason-someone-else-name-change'],
     next: '/someone-else-new-name'
   },
   '/someone-else-new-name': {

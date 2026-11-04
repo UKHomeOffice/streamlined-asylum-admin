@@ -110,6 +110,11 @@ module.exports = {
         step: '/relationship-name-change',
         field: 'relationship-name-change',
         dependsOn: 'change-someone-elses-name'
+      },
+      {
+        step: '/reason-someone-else-name-change',
+        field: 'reason-someone-else-name-change',
+        dependsOn: 'change-someone-elses-name'
       }
     ]
   },

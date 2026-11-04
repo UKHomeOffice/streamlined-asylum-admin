@@ -30,6 +30,9 @@
   "relationship-name-change": {
     "captionHeading": "Update personal details"
   },
+  "reason-someone-else-name-change": {
+    "captionHeading": "Update personal details"
+  },
   "someone-else-new-name": {
     "header": "Change someone else’s name"
   },

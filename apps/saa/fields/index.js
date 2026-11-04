@@ -67,6 +67,12 @@ module.exports = {
     validate: ['required'],
     isPageHeading: true
   },
+  'reason-someone-else-name-change': {
+    mixin: 'radio-group',
+    options: ['error', 'marriage-or-divorce', 'deed-poll'],
+    validate: ['required'],
+    isPageHeading: true
+  },
   'reason-name-change': {
     mixin: 'radio-group',
     options: [

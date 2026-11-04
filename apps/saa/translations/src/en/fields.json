@@ -95,6 +95,20 @@
       }
     }
   },
+  "reason-someone-else-name-change": {
+    "legend": "Why do you need to change their name?",
+    "options": {
+      "error": {
+        "label": "An error"
+      },
+      "marriage-or-divorce": {
+        "label": "Marriage or divorce"
+      },
+      "deed-poll": {
+        "label": "Legal change by deedpoll"
+      }
+    }
+  },
   "reason-name-change": {
     "legend": "Why do you need to change the name?",
     "options": {

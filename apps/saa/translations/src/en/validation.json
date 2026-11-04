@@ -23,6 +23,9 @@
   "relationship-name-change": {
     "required": "Select how they are related to you"
   },
+  "reason-someone-else-name-change": {
+    "required": "Select why you need to change their name"
+  },
   "reason-name-change": {
     "required": "Select why you need to change the name"
   },
