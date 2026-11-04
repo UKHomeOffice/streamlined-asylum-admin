@@ -9,6 +9,7 @@ const {
   getNotifyErrorMessage,
   isTeamOnlyNotifyError,
   formatDate,
+  isValidUan,
   formatUanForDisplay,
   logAndThrow
 } = require('../../../utils/index');
@@ -184,6 +185,7 @@ describe('formatUanForDisplay', () => {
     '123',
     '1234'
   ])('should reject input %p unless it is a 16-digit string', value => {
+    expect(isValidUan(value)).toBe(false);
     expect(() => formatUanForDisplay(value)).toThrow(new Error('Invalid UAN'));
     expect(mockLogger.error).toHaveBeenCalledTimes(1);
     expect(mockLogger.error).toHaveBeenCalledWith(
@@ -195,6 +197,7 @@ describe('formatUanForDisplay', () => {
     ['1234567890123456', '1234-5678-9012-3456'],
     ['0000123456789012', '0000-1234-5678-9012']
   ])('should format UAN %s as %s', (value, expected) => {
+    expect(isValidUan(value)).toBe(true);
     expect(formatUanForDisplay(value)).toBe(expected);
   });
 });

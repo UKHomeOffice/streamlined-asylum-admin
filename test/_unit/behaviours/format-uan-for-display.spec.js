@@ -1,9 +1,11 @@
 jest.mock('../../../utils', () => ({
+  isValidUan: jest.requireActual('../../../utils').isValidUan,
   formatUanForDisplay: jest.fn().mockReturnValue('1234-5678-9012-3456')
 }));
 
 const { formatUanForDisplay } = require('../../../utils');
 const FormatUanForDisplay = require('../../../apps/common/behaviours/format-uan-for-display');
+const Session = require('hof/controller/behaviour-session');
 
 describe('format UAN for display behaviour', () => {
   const baseGetValues = jest.fn();
@@ -82,13 +84,48 @@ describe('format UAN for display behaviour', () => {
     expect(formatUanForDisplay).not.toHaveBeenCalled();
   });
 
-  test('should format the superclass values including validation redisplay values', () => {
-    values[key] = '1234 5678 9012 3456';
+  test.each([
+    '123',
+    '12345678901234567',
+    '1234abcd56789012',
+    '1234 5678 9012 3456',
+    '1234567890123456\n',
+    1234567890123456
+  ])('should redisplay invalid attempted UAN %p without formatting', value => {
+    values[key] = value;
 
     behaviour.getValues(req, res, next);
 
-    expect(formatUanForDisplay).toHaveBeenCalledWith('1234 5678 9012 3456');
-    expect(values[key]).toBe('1234 5678 9012 3456');
+    expect(next).toHaveBeenCalledWith(null, values);
+    expect(next.mock.calls[0][1]).toBe(values);
+    expect(formatUanForDisplay).not.toHaveBeenCalled();
+    expect(req.sessionModel.set).not.toHaveBeenCalled();
+  });
+
+  test('should preserve HOF errorValues over a valid saved UAN on GET redisplay', () => {
+    const stored = { [key]: '1234567890123456' };
+    req.form = { values: { [key]: '123' } };
+    req.sessionModel = {
+      toJSON: () => ({ ...stored }),
+      get: name => stored[name],
+      set: jest.fn((name, value) => {
+        stored[name] = value;
+      })
+    };
+    const SessionBehaviour = FormatUanForDisplay(Session(BaseBehaviour));
+    const sessionBehaviour = new SessionBehaviour();
+    sessionBehaviour.setErrors({ [key]: 'validation error' }, req);
+    req.sessionModel.set.mockClear();
+
+    expect(() => sessionBehaviour.getValues(req, res, next)).not.toThrow();
+
+    expect(next).toHaveBeenCalledWith(
+      null,
+      expect.objectContaining({ [key]: '123' })
+    );
+    expect(stored[key]).toBe('1234567890123456');
+    expect(formatUanForDisplay).not.toHaveBeenCalled();
+    expect(req.sessionModel.set).not.toHaveBeenCalled();
   });
 
   test('should forward superclass errors without formatting', () => {

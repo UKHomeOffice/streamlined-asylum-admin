@@ -1,4 +1,4 @@
-const { formatUanForDisplay } = require('../../../utils');
+const { formatUanForDisplay, isValidUan } = require('../../../utils');
 const { REQUEST_METHODS } = require('../../../utils/constants');
 /**
  * Displays the UAN with hyphens while keeping its session value digits-only.
@@ -12,12 +12,14 @@ const formatUan = superclass =>
         if (error) {
           return next(error);
         }
-        if (req.method !== REQUEST_METHODS.GET || !values?.[key]) {
+        const uan = values?.[key];
+        // Preserve invalid attempted values so we can redisplay validation errors.
+        if (req.method !== REQUEST_METHODS.GET || !isValidUan(uan)) {
           return next(null, values);
         }
         return next(null, {
           ...values,
-          [key]: formatUanForDisplay(values[key])
+          [key]: formatUanForDisplay(uan)
         });
       });
     }

@@ -131,6 +131,14 @@ const formatDate = date => {
 };
 
 /**
+ * Checks the normalised UAN contract without changing the input.
+ *
+ * @param {*} uan - The value to check.
+ * @returns {boolean} True for a string containing exactly 16 digits.
+ */
+const isValidUan = uan => typeof uan === 'string' && /^\d{16}$/.test(uan);
+
+/**
  * Validates a normalised UAN, then groups it into four-digit blocks for display.
  *
  * @param {*} uan - A string containing exactly 16 digits without separators.
@@ -138,7 +146,7 @@ const formatDate = date => {
  * @throws {Error} If the input is not a string containing exactly 16 digits.
  */
 const formatUanForDisplay = uan => {
-  if (typeof uan !== 'string' || !/^\d{16}$/.test(uan)) {
+  if (!isValidUan(uan)) {
     logAndThrow('Cannot format UAN: expected a 16-digit string', 'Invalid UAN');
   }
   return uan.match(/.{4}/g).join('-');
@@ -152,5 +160,6 @@ module.exports = {
   isTeamOnlyNotifyError,
   hasSelectedSection,
   formatDate,
+  isValidUan,
   formatUanForDisplay
 };
