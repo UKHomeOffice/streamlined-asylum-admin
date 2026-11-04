@@ -6,8 +6,8 @@ const aggregatorSummaries = require('../config/aggregator-summaries');
 const { SAA_BASE_URL } = require('../../../utils/constants');
 const evidenceSummary = require('./summary-data-evidence-help-your-claim');
 const emailAddressSummary = require('./summary-data-email-address');
-const { formatDate, formatUanForDisplay } = require('../../../utils');
 const dateOfBirthSummary = require('./summary-data-date-of-birth');
+const { formatDate, formatUanForDisplay } = require('../../../utils');
 
 // Same rows as /check-your-answers-evidence; Change goes back to that page.
 const evidenceRows = evidenceSummary.evidence.steps.map(row => ({
