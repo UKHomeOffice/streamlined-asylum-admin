@@ -1,6 +1,6 @@
 const config = require('../../../config');
 const { saveApplication } = require('../../../utils/application-service');
-const EXCLUDE_TEMP_STEPS_REGEX = /\/(change|edit|delete)(?:\/|$)/;
+const { CHANGE_EDIT_DELETE_REGEX } = require('../../../utils/constants');
 
 const saveFormSession = superclass =>
   class extends superclass {
@@ -24,7 +24,7 @@ const saveFormSession = superclass =>
           key => delete session[key]
         );
         session.steps = (session.steps || []).filter(
-          step => !EXCLUDE_TEMP_STEPS_REGEX.test(step)
+          step => !CHANGE_EDIT_DELETE_REGEX.test(step)
         );
 
         const applicationId = req.sessionModel.get('application-id');
