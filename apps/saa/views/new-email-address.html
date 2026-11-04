@@ -1,0 +1,9 @@
+{{<partials-page}}
+  {{$page-content}}
+    {{#markdown}}new-email-address{{/markdown}}
+    {{#renderField}}old-email-address{{/renderField}}
+    {{#renderField}}new-email-address{{/renderField}}
+    {{#renderField}}confirm-new-email-address{{/renderField}}
+    {{#input-submit}}continue{{/input-submit}}
+  {{/page-content}}
+{{/partials-page}}
