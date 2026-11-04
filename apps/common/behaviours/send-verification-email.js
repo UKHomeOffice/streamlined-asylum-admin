@@ -17,7 +17,8 @@ const logger = require('hof/lib/logger')({ env: env });
 
 const getPersonalisation = (protocol, host, token) => {
   return {
-    link: `${protocol}://${host}${auth.continueAppPath}?token=${token}`
+    link: `${protocol}://${host}${auth.continueAppPath}?token=${token}`,
+    host: `${protocol}://${host}`
   };
 };
 

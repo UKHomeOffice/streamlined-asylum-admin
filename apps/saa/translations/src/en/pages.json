@@ -3,7 +3,8 @@
     "header": "Continue to your form"
   },
   "which-form": {
-    "header": "Which form do you need to continue?"
+    "header": "Which form do you need to continue?",
+    "intro": "Your form will be saved for 7 days from the first time you save it. After 7 days you must start again."
   },
   "information-given": {
     "header": "Information you have given us"
@@ -239,6 +240,9 @@
     "sections": {
       "your-details": {
         "header": "Your details"
+      },
+      "claimant-details": {
+        "header": "Claimant details"
       },
       "name": {
         "header": "Name"

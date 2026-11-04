@@ -1,9 +1,17 @@
+const mockLogger = { error: jest.fn() };
+
+jest.mock('hof/lib/logger', () => jest.fn(() => mockLogger));
+
+const loggerFactory = require('hof/lib/logger');
 const {
   sanitiseFilename,
   normaliseEmail,
   getNotifyErrorMessage,
   isTeamOnlyNotifyError,
-  formatDate
+  formatDate,
+  isValidUan,
+  formatUanForDisplay,
+  logAndThrow
 } = require('../../../utils/index');
 
 describe('SAA utilities tests', () => {
@@ -148,6 +156,103 @@ describe('normaliseEmail', () => {
   test('should return an empty string when the email address is not a string', () => {
     expect(normaliseEmail(123)).toBe('');
   });
+});
+
+describe('formatUanForDisplay', () => {
+  test.each([
+    undefined,
+    null,
+    1234,
+    false,
+    {},
+    [],
+    '',
+    '   ',
+    '--',
+    ' \t-\u2013\u2014\n ',
+    '1212-       1212  - 1212 1212',
+    '1212-1212-1212-1212',
+    ' 1212\t1212\n1212 1212 ',
+    '--1212--1212--1212--1212--',
+    '1212\u20131212\u20141212-1212',
+    '1234abcd56789012',
+    '123456789012345',
+    '12345678901234567',
+    '12345678901234567890',
+    '1234567890123456\n',
+    1234567890123456,
+    '1',
+    '123',
+    '1234'
+  ])('should reject input %p unless it is a 16-digit string', value => {
+    expect(isValidUan(value)).toBe(false);
+    expect(() => formatUanForDisplay(value)).toThrow(new Error('Invalid UAN'));
+    expect(mockLogger.error).toHaveBeenCalledTimes(1);
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      'Cannot format UAN: expected a 16-digit string'
+    );
+  });
+
+  test.each([
+    ['1234567890123456', '1234-5678-9012-3456'],
+    ['0000123456789012', '0000-1234-5678-9012']
+  ])('should format UAN %s as %s', (value, expected) => {
+    expect(isValidUan(value)).toBe(true);
+    expect(formatUanForDisplay(value)).toBe(expected);
+  });
+});
+
+describe('logAndThrow', () => {
+  beforeEach(() => {
+    mockLogger.error.mockReset();
+    loggerFactory.mockReturnValue(mockLogger);
+  });
+
+  test('should log the internal message once and throw the public message', () => {
+    expect(() => logAndThrow('Internal failure', 'Unable to continue')).toThrow(
+      new Error('Unable to continue')
+    );
+    expect(mockLogger.error).toHaveBeenCalledTimes(1);
+    expect(mockLogger.error).toHaveBeenCalledWith('Internal failure');
+  });
+
+  test('should include metadata only in the log', () => {
+    const meta = { applicationId: 'application-a' };
+
+    expect(() =>
+      logAndThrow('Internal failure', 'Unable to continue', meta)
+    ).toThrow(new Error('Unable to continue'));
+    expect(mockLogger.error).toHaveBeenCalledTimes(1);
+    expect(mockLogger.error).toHaveBeenCalledWith('Internal failure', meta);
+  });
+
+  test.each([undefined, ''])(
+    'should fall back to the internal message when the public message is %p',
+    publicMessage => {
+      expect(() => logAndThrow('Internal failure', publicMessage)).toThrow(
+        new Error('Internal failure')
+      );
+      expect(mockLogger.error).toHaveBeenCalledWith('Internal failure');
+    }
+  );
+
+  test.each([undefined, null, {}, { error: 'not a function' }])(
+    'should still throw when error logging is unavailable: %p',
+    logger => {
+      loggerFactory.mockReturnValueOnce(logger);
+
+      jest.isolateModules(() => {
+        const {
+          logAndThrow: isolatedLogAndThrow
+        } = require('../../../utils/index');
+
+        expect(() =>
+          isolatedLogAndThrow('Internal failure', 'Unable to continue')
+        ).toThrow(new Error('Unable to continue'));
+      });
+      expect(mockLogger.error).not.toHaveBeenCalled();
+    }
+  );
 });
 
 describe('formatDate', () => {
