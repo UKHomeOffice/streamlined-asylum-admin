@@ -35,6 +35,7 @@
   },
   "someone-else-new-name": {
     "header": "Change someone else’s name",
+    "captionHeading": "Update personal details",
     "old-name": "Old name",
     "new-name": "New name"
   },
