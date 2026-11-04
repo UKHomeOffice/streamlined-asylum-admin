@@ -573,7 +573,8 @@ const steps = {
   '/service-unavailable': {},
   '/session-ended': {},
   '/form-saved': {
-    behaviours: [SaveAndExit]
+    behaviours: [SaveAndExit],
+    backLink: false
   },
   '/expired-link': {}
 };
