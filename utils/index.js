@@ -138,7 +138,7 @@ const formatDate = date => {
  * @throws {Error} If the input is not a string containing exactly 16 digits.
  */
 const formatUanForDisplay = uan => {
-  if (typeof uan !== 'string' || uan.length !== 16 || !/^\d{16}$/.test(uan)) {
+  if (typeof uan !== 'string' || !/^\d{16}$/.test(uan)) {
     logAndThrow('Cannot format UAN: expected a 16-digit string', 'Invalid UAN');
   }
   return uan.match(/.{4}/g).join('-');
