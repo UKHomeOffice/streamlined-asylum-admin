@@ -207,7 +207,8 @@ const steps = {
     next: '/new-date-of-birth-evidence'
   },
   '/new-date-of-birth-evidence': {
-    // provisional document category: documents-new-dob
+    ...documentUploadStep('documents-new-dob'),
+    template: 'upload-dob-evidence',
     next: '/check-your-answers-date-of-birth'
   },
   '/check-your-answers-date-of-birth': {
