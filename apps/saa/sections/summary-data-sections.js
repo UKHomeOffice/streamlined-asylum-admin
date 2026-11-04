@@ -7,6 +7,7 @@ const { SAA_BASE_URL } = require('../../../utils/constants');
 const evidenceSummary = require('./summary-data-evidence-help-your-claim');
 const emailAddressSummary = require('./summary-data-email-address');
 const { formatDate, formatUanForDisplay } = require('../../../utils');
+const dateOfBirthSummary = require('./summary-data-date-of-birth');
 
 // Same rows as /check-your-answers-evidence; Change goes back to that page.
 const evidenceRows = evidenceSummary.evidence.steps.map(row => ({
@@ -19,6 +20,13 @@ const evidenceRows = evidenceSummary.evidence.steps.map(row => ({
 const emailAddressRows = emailAddressSummary['email-address'].steps.map(row => ({
   ...row,
   changeLink: `${SAA_BASE_URL}/check-your-answers-email`,
+  dependsOn: 'change-personal-details'
+}));
+
+// Same rows as /check-your-answers-date-of-birth; Change goes back to that page.
+const dateOfBirthRows = dateOfBirthSummary['date-of-birth'].steps.map(row => ({
+  ...row,
+  changeLink: `${SAA_BASE_URL}/check-your-answers-date-of-birth`,
   dependsOn: 'change-personal-details'
 }));
 
@@ -178,6 +186,9 @@ module.exports = {
         field: 'change-personal-details'
       }
     ]
+  },
+  'date-of-birth': {
+    steps: dateOfBirthRows
   },
   'email-address': {
     steps: emailAddressRows
