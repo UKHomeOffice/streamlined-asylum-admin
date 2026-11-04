@@ -6,6 +6,7 @@ const aggregatorSummaries = require('../config/aggregator-summaries');
 const { SAA_BASE_URL } = require('../../../utils/constants');
 const evidenceSummary = require('./summary-data-evidence-help-your-claim');
 const emailAddressSummary = require('./summary-data-email-address');
+const { formatDate, formatUanForDisplay } = require('../../../utils');
 
 // Same rows as /check-your-answers-evidence; Change goes back to that page.
 const evidenceRows = evidenceSummary.evidence.steps.map(row => ({
@@ -43,6 +44,33 @@ const aggregateSummaryRow = name => {
 
 module.exports = {
   'your-details': {
+    steps: [
+      {
+        step: '/claimant-details',
+        field: 'claimant-unique-application-number',
+        parse: uan => formatUanForDisplay(uan),
+        omitChangeLink: true
+      },
+      {
+        step: '/claimant-details',
+        field: 'claimant-date-of-birth',
+        parse: dob => formatDate(dob),
+        omitChangeLink: true
+      },
+      {
+        step: '/claim-decided',
+        field: 'claim-decided',
+        omitChangeLink: true
+      },
+      {
+        step: '/email-address',
+        field: 'user-email',
+        parse: (email, req) => email || req.sessionModel.get('user-email'),
+        omitChangeLink: true
+      }
+    ]
+  },
+  'claimant-details': {
     steps: [
       {
         step: '/claimants-name',
