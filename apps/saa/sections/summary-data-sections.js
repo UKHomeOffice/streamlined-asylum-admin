@@ -5,12 +5,20 @@ const {
 const aggregatorSummaries = require('../config/aggregator-summaries');
 const { SAA_BASE_URL } = require('../../../utils/constants');
 const evidenceSummary = require('./summary-data-evidence-help-your-claim');
+const emailAddressSummary = require('./summary-data-email-address');
 
 // Same rows as /check-your-answers-evidence; Change goes back to that page.
 const evidenceRows = evidenceSummary.evidence.steps.map(row => ({
   ...row,
   changeLink: `${SAA_BASE_URL}/check-your-answers-evidence`,
   dependsOn: 'send-evidence-for-your-claim'
+}));
+
+// Same rows as /check-your-answers-email; Change goes back to that page.
+const emailAddressRows = emailAddressSummary['email-address'].steps.map(row => ({
+  ...row,
+  changeLink: `${SAA_BASE_URL}/check-your-answers-email`,
+  dependsOn: 'change-personal-details'
 }));
 
 // Read-only rows for every item of an aggregate; Change goes to that aggregate's summary page.
@@ -92,6 +100,9 @@ module.exports = {
         field: 'do-you-need-to-change-your-name'
       }
     ]
+  },
+  'email-address': {
+    steps: emailAddressRows
   },
   'add-or-remove-dependants': {
     steps: [
