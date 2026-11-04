@@ -83,11 +83,20 @@ describe('change someone else’s name fork behaviour', () => {
     );
   });
 
-  test('routes to the relationship page when someone else’s name needs changing', () => {
+  test('preserves the configured relationship route when someone else’s name needs changing', () => {
+    baseGetNextStep.mockReturnValue('/updates/relationship-name-change');
     const req = createRequest('no', 'yes');
 
     expect(behaviour.getNextStep(req, {})).toBe(
       '/updates/relationship-name-change'
+    );
+  });
+
+  test('does not override the inherited route for a yes answer', () => {
+    const req = createRequest('yes', 'yes');
+
+    expect(behaviour.getNextStep(req, {})).toBe(
+      '/updates/change-your-date-of-birth'
     );
   });
 

@@ -26,7 +26,7 @@ describe('SAA multi-select follow-up route config', () => {
       require('../../../../apps/saa/behaviours/change-someone-elses-name-fork')
     );
     expect(step.forks).toBeUndefined();
-    expect(step.next).toBe('/change-your-date-of-birth');
+    expect(step.next).toBe('/relationship-name-change');
   });
 
   test('allows each dynamic section start to be reached from the multi-select entry point', () => {

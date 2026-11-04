@@ -171,7 +171,7 @@ const steps = {
   '/do-you-need-to-change-someone-elses-name': {
     behaviours: [multiSelectFollowUpsBehaviour, changeSomeoneElsesNameFork],
     fields: ['change-someone-elses-name'],
-    next: '/change-your-date-of-birth'
+    next: '/relationship-name-change'
   },
   '/relationship-name-change': {
     next: '/someone-else-new-name'
