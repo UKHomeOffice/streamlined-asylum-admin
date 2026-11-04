@@ -168,52 +168,34 @@ describe('formatUanForDisplay', () => {
     '',
     '   ',
     '--',
-    ' \t-\u2013\u2014\n '
-  ])('should reject unusable input %p with a clear error', value => {
-    expect(() => formatUanForDisplay(value)).toThrow(
-      new Error('Invalid UAN')
-    );
-    expect(mockLogger.error).toHaveBeenCalledTimes(1);
-    expect(mockLogger.error).toHaveBeenCalledWith(
-      'Cannot format UAN: expected a non-empty string'
-    );
-  });
-
-  test.each([
+    ' \t-\u2013\u2014\n ',
     '1212-       1212  - 1212 1212',
     '1212-1212-1212-1212',
     ' 1212\t1212\n1212 1212 ',
     '--1212--1212--1212--1212--',
-    '1212\u20131212\u20141212-1212'
-  ])('should clean separators before formatting %s', value => {
-    expect(formatUanForDisplay(value)).toBe('1212-1212-1212-1212');
-  });
-
-  test('should not silently remove unexpected letters', () => {
-    expect(formatUanForDisplay('1234-abcd-5678-9012')).toBe(
-      '1234-abcd-5678-9012'
+    '1212\u20131212\u20141212-1212',
+    '1234abcd56789012',
+    '123456789012345',
+    '12345678901234567',
+    '12345678901234567890',
+    '1234567890123456\n',
+    1234567890123456,
+    '1',
+    '123',
+    '1234'
+  ])('should reject input %p unless it is a 16-digit string', value => {
+    expect(() => formatUanForDisplay(value)).toThrow(new Error('Invalid UAN'));
+    expect(mockLogger.error).toHaveBeenCalledTimes(1);
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      'Cannot format UAN: expected a 16-digit string'
     );
   });
 
   test.each([
     ['1234567890123456', '1234-5678-9012-3456'],
-    ['12345678901234567890', '1234-5678-9012-3456-7890'],
     ['0000123456789012', '0000-1234-5678-9012']
   ])('should format UAN %s as %s', (value, expected) => {
     expect(formatUanForDisplay(value)).toBe(expected);
-  });
-
-  test.each(['1', '123', '1234'])(
-    'should leave a single group unchanged: %s',
-    value => {
-      expect(formatUanForDisplay(value)).toBe(value);
-    }
-  );
-
-  test('should preserve a final group shorter than four digits', () => {
-    expect(formatUanForDisplay('12345678901234567')).toBe(
-      '1234-5678-9012-3456-7'
-    );
   });
 });
 

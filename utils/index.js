@@ -131,22 +131,17 @@ const formatDate = date => {
 };
 
 /**
- * Removes whitespace and hyphen separators, then groups a UAN for display.
+ * Validates a normalised UAN, then groups it into four-digit blocks for display.
  *
- * @param {*} uan - A UAN string, optionally separated by whitespace or hyphens.
+ * @param {*} uan - A string containing exactly 16 digits without separators.
  * @returns {string} The display UAN, for example "1234-5678-9012-3456".
- * @throws {Error} If the input is not a string or is empty after removing separators.
+ * @throws {Error} If the input is not a string containing exactly 16 digits.
  */
 const formatUanForDisplay = uan => {
-  const cleaned =
-    typeof uan === 'string' ? uan.replaceAll(/[\s\u2013\u2014-]+/g, '') : '';
-  if (!cleaned) {
-    logAndThrow(
-      'Cannot format UAN: expected a non-empty string',
-      'Invalid UAN'
-    );
+  if (typeof uan !== 'string' || uan.length !== 16 || !/^\d{16}$/.test(uan)) {
+    logAndThrow('Cannot format UAN: expected a 16-digit string', 'Invalid UAN');
   }
-  return cleaned.match(/.{1,4}/g).join('-');
+  return uan.match(/.{4}/g).join('-');
 };
 
 module.exports = {

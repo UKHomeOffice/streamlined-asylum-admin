@@ -100,10 +100,9 @@ const resumeFormSession = superclass =>
     }
 
     setupRadioButtons(req, drafts) {
-      const sortedDrafts = [...drafts].sort(
+      const sortedDrafts = drafts.toSorted(
         (first, second) =>
-          new Date(second.created_at).getTime() -
-          new Date(first.created_at).getTime()
+          Date.parse(second.created_at) - Date.parse(first.created_at)
       );
       req.form.options.fields[FIELD_APP_ID] = {
         mixin: 'radio-group',

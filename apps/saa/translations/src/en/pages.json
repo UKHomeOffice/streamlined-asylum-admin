@@ -266,12 +266,6 @@
       }
     },
     "fields": {
-      "claim-decided": {
-        "label": "Claim decided"
-      },
-      "user-email": {
-        "label": "Email address"
-      },
       "addremovechildpartner": {
         "label": "Add or remove a child or partner"
       },

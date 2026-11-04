@@ -60,6 +60,11 @@ module.exports = {
       {
         step: '/claim-decided',
         field: 'claim-decided',
+        // This common-journey field has no radio config in SAA, so capitalise its raw yes/no value for display.
+        parse: claimDecided =>
+          claimDecided
+            ? claimDecided.charAt(0).toUpperCase() + claimDecided.slice(1)
+            : null,
         omitChangeLink: true
       },
       {
