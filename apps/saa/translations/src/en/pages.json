@@ -40,7 +40,8 @@
     "captionHeading": "Update personal details"
   },
   "new-date-of-birth-evidence": {
-    "header": "Upload evidence to support this change"
+    "header": "Upload evidence to support this change",
+    "captionHeading": "Update personal details"
   },
   "check-your-answers-date-of-birth": {
     "header": "Check your answers"
