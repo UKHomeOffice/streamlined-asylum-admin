@@ -224,6 +224,8 @@ const steps = {
     next: '/check-your-answers-date-of-birth'
   },
   '/check-your-answers-date-of-birth': {
+    behaviours: [Summary, SummaryLabels, EditRouteReturn],
+    sections: require('./sections/summary-data-date-of-birth'),
     next: '/change-someone-else-date-of-birth'
   },
   '/change-someone-else-date-of-birth': {

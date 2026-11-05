@@ -273,6 +273,10 @@
     "summary-label": "Files uploaded",
     "changeLinkDescription": "Files uploaded"
   },
+  "documents-new-dob": {
+    "summary-label": "Files uploaded",
+    "changeLinkDescription": "Files uploaded"
+  },
   "main-claimant-died": {
     "legend": "Did they make the claim?",
     "summary-label": "Did they make the claim?",
@@ -382,7 +386,8 @@
   },
   "correct-date-of-birth": {
     "legend": "What is your correct date of birth?",
-    "hint": "For example, 27 3 2020"
+    "hint": "For example, 27 3 2020",
+    "summary-label": "What is your correct date of birth?"
   },
   "change-someone-else-date-of-birth": {
     "legend": "Do you need to change someone else's date of birth?",

@@ -78,6 +78,15 @@ describe('summary data sections', () => {
   test('returns nothing when no children or partners have been added', () => {
     expect(row.parse(undefined, { form: { options: {} } })).toBeNull();
   });
+
+  test('DOB Change links on /confirm return to its check-your-answers page', () => {
+    const rows = sections['date-of-birth'].steps;
+
+    expect(rows.map(dobRow => dobRow.changeLink)).toEqual([
+      '/changes/check-your-answers-date-of-birth',
+      '/changes/check-your-answers-date-of-birth'
+    ]);
+  });
 });
 
 describe('evidence rows on the confirm page', () => {

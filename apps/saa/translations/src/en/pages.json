@@ -256,6 +256,9 @@
       "personal-details": {
         "header": "Personal details"
       },
+      "date-of-birth": {
+        "header": "Change your date of birth"
+      },
       "evidence": {
         "header": "Evidence"
       },
