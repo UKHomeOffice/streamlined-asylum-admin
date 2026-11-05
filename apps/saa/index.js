@@ -21,7 +21,7 @@ const EditRouteStart = require('./behaviours/edit-route-start');
 const SummaryLabels = require('./behaviours/summary-labels');
 const ResetSectionSummary = require('./behaviours/reset-section-summary');
 const ResumeFormSession = require('./behaviours/resume-form-session');
-const ClearOwnDateOfBirth = require('./behaviours/clear-own-dob');
+const ClearRedundantFields = require('./behaviours/clear-redundant-fields');
 
 const documentUploadStep = category => ({
   behaviours: [SaveDocument(category, 'file-upload'), RemoveDocument(category)],
@@ -203,7 +203,8 @@ const steps = {
   },
   '/change-your-date-of-birth': {
     fields: ['change-your-date-of-birth'],
-    behaviours: [ClearOwnDateOfBirth],
+    behaviours: [ClearRedundantFields('change-your-date-of-birth',
+      ['correct-date-of-birth', 'documents-new-dob'])],
     forks: [
       {
         target: '/change-someone-else-date-of-birth',

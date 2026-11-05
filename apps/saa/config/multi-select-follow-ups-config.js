@@ -94,11 +94,6 @@ module.exports = {
               }
             }
           ],
-          fieldsToUnset: [
-            'change-your-date-of-birth',
-            'correct-date-of-birth',
-            'documents-new-dob'
-          ],
           routes: [
             '/change-your-date-of-birth',
             '/correct-date-of-birth',

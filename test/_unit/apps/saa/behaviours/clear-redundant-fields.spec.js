@@ -1,4 +1,4 @@
-const ClearOwnDateOfBirth = require('../../../../../apps/saa/behaviours/clear-own-dob');
+const ClearRedundantFields = require('../../../../../apps/saa/behaviours/clear-redundant-fields');
 
 class BaseBehaviour {
   saveValues(req, res, callback) {
@@ -6,7 +6,8 @@ class BaseBehaviour {
   }
 }
 
-const Behaviour = ClearOwnDateOfBirth(BaseBehaviour);
+const Behaviour = ClearRedundantFields('change-your-date-of-birth',
+  ['correct-date-of-birth', 'documents-new-dob'])(BaseBehaviour);
 
 test('clears the own DOB date and evidence when the answer is no', () => {
   const req = {
