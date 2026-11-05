@@ -42,6 +42,7 @@
     "new-name": "New name"
   },
   "someone-else-new-name-evidence": {
+    "title": "Upload evidence to support this change - someone else’s name",
     "header": "Upload evidence to support this change",
     "captionHeading": "Update personal details"
   },
