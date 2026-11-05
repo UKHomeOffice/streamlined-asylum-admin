@@ -41,6 +41,10 @@
     "old-name": "Old name",
     "new-name": "New name"
   },
+  "someone-else-new-name-evidence": {
+    "header": "Upload evidence to support this change",
+    "captionHeading": "Update personal details"
+  },
   "change-your-date-of-birth": {
     "captionHeading": "Update personal details"
   },
