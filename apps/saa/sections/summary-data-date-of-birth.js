@@ -1,4 +1,5 @@
 const { SAA_BASE_URL } = require('../../../utils/constants');
+const { formatDate } = require('../../../utils');
 
 module.exports = {
   'date-of-birth': {
@@ -6,7 +7,8 @@ module.exports = {
       {
         step: '/correct-date-of-birth',
         field: 'correct-date-of-birth',
-        changeLink: `${SAA_BASE_URL}/correct-date-of-birth`
+        changeLink: `${SAA_BASE_URL}/correct-date-of-birth`,
+        parse: date => date ? formatDate(date) : null
       },
       {
         step: '/new-date-of-birth-evidence',

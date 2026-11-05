@@ -27,7 +27,7 @@ const emailAddressRows = emailAddressSummary['email-address'].steps.map(row => (
 const dateOfBirthRows = dateOfBirthSummary['date-of-birth'].steps.map(row => ({
   ...row,
   changeLink: `${SAA_BASE_URL}/check-your-answers-date-of-birth`,
-  dependsOn: 'change-personal-details'
+  dependsOn: 'change-your-date-of-birth'
 }));
 
 // Read-only rows for every item of an aggregate; Change goes to that aggregate's summary page.
