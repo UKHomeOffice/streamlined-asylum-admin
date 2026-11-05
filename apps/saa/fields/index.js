@@ -61,6 +61,18 @@ module.exports = {
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
   },
+  'relationship-name-change': {
+    mixin: 'radio-group',
+    options: ['my-child', 'spouse-or-partner'],
+    validate: ['required'],
+    isPageHeading: true
+  },
+  'reason-someone-else-name-change': {
+    mixin: 'radio-group',
+    options: ['error', 'marriage-or-divorce', 'deed-poll'],
+    validate: ['required'],
+    isPageHeading: true
+  },
   'reason-name-change': {
     mixin: 'radio-group',
     options: [
@@ -70,6 +82,26 @@ module.exports = {
     ],
     validate: ['required'],
     isPageHeading: true
+  },
+  'someone-else-old-given-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'someone-else-old-family-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'someone-else-new-given-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'someone-else-new-family-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
   },
   'given-name': {
     mixin: 'input-text',
@@ -102,7 +134,7 @@ module.exports = {
   },
   'relationship-to-child-partner': {
     mixin: 'radio-group',
-    options: ['my-child', 'husband-wife-partner'],
+    options: ['my-child', 'spouse-or-partner'],
     validate: ['required'],
     isPageHeading: true
   },

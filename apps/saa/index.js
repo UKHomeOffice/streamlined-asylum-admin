@@ -179,9 +179,21 @@ const steps = {
     next: '/relationship-name-change'
   },
   '/relationship-name-change': {
+    fields: ['relationship-name-change'],
+    next: '/reason-someone-else-name-change'
+  },
+  '/reason-someone-else-name-change': {
+    fields: ['reason-someone-else-name-change'],
     next: '/someone-else-new-name'
   },
   '/someone-else-new-name': {
+    behaviours: [CustomValidation],
+    fields: [
+      'someone-else-old-given-name',
+      'someone-else-old-family-name',
+      'someone-else-new-given-name',
+      'someone-else-new-family-name'
+    ],
     next: '/someone-else-new-name-evidence'
   },
   '/someone-else-new-name-evidence': {

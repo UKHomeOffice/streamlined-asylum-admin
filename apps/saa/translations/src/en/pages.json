@@ -29,10 +29,16 @@
     "captionHeading": "Update personal details"
   },
   "relationship-name-change": {
-    "header": "How are they related to you?"
+    "captionHeading": "Update personal details"
+  },
+  "reason-someone-else-name-change": {
+    "captionHeading": "Update personal details"
   },
   "someone-else-new-name": {
-    "header": "Change someone else’s name"
+    "header": "Change someone else’s name",
+    "captionHeading": "Update personal details",
+    "old-name": "Old name",
+    "new-name": "New name"
   },
   "change-your-date-of-birth": {
     "captionHeading": "Update personal details"
