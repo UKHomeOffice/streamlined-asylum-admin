@@ -6,6 +6,25 @@ const PRETTY_DATE_FORMATTER = new Intl.DateTimeFormat(
   config.dateFormat
 );
 
+const logger = require('hof/lib/logger')({ env: config.env });
+
+/**
+ * Logs an internal error message and throws an Error for the caller to handle.
+ * Logging is skipped if the logger does not provide an error method.
+ *
+ * @param {string} message - The internal log message; avoid sensitive data.
+ * @param {string} [publicMessage] - The thrown message, falling back to message if empty or omitted.
+ * @param {object} [meta] - Optional log metadata, not included in the thrown message.
+ * @returns {never} Always throws.
+ * @throws {Error} An error containing publicMessage or message.
+ */
+function logAndThrow(message, publicMessage, meta) {
+  if (logger && typeof logger.error === 'function') {
+    meta ? logger.error(message, meta) : logger.error(message);
+  }
+  throw new Error(publicMessage || message);
+}
+
 /**
  * Redacts the middle of a filename while preserving its first two characters,
  * final two basename characters, and extension.
@@ -111,11 +130,36 @@ const formatDate = date => {
   }
 };
 
+/**
+ * Checks the normalised UAN contract without changing the input.
+ *
+ * @param {*} uan - The value to check.
+ * @returns {boolean} True for a string containing exactly 16 digits.
+ */
+const isValidUan = uan => typeof uan === 'string' && /^\d{16}$/.test(uan);
+
+/**
+ * Validates a normalised UAN, then groups it into four-digit blocks for display.
+ *
+ * @param {*} uan - A string containing exactly 16 digits without separators.
+ * @returns {string} The display UAN, for example "1234-5678-9012-3456".
+ * @throws {Error} If the input is not a string containing exactly 16 digits.
+ */
+const formatUanForDisplay = uan => {
+  if (!isValidUan(uan)) {
+    logAndThrow('Cannot format UAN: expected a 16-digit string', 'Invalid UAN');
+  }
+  return uan.match(/.{4}/g).join('-');
+};
+
 module.exports = {
+  logAndThrow,
   sanitiseFilename,
   normaliseEmail,
   getNotifyErrorMessage,
   isTeamOnlyNotifyError,
   hasSelectedSection,
-  formatDate
+  formatDate,
+  isValidUan,
+  formatUanForDisplay
 };

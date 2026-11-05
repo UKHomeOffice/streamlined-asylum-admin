@@ -1,4 +1,7 @@
 {
+  "application-id": {
+    "required": "You must select a form"
+  },
   "claimant-main-language": {
     "required": "You must select a main language"
   },

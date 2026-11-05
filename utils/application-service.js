@@ -2,7 +2,7 @@
 
 const { randomUUID } = require('node:crypto');
 const { model: Model } = require('hof');
-const { API_METHODS } = require('./constants');
+const { REQUEST_METHODS } = require('./constants');
 const { normaliseEmail, formatDate } = require('./index');
 const config = require('../config');
 const { protocol, host, port } = config.saveService;
@@ -128,7 +128,7 @@ async function findApplicationsByEmail(email) {
   }
   const records = await request({
     url: `${applicationsUrl}/email/${encodeURIComponent(normalisedEmail)}`,
-    method: API_METHODS.GET
+    method: REQUEST_METHODS.GET
   });
   return records.filter(isDraft);
 }
@@ -147,7 +147,7 @@ async function findApplicationsByUan(uan) {
   }
   const records = await request({
     url: `${applicationsUrl}/uan/${encodeURIComponent(uan)}`,
-    method: API_METHODS.GET
+    method: REQUEST_METHODS.GET
   });
   return records.filter(isDraft);
 }
@@ -170,7 +170,7 @@ async function createApplication({ email, uan, dateOfBirth, session = {} }) {
 
   const [record] = await request({
     url: applicationsUrl,
-    method: API_METHODS.POST,
+    method: REQUEST_METHODS.POST,
     data: {
       email: normalisedEmail,
       uan,
@@ -194,7 +194,7 @@ async function saveApplication(id, session) {
   assertApplicationId(id);
   const [record] = await request({
     url: `${applicationsUrl}/${encodeURIComponent(id)}`,
-    method: API_METHODS.PATCH,
+    method: REQUEST_METHODS.PATCH,
     data: { session }
   });
   return record;
@@ -218,7 +218,7 @@ async function submitApplication(
   assertApplicationId(id);
   const [record] = await request({
     url: `${applicationsUrl}/${encodeURIComponent(id)}`,
-    method: API_METHODS.PATCH,
+    method: REQUEST_METHODS.PATCH,
     data: {
       session,
       submitted_at: new Date().toISOString(),

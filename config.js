@@ -22,6 +22,18 @@ module.exports = {
     allowSkip: String(process.env.ALLOW_SKIP) === 'true',
     skipEmail: process.env.SKIP_EMAIL
   },
+  sessionDefaults: {
+    preservedKeys: ['csrf-secret', 'user-email', 'valid-token'],
+    preservedSteps: ['/continue-to-form', '/which-form'],
+    excludedSnapshotKeys: [
+      'csrf-secret',
+      'user-email',
+      'valid-token',
+      'errors',
+      'errorValues'
+    ],
+    saveExemptions:[]
+  },
   govukNotify: {
     notifyApiKey: process.env.NOTIFY_KEY,
     emailTemplates: {
