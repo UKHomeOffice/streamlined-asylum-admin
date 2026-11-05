@@ -167,7 +167,8 @@ const steps = {
     next: '/new-name-evidence'
   },
   '/new-name-evidence': {
-    // provisional document category: documents-new-name
+    ...documentUploadStep('documents-new-name'),
+    template: 'upload-new-name-evidence',
     next: '/check-your-answers-name'
   },
   '/check-your-answers-name': {
@@ -197,8 +198,11 @@ const steps = {
     next: '/someone-else-new-name-evidence'
   },
   '/someone-else-new-name-evidence': {
-    // provisional document category: documents-someone-else-new-name
-    next: '/change-your-date-of-birth'
+    ...documentUploadStep('documents-someone-else-new-name'),
+    template: 'upload-new-name-evidence',
+    next: '/check-your-answers-someone-else-name'
+  },
+  '/check-your-answers-someone-else-name': {
   },
   '/change-your-date-of-birth': {
     fields: ['change-your-date-of-birth'],
