@@ -22,7 +22,6 @@ const SummaryLabels = require('./behaviours/summary-labels');
 const ResetSectionSummary = require('./behaviours/reset-section-summary');
 const ResumeFormSession = require('./behaviours/resume-form-session');
 const SaveFormSession = require('./behaviours/save-form-session');
-const SaveAndExit = require('./behaviours/save-and-exit');
 
 const documentUploadStep = category => ({
   behaviours: [SaveDocument(category, 'file-upload'), RemoveDocument(category)],
@@ -573,7 +572,7 @@ const steps = {
   '/service-unavailable': {},
   '/session-ended': {},
   '/form-saved': {
-    behaviours: [SaveAndExit],
+    clearSession: true,
     backLink: false
   },
   '/expired-link': {}
