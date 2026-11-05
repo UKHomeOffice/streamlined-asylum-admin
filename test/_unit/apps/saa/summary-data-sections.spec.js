@@ -82,12 +82,11 @@ describe('summary data sections', () => {
   test('DOB Change links on /confirm return to its check-your-answers page', () => {
     const rows = sections['date-of-birth'].steps;
 
-    expect(rows.map(row => row.changeLink)).toEqual([
+    expect(rows.map(dobRow => dobRow.changeLink)).toEqual([
       '/changes/check-your-answers-date-of-birth',
       '/changes/check-your-answers-date-of-birth'
     ]);
   });
-
 });
 
 describe('evidence rows on the confirm page', () => {
