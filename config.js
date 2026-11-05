@@ -83,6 +83,12 @@ module.exports = {
       '/new-email-address',
       '/your-phone-number',
       '/new-phone-number',
+      '/main-claimant-died',
+      '/about-who-has-died',
+      '/name-person-who-died',
+      '/date-of-birth-person-who-died',
+      '/nationality-person-who-died',
+      '/upload-death-certificate',
       '/declaration',
       '/submitted',
       '/expired-link'
