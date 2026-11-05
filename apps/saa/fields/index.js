@@ -63,7 +63,7 @@ module.exports = {
   },
   'relationship-name-change': {
     mixin: 'radio-group',
-    options: ['my-child', 'husband-wife-partner'],
+    options: ['my-child', 'spouse-or-partner'],
     validate: ['required'],
     isPageHeading: true
   },
@@ -134,7 +134,7 @@ module.exports = {
   },
   'relationship-to-child-partner': {
     mixin: 'radio-group',
-    options: ['my-child', 'husband-wife-partner'],
+    options: ['my-child', 'spouse-or-partner'],
     validate: ['required'],
     isPageHeading: true
   },

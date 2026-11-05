@@ -90,7 +90,7 @@
       "my-child": {
         "label": "My child"
       },
-      "husband-wife-partner": {
+      "spouse-or-partner": {
         "label": "My husband, wife, civil partner, or unmarried partner that I have lived with for 2 years or more"
       }
     }
@@ -105,7 +105,7 @@
         "label": "Marriage or divorce"
       },
       "deed-poll": {
-        "label": "Legal change by deedpoll"
+        "label": "Legal change by deed poll"
       }
     }
   },
@@ -181,7 +181,7 @@
       "my-child": {
         "label": "My child"
       },
-      "husband-wife-partner": {
+      "spouse-or-partner": {
         "label": "My husband, wife, civil partner, or unmarried partner that I have lived with for 2 years or more"
       }
     }

@@ -8,7 +8,7 @@ const translations = {
   'fields.add-remove-child-partner.options.remove-child-partner.summary-label':
     'Remove a child or partner as a dependant',
   'fields.relationship-to-child-partner.options.my-child.label': 'My child',
-  'fields.relationship-to-child-partner.options.husband-wife-partner.label':
+  'fields.relationship-to-child-partner.options.spouse-or-partner.label':
     'My partner',
   'fields.relationship-to-child-partner.legend': 'How are they related to you?',
   'fields.child-partner-given-name.label': 'Given name',
@@ -238,7 +238,7 @@ describe('parse section summary fields behaviour', () => {
       const row = rowFor([
         {
           field: 'relationship-to-child-partner',
-          value: ['my-child', 'husband-wife-partner']
+          value: ['my-child', 'spouse-or-partner']
         }
       ]);
 
