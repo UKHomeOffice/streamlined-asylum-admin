@@ -202,7 +202,7 @@ const steps = {
     template: 'upload-new-name-evidence',
     next: '/check-your-answers-someone-else-name'
   },
-    '/check-your-answers-someone-else-name': {
+  '/check-your-answers-someone-else-name': {
   },
   '/change-your-date-of-birth': {
     fields: ['change-your-date-of-birth'],
