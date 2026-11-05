@@ -20,7 +20,8 @@
     "captionHeading": "Update personal details"
   },
   "new-name-evidence": {
-    "header": "Upload evidence to support this change"
+    "header": "Upload evidence to support this change",
+    "captionHeading": "Update personal details"
   },
   "check-your-answers-name": {
     "header": "Check your answers"

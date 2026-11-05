@@ -167,7 +167,8 @@ const steps = {
     next: '/new-name-evidence'
   },
   '/new-name-evidence': {
-    // provisional document category: documents-new-name
+    ...documentUploadStep('documents-new-name'),
+    template: 'upload-new-name-evidence',
     next: '/check-your-answers-name'
   },
   '/check-your-answers-name': {
