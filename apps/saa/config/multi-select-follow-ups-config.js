@@ -87,7 +87,7 @@ module.exports = {
               }
             },
             {
-              route: '/check-your-answers-date-of-birth',
+              route: '/check-your-answers-someone-else-date-of-birth',
               condition: {
                 field: 'change-someone-else-date-of-birth',
                 value: 'yes'
@@ -99,35 +99,6 @@ module.exports = {
             '/correct-date-of-birth',
             '/new-date-of-birth-evidence',
             '/check-your-answers-date-of-birth',
-            '/change-someone-else-date-of-birth',
-            '/relationship-date-of-birth',
-            '/someone-else-correct-date-of-birth'
-          ]
-        }
-      ]
-    },
-    {
-      value: 'someone-else-date-of-birth',
-      order: 20,
-      sections: [
-        {
-          /*
-           * The routes below are not a forced sequence. They are the current
-           * possible pages owned by this selected option, while HOF still owns
-           * the actual page-to-page movement inside the section.
-           */
-          id: 'someone-elsedate-of-birth',
-          start: '/change-someone-else-date-of-birth',
-          completeOn: [
-            {
-              route: '/check-your-answers-someone-else-date-of-birth',
-              condition: {
-                field: 'change-someone-else-date-of-birth',
-                value: 'yes'
-              }
-            }
-          ],
-          routes: [
             '/change-someone-else-date-of-birth',
             '/relationship-date-of-birth',
             '/someone-else-correct-date-of-birth',
