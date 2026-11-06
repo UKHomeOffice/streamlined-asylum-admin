@@ -37,8 +37,6 @@ module.exports = {
       '/form-saved',
       '/session-ended',
       '/no-options-chosen',
-      '/upload-supporting-evidence',
-      '/violent-upsetting-images',
       '/add-remove-child-partner',
       '/provide-photo-identity',
       '/reason-for-removing-child-partner',
