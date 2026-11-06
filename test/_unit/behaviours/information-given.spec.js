@@ -30,15 +30,19 @@ describe('information given behaviour', () => {
   let req;
   let res;
   let savedSteps;
+  let savedRoute;
 
   beforeEach(() => {
     behaviour = new Behaviour();
     savedSteps = ['/continue-to-form', '/which-form'];
+    savedRoute = undefined;
     req = {
       baseUrl: '/changes',
       path: '/information-given',
       form: { options: { steps, next: '/claimants-name' } },
-      sessionModel: { get: jest.fn(() => savedSteps) }
+      sessionModel: {
+        get: jest.fn(key => (key === 'steps' ? savedSteps : savedRoute))
+      }
     };
     res = {};
     baseGetNextStep.mockReset().mockReturnValue('/changes/claimants-name');
@@ -57,6 +61,35 @@ describe('information given behaviour', () => {
     );
     expect(savedSteps).toEqual(original);
     expect(baseGetNextStep).not.toHaveBeenCalled();
+  });
+
+  test('should prefer the saved summary route even when it is absent from completed steps', () => {
+    savedSteps.push('/claimants-name');
+    savedRoute = '/check-your-answers-add-child-partner';
+
+    expect(behaviour.getNextStep(req, res)).toBe(
+      '/changes/check-your-answers-add-child-partner'
+    );
+    expect(savedSteps).not.toContain(savedRoute);
+  });
+
+  test.each(['/removed-route', '/form-saved', '/information-given', 123])(
+    'should ignore invalid saved-route marker %p',
+    route => {
+      savedRoute = route;
+      savedSteps.push('/claimant-main-language');
+
+      expect(behaviour.getNextStep(req, res)).toBe(
+        '/changes/claimant-main-language'
+      );
+    }
+  );
+
+  test('should use a saved confirmation route without completed-step history', () => {
+    savedRoute = '/confirm';
+    savedSteps = undefined;
+
+    expect(behaviour.getNextStep(req, res)).toBe('/changes/confirm');
   });
 
   test.each([

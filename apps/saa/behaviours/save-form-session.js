@@ -26,6 +26,8 @@ const saveFormSession = superclass =>
         session.steps = (session.steps || []).filter(
           step => !CHANGE_EDIT_DELETE_REGEX.test(step)
         );
+        // The current page is saved before we record its completion in steps.
+        session['last-saved-route'] = currentRoute;
 
         const applicationId = req.sessionModel.get('application-id');
         const saved = await saveApplication(applicationId, session);
