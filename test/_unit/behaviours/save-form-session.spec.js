@@ -18,6 +18,8 @@ jest.mock('../../../config', () => ({
 const { saveApplication } = require('../../../utils/application-service');
 const SaveFormSession = require('../../../apps/saa/behaviours/save-form-session');
 const InformationGiven = require('../../../apps/saa/behaviours/information-given');
+const ResumeFormSession = require('../../../apps/saa/behaviours/resume-form-session');
+const Model = require('hof/model');
 
 describe('save form session behaviour', () => {
   const baseLocals = jest.fn();
@@ -65,7 +67,10 @@ describe('save form session behaviour', () => {
       baseUrl: '/changes',
       sessionModel: {
         toJSON: jest.fn(() => structuredClone(session)),
-        get: jest.fn(key => session[key])
+        get: jest.fn(key => session[key]),
+        set: jest.fn((key, value) => {
+          session[key] = value;
+        })
       },
       log: jest.fn()
     };
@@ -92,7 +97,7 @@ describe('save form session behaviour', () => {
     }
   );
 
-  test('should save a filtered snapshot without changing the live session before continuing', async () => {
+  test('should save a filtered snapshot and update only the live resume marker before continuing', async () => {
     const original = structuredClone(session);
 
     expect(await behaviour.successHandler(req, res, next)).toBe('continued');
@@ -110,7 +115,10 @@ describe('save form session behaviour', () => {
         '/change-personal-details'
       ]
     });
-    expect(session).toEqual(original);
+    expect(session).toEqual({
+      ...original,
+      'last-saved-route': '/claimants-name'
+    });
     expect(req.log).toHaveBeenCalledWith(
       'info',
       'Saved form session for application 9'
@@ -136,6 +144,7 @@ describe('save form session behaviour', () => {
 
   test('should save before redirecting when save-and-exit is requested', async () => {
     req.body['save-and-exit'] = 'true';
+    session['last-saved-route'] = '/claimant-main-language';
     let resolveSave;
     saveApplication.mockReturnValue(
       new Promise(resolve => {
@@ -147,52 +156,84 @@ describe('save form session behaviour', () => {
 
     expect(res.redirect).not.toHaveBeenCalled();
     expect(baseSuccessHandler).not.toHaveBeenCalled();
+    expect(session['last-saved-route']).toBe('/claimant-main-language');
+    expect(req.sessionModel.set).not.toHaveBeenCalled();
     resolveSave({ id: 9 });
     expect(await saving).toBe('redirected');
+    expect(session['last-saved-route']).toBe('/claimants-name');
     expect(res.redirect).toHaveBeenCalledWith('/changes/form-saved');
     expect(baseSuccessHandler).not.toHaveBeenCalled();
     expect(next).not.toHaveBeenCalled();
   });
 
-  test('should resume the saved aggregator summary rather than its preceding evidence page', async () => {
-    const summaryRoute = '/check-your-answers-add-child-partner';
-    req.form.options.route = summaryRoute;
-    req.body['save-and-exit'] = 'true';
-    session.steps = ['/which-form', '/evidence-child-partner'];
-    session.addremovechildpartner = {
-      aggregatedValues: [
-        { fields: [{ field: 'child-partner-given-name', value: 'Alex' }] }
-      ]
-    };
+  test.each([false, true])(
+    'should preserve the saved aggregator summary across repeated entry-page saves with save-and-exit %p',
+    async exit => {
+      const summaryRoute = '/check-your-answers-add-child-partner';
+      req.form.options.route = summaryRoute;
+      req.body['save-and-exit'] = 'true';
+      session.steps = ['/which-form', '/evidence-child-partner'];
+      session.addremovechildpartner = {
+        aggregatedValues: [
+          { fields: [{ field: 'child-partner-given-name', value: 'Alex' }] }
+        ]
+      };
 
-    await behaviour.successHandler(req, res, next);
+      await behaviour.successHandler(req, res, next);
 
-    const snapshot = saveApplication.mock.calls[0][1];
-    expect(snapshot['last-saved-route']).toBe(summaryRoute);
-    expect(snapshot.steps).not.toContain(summaryRoute);
-    expect(snapshot.addremovechildpartner).toEqual(
-      session.addremovechildpartner
-    );
-    expect(session['last-saved-route']).toBeUndefined();
-    expect(res.redirect).toHaveBeenCalledWith('/changes/form-saved');
+      let snapshot = saveApplication.mock.calls[0][1];
+      expect(snapshot['last-saved-route']).toBe(summaryRoute);
+      expect(snapshot.steps).not.toContain(summaryRoute);
+      expect(snapshot.addremovechildpartner).toEqual(
+        session.addremovechildpartner
+      );
+      expect(session['last-saved-route']).toBe(summaryRoute);
+      expect(res.redirect).toHaveBeenCalledWith('/changes/form-saved');
 
-    const ResumeBehaviour = InformationGiven(BaseBehaviour);
-    const resumeReq = {
-      baseUrl: '/changes',
-      form: {
-        options: {
-          steps: {
-            '/evidence-child-partner': { next: summaryRoute },
-            [summaryRoute]: { next: '/send-evidence-for-your-claim' }
+      const ResumeBehaviour = InformationGiven(BaseBehaviour);
+      const resumeReq = {
+        baseUrl: '/changes',
+        form: {
+          options: {
+            steps: {
+              '/evidence-child-partner': { next: summaryRoute },
+              [summaryRoute]: { next: '/send-evidence-for-your-claim' }
+            }
           }
+        },
+        sessionModel: { get: key => snapshot[key] }
+      };
+      expect(new ResumeBehaviour().getNextStep(resumeReq, res)).toBe(
+        `/changes${summaryRoute}`
+      );
+
+      for (let round = 0; round < 2; round++) {
+        session = structuredClone(snapshot);
+        const original = structuredClone(session);
+        req.form.options.route = '/information-given';
+        req.body = exit ? { 'save-and-exit': 'true' } : {};
+        res.redirect.mockClear();
+        baseSuccessHandler.mockClear();
+
+        await behaviour.successHandler(req, res, next);
+
+        snapshot = saveApplication.mock.calls.at(-1)[1];
+        expect(snapshot['last-saved-route']).toBe(summaryRoute);
+        expect(snapshot.steps).not.toContain(summaryRoute);
+        expect(session).toEqual(original);
+        if (exit) {
+          expect(res.redirect).toHaveBeenCalledWith('/changes/form-saved');
+          expect(baseSuccessHandler).not.toHaveBeenCalled();
+        } else {
+          expect(baseSuccessHandler).toHaveBeenCalledWith(req, res, next);
+          expect(res.redirect).not.toHaveBeenCalled();
         }
-      },
-      sessionModel: { get: key => snapshot[key] }
-    };
-    expect(new ResumeBehaviour().getNextStep(resumeReq, res)).toBe(
-      `/changes${summaryRoute}`
-    );
-  });
+        expect(new ResumeBehaviour().getNextStep(resumeReq, res)).toBe(
+          `/changes${summaryRoute}`
+        );
+      }
+    }
+  );
 
   test.each([false, true])(
     'should delegate exempt routes without saving, even with save-and-exit %p',
@@ -207,6 +248,48 @@ describe('save form session behaviour', () => {
         expect(saveApplication).not.toHaveBeenCalled();
         expect(res.redirect).not.toHaveBeenCalled();
       });
+    }
+  );
+
+  test.each([
+    ['/send-evidence-for-your-claim', false],
+    ['/check-your-answers-death', true]
+  ])(
+    'should resume newer saved progress at %s when the already-loaded draft is selected again',
+    async (newRoute, exit) => {
+      const summaryRoute = '/check-your-answers-add-child-partner';
+      session['last-saved-route'] = summaryRoute;
+      session.steps = ['/which-form', '/evidence-child-partner'];
+      const loadedDraft = { id: 9, session: structuredClone(session) };
+      req.sessionModel = new Model(session);
+      req.form.options.steps = {
+        '/evidence-child-partner': { next: summaryRoute },
+        [summaryRoute]: { next: '/send-evidence-for-your-claim' },
+        '/send-evidence-for-your-claim': { next: '/someone-on-claim-died' },
+        '/check-your-answers-death': { next: '/something-else' }
+      };
+      const resume = new (InformationGiven(BaseBehaviour))();
+      const loader = new (ResumeFormSession(BaseBehaviour))();
+      expect(resume.getNextStep(req, res)).toBe(`/changes${summaryRoute}`);
+
+      req.form.options.route = newRoute;
+      req.body = exit ? { 'save-and-exit': 'true' } : {};
+      await behaviour.successHandler(req, res, next);
+
+      expect(req.sessionModel.get('last-saved-route')).toBe(newRoute);
+      expect(saveApplication.mock.calls[0][1]['last-saved-route']).toBe(
+        newRoute
+      );
+      expect(req.sessionModel.get('steps')).not.toContain(newRoute);
+      loader.loadApplication(req, loadedDraft);
+      expect(resume.getNextStep(req, res)).toBe(`/changes${newRoute}`);
+
+      req.form.options.route = '/information-given';
+      await behaviour.successHandler(req, res, next);
+      expect(saveApplication.mock.calls[1][1]['last-saved-route']).toBe(
+        newRoute
+      );
+      expect(resume.getNextStep(req, res)).toBe(`/changes${newRoute}`);
     }
   );
 
@@ -237,6 +320,7 @@ describe('save form session behaviour', () => {
       expect(baseSuccessHandler).not.toHaveBeenCalled();
       expect(res.redirect).not.toHaveBeenCalled();
       expect(req.log).not.toHaveBeenCalled();
+      expect(req.sessionModel.set).not.toHaveBeenCalled();
     }
   );
 
@@ -244,6 +328,7 @@ describe('save form session behaviour', () => {
     'should stop on API failure with save-and-exit %p',
     async exit => {
       const error = new Error('Save failed');
+      session['last-saved-route'] = '/check-your-answers-add-child-partner';
       const original = structuredClone(session);
       req.body['save-and-exit'] = exit;
       saveApplication.mockRejectedValue(error);
@@ -256,6 +341,7 @@ describe('save form session behaviour', () => {
       expect(baseSuccessHandler).not.toHaveBeenCalled();
       expect(res.redirect).not.toHaveBeenCalled();
       expect(req.log).not.toHaveBeenCalled();
+      expect(req.sessionModel.set).not.toHaveBeenCalled();
     }
   );
 
