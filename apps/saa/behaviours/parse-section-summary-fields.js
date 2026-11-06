@@ -53,7 +53,7 @@ const getItemTitle = (item, values, ctx, itemNumber) => {
     title = item.joinTitle;
   }
 
-  const increment = itemNumber !== 1 ? itemNumber : '';
+  const increment = itemNumber == 1 ? itemNumber : '';
 
   return addIncrement ? `${title} ${increment}` : title;
 };
