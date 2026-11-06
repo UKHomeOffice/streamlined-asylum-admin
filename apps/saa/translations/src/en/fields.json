@@ -93,6 +93,31 @@
       }
     }
   },
+  "relationship-name-change": {
+    "legend": "How are they related to you?",
+    "options": {
+      "my-child": {
+        "label": "My child"
+      },
+      "spouse-or-partner": {
+        "label": "My husband, wife, civil partner, or unmarried partner that I have lived with for 2 years or more"
+      }
+    }
+  },
+  "reason-someone-else-name-change": {
+    "legend": "Why do you need to change their name?",
+    "options": {
+      "error": {
+        "label": "An error"
+      },
+      "marriage-or-divorce": {
+        "label": "Marriage or divorce"
+      },
+      "deed-poll": {
+        "label": "Legal change by deed poll"
+      }
+    }
+  },
   "reason-name-change": {
     "legend": "Why do you need to change the name?",
     "options": {
@@ -106,6 +131,22 @@
         "label": "Legal change by deed poll"
       }
     }
+  },
+  "someone-else-old-given-name": {
+    "label": "Given name",
+    "summary-label": "Old given name"
+  },
+  "someone-else-old-family-name": {
+    "label": "Family name",
+    "summary-label": "Old family name"
+  },
+  "someone-else-new-given-name": {
+    "label": "Given name",
+    "summary-label": "New given name"
+  },
+  "someone-else-new-family-name": {
+    "label": "Family name",
+    "summary-label": "New family name"
   },
   "given-name": {
     "label": "Given name",
@@ -149,7 +190,7 @@
       "my-child": {
         "label": "My child"
       },
-      "husband-wife-partner": {
+      "spouse-or-partner": {
         "label": "My husband, wife, civil partner, or unmarried partner that I have lived with for 2 years or more"
       }
     }
@@ -229,6 +270,10 @@
     "changeLinkDescription": "Files uploaded"
   },
   "documents-help-your-claim": {
+    "summary-label": "Files uploaded",
+    "changeLinkDescription": "Files uploaded"
+  },
+  "documents-new-dob": {
     "summary-label": "Files uploaded",
     "changeLinkDescription": "Files uploaded"
   },
@@ -341,7 +386,8 @@
   },
   "correct-date-of-birth": {
     "legend": "What is your correct date of birth?",
-    "hint": "For example, 27 3 2020"
+    "hint": "For example, 27 3 2020",
+    "summary-label": "What is your correct date of birth?"
   },
   "change-someone-else-date-of-birth": {
     "legend": "Do you need to change someone else's date of birth?",

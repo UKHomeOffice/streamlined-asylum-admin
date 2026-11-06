@@ -6,6 +6,7 @@ const aggregatorSummaries = require('../config/aggregator-summaries');
 const { SAA_BASE_URL } = require('../../../utils/constants');
 const evidenceSummary = require('./summary-data-evidence-help-your-claim');
 const emailAddressSummary = require('./summary-data-email-address');
+const dateOfBirthSummary = require('./summary-data-date-of-birth');
 const { formatDate, formatUanForDisplay } = require('../../../utils');
 
 // Same rows as /check-your-answers-evidence; Change goes back to that page.
@@ -19,6 +20,13 @@ const evidenceRows = evidenceSummary.evidence.steps.map(row => ({
 const emailAddressRows = emailAddressSummary['email-address'].steps.map(row => ({
   ...row,
   changeLink: `${SAA_BASE_URL}/check-your-answers-email`,
+  dependsOn: 'change-personal-details'
+}));
+
+// Same rows as /check-your-answers-date-of-birth; Change goes back to that page.
+const dateOfBirthRows = dateOfBirthSummary['date-of-birth'].steps.map(row => ({
+  ...row,
+  changeLink: `${SAA_BASE_URL}/check-your-answers-date-of-birth`,
   dependsOn: 'change-personal-details'
 }));
 
@@ -138,6 +146,36 @@ module.exports = {
       {
         step: '/do-you-need-to-change-someone-elses-name',
         field: 'change-someone-elses-name'
+      },
+      {
+        step: '/relationship-name-change',
+        field: 'relationship-name-change',
+        dependsOn: 'change-someone-elses-name'
+      },
+      {
+        step: '/reason-someone-else-name-change',
+        field: 'reason-someone-else-name-change',
+        dependsOn: 'change-someone-elses-name'
+      },
+      {
+        step: '/someone-else-new-name',
+        field: 'someone-else-old-given-name',
+        dependsOn: 'change-someone-elses-name'
+      },
+      {
+        step: '/someone-else-new-name',
+        field: 'someone-else-old-family-name',
+        dependsOn: 'change-someone-elses-name'
+      },
+      {
+        step: '/someone-else-new-name',
+        field: 'someone-else-new-given-name',
+        dependsOn: 'change-someone-elses-name'
+      },
+      {
+        step: '/someone-else-new-name',
+        field: 'someone-else-new-family-name',
+        dependsOn: 'change-someone-elses-name'
       }
     ]
   },
@@ -148,6 +186,9 @@ module.exports = {
         field: 'change-personal-details'
       }
     ]
+  },
+  'date-of-birth': {
+    steps: dateOfBirthRows
   },
   'email-address': {
     steps: emailAddressRows

@@ -22,6 +22,10 @@ const customValidation = superclass =>
         'helper-family-name',
         'given-name',
         'family-name',
+        'someone-else-old-given-name',
+        'someone-else-old-family-name',
+        'someone-else-new-given-name',
+        'someone-else-new-family-name',
         'someone-else-correct-date-of-birth-given-name',
         'someone-else-correct-date-of-birth-family-name'
       ];

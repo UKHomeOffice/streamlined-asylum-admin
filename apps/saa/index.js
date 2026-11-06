@@ -168,7 +168,8 @@ const steps = {
     next: '/new-name-evidence'
   },
   '/new-name-evidence': {
-    // provisional document category: documents-new-name
+    ...documentUploadStep('documents-new-name'),
+    template: 'upload-new-name-evidence',
     next: '/check-your-answers-name'
   },
   '/check-your-answers-name': {
@@ -180,14 +181,29 @@ const steps = {
     next: '/relationship-name-change'
   },
   '/relationship-name-change': {
+    fields: ['relationship-name-change'],
+    next: '/reason-someone-else-name-change'
+  },
+  '/reason-someone-else-name-change': {
+    fields: ['reason-someone-else-name-change'],
     next: '/someone-else-new-name'
   },
   '/someone-else-new-name': {
+    behaviours: [CustomValidation],
+    fields: [
+      'someone-else-old-given-name',
+      'someone-else-old-family-name',
+      'someone-else-new-given-name',
+      'someone-else-new-family-name'
+    ],
     next: '/someone-else-new-name-evidence'
   },
   '/someone-else-new-name-evidence': {
-    // provisional document category: documents-someone-else-new-name
-    next: '/change-your-date-of-birth'
+    ...documentUploadStep('documents-someone-else-new-name'),
+    template: 'upload-new-name-evidence',
+    next: '/check-your-answers-someone-else-name'
+  },
+  '/check-your-answers-someone-else-name': {
   },
   '/change-your-date-of-birth': {
     fields: ['change-your-date-of-birth'],
@@ -213,6 +229,8 @@ const steps = {
     next: '/check-your-answers-date-of-birth'
   },
   '/check-your-answers-date-of-birth': {
+    behaviours: [Summary, SummaryLabels, EditRouteReturn],
+    sections: require('./sections/summary-data-date-of-birth'),
     next: '/change-someone-else-date-of-birth'
   },
   '/change-someone-else-date-of-birth': {

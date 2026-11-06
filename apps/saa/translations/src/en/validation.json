@@ -23,8 +23,38 @@
   "change-someone-elses-name": {
     "required": "Select if you need to change someone else's name"
   },
+  "relationship-name-change": {
+    "required": "Select how they are related to you"
+  },
+  "reason-someone-else-name-change": {
+    "required": "Select why you need to change their name"
+  },
   "reason-name-change": {
     "required": "Select why you need to change the name"
+  },
+  "someone-else-old-given-name": {
+    "required": "Enter their given name",
+    "noDigits": "Given name must not contain numbers",
+    "maxlength": "Given name must be between 1 and 255 characters",
+    "notUrl": "Given name must not contain a URL"
+  },
+  "someone-else-old-family-name": {
+    "required": "Enter their family name",
+    "noDigits": "Family name must not contain numbers",
+    "maxlength": "Family name must be between 1 and 255 characters",
+    "notUrl": "Family name must not contain a URL"
+  },
+  "someone-else-new-given-name": {
+    "required": "Enter their given name",
+    "noDigits": "Given name must not contain numbers",
+    "maxlength": "Given name must be between 1 and 255 characters",
+    "notUrl": "Given name must not contain a URL"
+  },
+  "someone-else-new-family-name": {
+    "required": "Enter their family name",
+    "noDigits": "Family name must not contain numbers",
+    "maxlength": "Family name must be between 1 and 255 characters",
+    "notUrl": "Family name must not contain a URL"
   },
   "given-name": {
     "required": "Enter your new given name",
