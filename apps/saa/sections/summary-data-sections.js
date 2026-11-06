@@ -190,6 +190,15 @@ module.exports = {
   'date-of-birth': {
     steps: dateOfBirthRows
   },
+  'someone-else-date-of-birth': {
+    steps: [
+      {
+        step: '/change-someone-else-date-of-birth',
+        field: 'change-someone-else-date-of-birth'
+      },
+      aggregateSummaryRow('someoneelsenewdob')
+    ]
+  },
   'email-address': {
     steps: emailAddressRows
   },

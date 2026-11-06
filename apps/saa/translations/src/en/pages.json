@@ -63,11 +63,22 @@
     "captionHeading": "Update personal details"
   },
   "relationship-date-of-birth": {
-    "captionHeading": "Update personal details"
+    "captionHeading": "Update personal details",
+    "add-another-dob": "Change another date of birth"
   },
   "someone-else-correct-date-of-birth": {
+    "item-title": "Change someone else’s date of birth",
     "header": "Change someone else’s date of birth",
     "captionHeading": "Update personal details"
+  },
+  "someone-else-new-date-of-birth-evidence": {
+    "header": "Upload evidence to support this change",
+    "captionHeading": "Update personal details"
+  },
+  "check-your-answers-someone-else-date-of-birth": {
+    "header": "Check your answers",
+    "captionHeading": "Update personal details",
+    "limit-exceeded": "You have changed the maximum number of dates of birth. You cannot add or remove any more."
   },
   "whose-nationality-to-change": {
     "header": "Do you need to change your nationality?"
@@ -264,6 +275,9 @@
       },
       "date-of-birth": {
         "header": "Change your date of birth"
+      },
+      "someone-else-date-of-birth": {
+        "header": "Change someone else's date of birth"
       },
       "evidence": {
         "header": "Evidence"
