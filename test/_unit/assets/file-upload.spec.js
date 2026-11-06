@@ -39,6 +39,7 @@ const createDocument = file => {
   };
   const spinner = { style: {} };
   const continueButton = { disabled: false, ariaDisabled: false };
+  const saveAndExitButton = { disabled: false, ariaDisabled: false };
   const removeLink = {
     classList: createClassList(),
     setAttribute: jest.fn(),
@@ -56,7 +57,7 @@ const createDocument = file => {
       'file-upload-error-fileType': errorElements.fileType
     })[id]),
     querySelectorAll: jest.fn(selector => (
-      selector === '[data-upload-continue]' ? [continueButton] : [removeLink]
+      selector === '[data-upload-continue]' ? [continueButton, saveAndExitButton] : [removeLink]
     )),
     querySelector: jest.fn().mockReturnValue(form)
   };
@@ -68,6 +69,7 @@ const createDocument = file => {
     input,
     spinner,
     continueButton,
+    saveAndExitButton,
     removeLink,
     form,
     errorElements
@@ -153,6 +155,9 @@ describe('file upload client validation', () => {
     expect(fixture.spinner.style.display).toBe('flex');
     expect(fixture.input.disabled).toBe(true);
     expect(fixture.continueButton.disabled).toBe(true);
+    expect(fixture.continueButton.ariaDisabled).toBe(true);
+    expect(fixture.saveAndExitButton.disabled).toBe(true);
+    expect(fixture.saveAndExitButton.ariaDisabled).toBe(true);
     expect(fixture.removeLink.classList.add).toHaveBeenCalledWith('disabled-link');
     expect(fixture.removeLink.setAttribute).toHaveBeenCalledWith('aria-disabled', 'true');
     expect(fixture.removeLink.addEventListener).toHaveBeenCalledWith('click', expect.any(Function));

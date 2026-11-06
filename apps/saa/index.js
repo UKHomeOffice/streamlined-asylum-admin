@@ -21,6 +21,8 @@ const EditRouteStart = require('./behaviours/edit-route-start');
 const SummaryLabels = require('./behaviours/summary-labels');
 const ResetSectionSummary = require('./behaviours/reset-section-summary');
 const ResumeFormSession = require('./behaviours/resume-form-session');
+const SaveFormSession = require('./behaviours/save-form-session');
+const InformationGiven = require('./behaviours/information-given');
 
 const documentUploadStep = category => ({
   behaviours: [SaveDocument(category, 'file-upload'), RemoveDocument(category)],
@@ -91,7 +93,7 @@ const steps = {
     backLink: false
   },
   '/information-given': {
-    behaviours: [Summary, SummaryLabels, EditRouteStart],
+    behaviours: [Summary, SummaryLabels, EditRouteStart, InformationGiven],
     sections: require('./sections/summary-data-sections'),
     next: '/claimants-name'
   },
@@ -202,8 +204,7 @@ const steps = {
     template: 'upload-new-name-evidence',
     next: '/check-your-answers-someone-else-name'
   },
-  '/check-your-answers-someone-else-name': {
-  },
+  '/check-your-answers-someone-else-name': {},
   '/change-your-date-of-birth': {
     fields: ['change-your-date-of-birth'],
     forks: [
@@ -387,6 +388,7 @@ const steps = {
     next: '/send-evidence-for-your-claim'
   },
   '/add-remove-child-partner': {
+    continueOnEdit: true,
     fields: ['add-remove-child-partner'],
     forks: [
       {
@@ -400,27 +402,33 @@ const steps = {
     next: '/reason-for-removing-child-partner'
   },
   '/reason-for-removing-child-partner': {
+    continueOnEdit: true,
     fields: ['reason-removing-child-partner'],
     next: '/relationship-to-child-partner'
   },
   '/relationship-to-child-partner': {
+    continueOnEdit: true,
     fields: ['relationship-to-child-partner'],
     next: '/child-partner-name'
   },
   '/child-partner-name': {
+    continueOnEdit: true,
     behaviours: [CustomValidation],
     fields: ['child-partner-given-name', 'child-partner-family-name'],
     next: '/child-partner-date-of-birth'
   },
   '/child-partner-date-of-birth': {
+    continueOnEdit: true,
     fields: ['child-partner-date-of-birth'],
     next: '/child-partner-nationality'
   },
   '/child-partner-nationality': {
+    continueOnEdit: true,
     fields: ['child-partner-nationality'],
     next: '/evidence-child-partner'
   },
   '/evidence-child-partner': {
+    continueOnEdit: true,
     ...documentUploadStep('documents-child-partner'),
     next: '/check-your-answers-add-child-partner'
   },
@@ -519,25 +527,31 @@ const steps = {
     next: '/something-else'
   },
   '/about-who-has-died': {
+    continueOnEdit: true,
     next: '/main-claimant-died'
   },
   '/main-claimant-died': {
+    continueOnEdit: true,
     fields: ['main-claimant-died'],
     next: '/name-person-who-died'
   },
   '/name-person-who-died': {
+    continueOnEdit: true,
     fields: ['given-name-person-who-died', 'family-name-person-who-died'],
     next: '/date-of-birth-person-who-died'
   },
   '/date-of-birth-person-who-died': {
+    continueOnEdit: true,
     fields: ['date-of-birth-person-who-died'],
     next: '/nationality-person-who-died'
   },
   '/nationality-person-who-died': {
+    continueOnEdit: true,
     fields: ['nationality-person-who-died'],
     next: '/upload-death-certificate'
   },
   '/upload-death-certificate': {
+    continueOnEdit: true,
     ...documentUploadStep('documents-death-certificate'),
     template: 'upload-supporting-evidence',
     next: '/check-your-answers-death'
@@ -572,8 +586,7 @@ const steps = {
   '/declaration': {
     next: '/submitted'
   },
-  '/submitted': {
-  },
+  '/submitted': {},
   '/something-else': {
     behaviours: [somethingElseFork],
     fields: ['something-else'],
@@ -587,11 +600,12 @@ const steps = {
   '/no-options': {
     backLink: 'something-else'
   },
-  '/page-not-found': {},
   '/service-unavailable': {},
-  '/problem-with-service': {},
   '/session-ended': {},
-  '/form-saved': {},
+  '/form-saved': {
+    clearSession: true,
+    backLink: false
+  },
   '/expired-link': {}
 };
 
@@ -653,5 +667,6 @@ module.exports = {
   fields: 'apps/saa/fields',
   views: 'apps/saa/views',
   translations: 'apps/saa/translations',
-  steps: steps
+  steps: steps,
+  behaviours: [SaveFormSession]
 };
