@@ -10,7 +10,8 @@ const app = require('../../../../apps/saa');
 // Add every new aggregator summary (mini CYA) route here.
 const aggregatorSummaryRoutes = [
   '/check-your-answers-add-child-partner',
-  '/check-your-answers-death'
+  '/check-your-answers-death',
+  '/check-your-answers-someone-else-date-of-birth'
 ];
 
 describe('SAA aggregator summary routes', () => {

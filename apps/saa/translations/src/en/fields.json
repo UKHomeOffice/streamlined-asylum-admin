@@ -401,16 +401,19 @@
     }
   },
   "someone-else-correct-date-of-birth-given-name": {
+    "summary-label": "Name",
     "label": "Given name"
   },
   "someone-else-correct-date-of-birth-family-name": {
     "label": "Family name"
   },
   "someone-else-correct-date-of-birth": {
+    "summary-label": "Correct date of birth",
     "legend": "Date of birth",
     "hint": "For example, 27 3 2020"
   },
   "relationship-date-of-birth": {
+    "summary-label": "How are they related to you?",
     "legend": "How are they related to you?",
     "options": {
       "my-child": {
@@ -420,5 +423,8 @@
         "label": "My husband, wife, civil partner, or unmarried partner that I have lived with for 2 years or more"
       }
     }
+  },
+  "documents-someone-else-new-dob": {
+    "summary-label": "Files uploaded"
   }
 }

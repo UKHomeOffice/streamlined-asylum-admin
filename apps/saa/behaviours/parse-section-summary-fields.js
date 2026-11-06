@@ -38,24 +38,28 @@ const parseValue = ({ field, value, parsed }, values, ctx) => {
 const hasValue = value =>
   Array.isArray(value) ? value.length > 0 : Boolean(value);
 
-const getItemTitle = (item, values, ctx) => {
-  const { itemTitle, titleField } = ctx;
+const getItemTitle = (item, values, ctx, itemNumber) => {
+  const { itemTitle, titleField, addIncrement } = ctx;
+  let title;
 
   if (itemTitle) {
-    // Same title on every item, e.g. when there is no titleField.
-    return ctx.translate(itemTitle);
-  }
-  if (ctx.isOptionField(titleField) && values[titleField]) {
-    return ctx.translate([
+    title = ctx.translate(itemTitle);
+  } else if (ctx.isOptionField(titleField) && values[titleField]) {
+    title = ctx.translate([
       `fields.${titleField}.options.${values[titleField]}.summary-label`,
       `fields.${titleField}.options.${values[titleField]}.label`
     ]);
+  } else {
+    title = item.joinTitle;
   }
-  return item.joinTitle;
+
+  const increment = itemNumber === 1 ? '' : itemNumber;
+
+  return addIncrement ? `${title} ${increment}` : title;
 };
 
 // Returns a copy so the saved field names stay unchanged for editing.
-const parseItem = (item, ctx) => {
+const parseItem = (item, ctx, itemNumber) => {
   const values = Object.fromEntries(
     item.fields.map(({ field, value }) => [field, value])
   );
@@ -74,7 +78,7 @@ const parseItem = (item, ctx) => {
       ctx.combinedFields.has(original.field)
   }));
 
-  return { ...item, joinTitle: getItemTitle(item, values, ctx), fields };
+  return { ...item, joinTitle: getItemTitle(item, values, ctx, itemNumber), fields };
 };
 
 const buildContext = (req, options) => {
@@ -94,7 +98,8 @@ const buildContext = (req, options) => {
     titleField: [
       options.titleField || req.form.options.titleField || []
     ].flat()[0],
-    itemTitle: options.itemTitle
+    itemTitle: options.itemTitle,
+    addIncrement: options.addIncrement
   };
 };
 
@@ -120,8 +125,8 @@ const formatAggregateForSummary = (aggregate, req, options = {}) => {
   const ctx = buildContext(req, options);
 
   return {
-    aggregatedValues: items.map(item =>
-      toSummaryItem(parseItem(item, ctx), ctx, options.changeLink)
+    aggregatedValues: items.map((item, index) =>
+      toSummaryItem(parseItem(item, ctx, index + 1), ctx, options.changeLink)
     )
   };
 };
@@ -134,7 +139,7 @@ const parseSectionSummaryFields =
           const locals = super.locals(req, res);
           const ctx = buildContext(req, options);
 
-          locals.items = locals.items.map(item => parseItem(item, ctx));
+          locals.items = locals.items.map((item, index) => parseItem(item, ctx, index + 1));
           return locals;
         }
       };

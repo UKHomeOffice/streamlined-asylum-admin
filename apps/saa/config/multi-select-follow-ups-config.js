@@ -87,7 +87,7 @@ module.exports = {
               }
             },
             {
-              route: '/check-your-answers-date-of-birth',
+              route: '/check-your-answers-someone-else-date-of-birth',
               condition: {
                 field: 'change-someone-else-date-of-birth',
                 value: 'yes'
@@ -101,7 +101,18 @@ module.exports = {
             '/check-your-answers-date-of-birth',
             '/change-someone-else-date-of-birth',
             '/relationship-date-of-birth',
-            '/someone-else-correct-date-of-birth'
+            '/someone-else-correct-date-of-birth',
+            '/someone-else-new-date-of-birth-evidence',
+            '/check-your-answers-someone-else-date-of-birth'
+          ],
+          fieldsToUnset: [
+            'change-someone-else-date-of-birth',
+            'someoneelsenewdob',
+            'relationship-date-of-birth',
+            'someone-else-correct-date-of-birth-given-name',
+            'someone-else-correct-date-of-birth-family-name',
+            'someone-else-correct-date-of-birth',
+            'documents-someone-else-new-dob'
           ]
         }
       ]
