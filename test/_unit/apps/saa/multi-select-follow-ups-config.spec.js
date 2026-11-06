@@ -198,6 +198,162 @@ describe('SAA multi-select follow-up route config', () => {
     expect(controller.getNextStep(req, {})).toBe('/changes/your-phone-number');
   });
 
+  test('clears saved phone answers when phone number is deselected', () => {
+    class BaseController {
+      constructor(options) {
+        this.options = options;
+      }
+
+      saveValues(req, res, callback) {
+        req.sessionModel.set(req.form.values);
+        callback();
+      }
+
+      getNextStep(req) {
+        return req.baseUrl + this.options.next;
+      }
+    }
+
+    const phoneFields = [
+      'your-phone-number',
+      'whose-phone-number',
+      'old-phone-number',
+      'new-phone-number',
+      'confirm-new-phone-number'
+    ];
+    const Controller = MultiSelectFollowUps(multiSelectFollowUpsConfig)(
+      BaseController
+    );
+    const controller = new Controller({
+      route: multiSelectFollowUpsConfig.entryPoint,
+      next: multiSelectFollowUpsConfig.exitPoint
+    });
+    const sessionValues = {
+      'your-phone-number': 'yes',
+      'whose-phone-number': 'mine',
+      'old-phone-number': '07700900000',
+      'new-phone-number': '07700900001',
+      'confirm-new-phone-number': '07700900001',
+      'new-email-address': 'new@example.com',
+      [multiSelectFollowUpsConfig.field]: ['email-address', 'phone-number'],
+      [multiSelectFollowUpsConfig.stateKey]: MultiSelectFollowUps.createState(
+        multiSelectFollowUpsConfig,
+        {},
+        ['email-address', 'phone-number']
+      )
+    };
+    const req = {
+      baseUrl: app.baseUrl,
+      params: {},
+      form: {
+        values: {
+          [multiSelectFollowUpsConfig.field]: ['email-address']
+        }
+      },
+      sessionModel: {
+        get(key) {
+          return sessionValues[key];
+        },
+        set(key, value) {
+          if (typeof key === 'object') {
+            Object.assign(sessionValues, key);
+            return;
+          }
+
+          sessionValues[key] = value;
+        },
+        unset(keys) {
+          [].concat(keys).forEach(key => delete sessionValues[key]);
+        }
+      }
+    };
+
+    controller.saveValues(req, {}, err => {
+      expect(err).toBeUndefined();
+    });
+
+    phoneFields.forEach(field => {
+      expect(sessionValues).not.toHaveProperty(field);
+    });
+    expect(sessionValues['new-email-address']).toBe('new@example.com');
+  });
+
+  test('clears saved email answers when email address is deselected', () => {
+    class BaseController {
+      constructor(options) {
+        this.options = options;
+      }
+
+      saveValues(req, res, callback) {
+        req.sessionModel.set(req.form.values);
+        callback();
+      }
+
+      getNextStep(req) {
+        return req.baseUrl + this.options.next;
+      }
+    }
+
+    const emailFields = [
+      'old-email-address',
+      'new-email-address',
+      'confirm-new-email-address'
+    ];
+    const Controller = MultiSelectFollowUps(multiSelectFollowUpsConfig)(
+      BaseController
+    );
+    const controller = new Controller({
+      route: multiSelectFollowUpsConfig.entryPoint,
+      next: multiSelectFollowUpsConfig.exitPoint
+    });
+    const sessionValues = {
+      'old-email-address': 'old@example.com',
+      'new-email-address': 'new@example.com',
+      'confirm-new-email-address': 'new@example.com',
+      'new-phone-number': '07700900001',
+      [multiSelectFollowUpsConfig.field]: ['email-address', 'phone-number'],
+      [multiSelectFollowUpsConfig.stateKey]: MultiSelectFollowUps.createState(
+        multiSelectFollowUpsConfig,
+        {},
+        ['email-address', 'phone-number']
+      )
+    };
+    const req = {
+      baseUrl: app.baseUrl,
+      params: {},
+      form: {
+        values: {
+          [multiSelectFollowUpsConfig.field]: ['phone-number']
+        }
+      },
+      sessionModel: {
+        get(key) {
+          return sessionValues[key];
+        },
+        set(key, value) {
+          if (typeof key === 'object') {
+            Object.assign(sessionValues, key);
+            return;
+          }
+
+          sessionValues[key] = value;
+        },
+        unset(keys) {
+          [].concat(keys).forEach(key => delete sessionValues[key]);
+        }
+      }
+    };
+
+    controller.saveValues(req, {}, err => {
+      expect(err).toBeUndefined();
+    });
+
+    emailFields.forEach(field => {
+      expect(sessionValues).not.toHaveProperty(field);
+    });
+    expect(sessionValues['new-phone-number']).toBe('07700900001');
+  });
+
   test.each([
     [['name', 'date-of-birth'], 'yes', 'no', '/change-your-date-of-birth'],
     [['name', 'nationality'], 'yes', 'no', '/whose-nationality-to-change'],
