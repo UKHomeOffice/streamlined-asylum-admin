@@ -22,6 +22,7 @@ const SummaryLabels = require('./behaviours/summary-labels');
 const ResetSectionSummary = require('./behaviours/reset-section-summary');
 const ResumeFormSession = require('./behaviours/resume-form-session');
 const SaveFormSession = require('./behaviours/save-form-session');
+const InformationGiven = require('./behaviours/information-given');
 
 const documentUploadStep = category => ({
   behaviours: [SaveDocument(category, 'file-upload'), RemoveDocument(category)],
@@ -92,7 +93,7 @@ const steps = {
     backLink: false
   },
   '/information-given': {
-    behaviours: [Summary, SummaryLabels, EditRouteStart],
+    behaviours: [Summary, SummaryLabels, EditRouteStart, InformationGiven],
     sections: require('./sections/summary-data-sections'),
     next: '/claimants-name'
   },
