@@ -233,6 +233,10 @@ const steps = {
     next: '/change-someone-else-date-of-birth'
   },
   '/change-someone-else-date-of-birth': {
+    behaviours: [
+      RequireSelectedSection,
+      ResetSectionSummary(['someoneelsenewdob'], 'change-someone-else-date-of-birth')
+    ],
     fields: ['change-someone-else-date-of-birth'],
     forks: [
       {
@@ -247,10 +251,6 @@ const steps = {
     next: '/nationality-change'
   },
   '/relationship-date-of-birth': {
-    behaviours: [
-      RequireSelectedSection,
-      ResetSectionSummary(['someoneelsenewdob', 'relationship-date-of-birth'])
-    ],
     fields: ['relationship-date-of-birth'],
     next: '/someone-else-correct-date-of-birth'
   },
