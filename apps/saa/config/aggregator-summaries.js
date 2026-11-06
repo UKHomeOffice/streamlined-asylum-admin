@@ -18,5 +18,15 @@ module.exports = {
     combineFields: {
       'given-name-person-who-died': ['family-name-person-who-died']
     }
+  },
+  someoneelsenewdob: {
+    route: '/check-your-answers-someone-else-date-of-birth',
+    dependsOn: 'change-someone-else-date-of-birth',
+    dateFields: ['someone-else-correct-date-of-birth'],
+    combineFields: {
+      'someone-else-correct-date-of-birth-given-name': ['someone-else-correct-date-of-birth-family-name']
+    },
+    itemTitle: 'Change someone else\'s date of birth',
+    addIncrement: true
   }
 };

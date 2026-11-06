@@ -248,12 +248,15 @@ const steps = {
     next: '/nationality-change'
   },
   '/relationship-date-of-birth': {
+    behaviours: [
+      RequireSelectedSection,
+      ResetSectionSummary(['someoneelsenewdob', 'relationship-date-of-birth'])
+    ],
     fields: ['relationship-date-of-birth'],
     next: '/someone-else-correct-date-of-birth'
   },
   '/someone-else-correct-date-of-birth': {
     behaviours: [CustomValidation],
-    // provisional document category: documents-someone-else-new-dob
     fields: [
       'someone-else-correct-date-of-birth-given-name',
       'someone-else-correct-date-of-birth-family-name',
@@ -262,9 +265,28 @@ const steps = {
     next: '/someone-else-new-date-of-birth-evidence'
   },
   '/someone-else-new-date-of-birth-evidence': {
+    ...documentUploadStep('documents-someone-else-new-dob'),
+    template: 'upload-dob-evidence',
     next: '/check-your-answers-someone-else-date-of-birth'
   },
   '/check-your-answers-someone-else-date-of-birth': {
+    backLink: false,
+    behaviours: [
+      AggregateSaveUpdate,
+      LimitAggregateItems,
+      ParseSummaryFields(aggregatorSummaries.someoneelsenewdob),
+      EditRouteReturn
+    ],
+    aggregateTo: 'someoneelsenewdob',
+    aggregateFrom: [
+      'relationship-date-of-birth',
+      'someone-else-correct-date-of-birth-given-name',
+      'someone-else-correct-date-of-birth-family-name',
+      'someone-else-correct-date-of-birth',
+      'documents-someone-else-new-dob'
+    ],
+    addStep: 'relationship-date-of-birth',
+    aggregateLimit: config.aggregateLimits.someoneElseNewDob,
     next: '/nationality-change'
   },
   '/nationality-change': {
