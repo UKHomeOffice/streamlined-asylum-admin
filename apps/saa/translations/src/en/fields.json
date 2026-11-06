@@ -420,5 +420,28 @@
         "label": "My husband, wife, civil partner, or unmarried partner that I have lived with for 2 years or more"
       }
     }
+  },
+  "your-phone-number": {
+    "legend": "Is the new phone number your own?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
+  "whose-phone-number": {
+    "label": "Whose phone number is it?"
+  },
+  "old-phone-number": {
+    "label": "Old phone number"
+  },
+  "new-phone-number": {
+    "label": "New phone number"
+  },
+  "confirm-new-phone-number": {
+    "label": "Confirm new phone number"
   }
 }

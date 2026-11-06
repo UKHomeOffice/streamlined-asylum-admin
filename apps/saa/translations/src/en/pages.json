@@ -114,10 +114,15 @@
     "captionHeading": "Update personal details"
   },
   "your-phone-number": {
-    "header": "Is the new phone number your own?"
+    "captionHeading": "Update personal details"
   },
   "new-phone-number": {
-    "header": "Change your phone number"
+    "header": "Change your phone number",
+    "captionHeading": "Update personal details"
+  },
+  "check-your-answers-phone-number": {
+    "header": "Check your answers",
+    "captionHeading": "Update personal details"
   },
   "declaration": {
     "header": "Declaration"
@@ -270,6 +275,9 @@
       },
       "email-address": {
         "header": "Change your email address"
+      },
+      "phone-number": {
+        "header": "Change your phone number"
       },
       "add-or-remove-dependants": {
         "header": "Add or remove dependants"
