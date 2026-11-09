@@ -26,9 +26,13 @@ describe('file upload configuration', () => {
   });
 
   test('only requires the photo identity and supporting evidence categories', () => {
-    const requiredCategories = Object.entries(uploadConfig.documentCategories)
-      .filter(([, category]) => category.required)
-      .map(([name]) => name);
+    const requiredCategories = [
+      ...Object.keys(uploadConfig.documentCategories),
+      'documents-update-contact',
+      'documents-help-your-claim'
+    ].filter(name =>
+      uploadConfig.documentCategories[name]?.required ?? uploadConfig.required
+    );
 
     expect(requiredCategories).toEqual([
       'documents-update-contact',

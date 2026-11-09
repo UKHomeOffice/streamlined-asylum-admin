@@ -17,6 +17,7 @@ module.exports = {
   ],
   limit: 6,
   limitValidationError: 'fileCountLimit',
+  // Categories inherit global defaults unless overridden here.
   documentCategories: {
     'documents-new-name': { required: false },
     'documents-someone-else-new-name': { required: false },
@@ -25,8 +26,6 @@ module.exports = {
     'documents-nationality': { required: false },
     'documents-someone-else-nationality': { required: false },
     'documents-child-partner': { required: false },
-    'documents-death-certificate': { required: false },
-    'documents-update-contact': { required: true },
-    'documents-help-your-claim': { required: true }
+    'documents-death-certificate': { required: false }
   }
 };
