@@ -75,7 +75,10 @@ module.exports = (documentCategory, fieldName) => superclass => class extends su
       try {
         await upload.save();
         req.sessionModel.set(documentCategory, [...documents, upload.toJSON()]);
-        return res.redirect(`${req.baseUrl}${req.path}`);
+        // Explicit Save-and-exit uploads must continue to draft persistence.
+        if (!req.body['save-and-exit']) {
+          return res.redirect(`${req.baseUrl}${req.path}`);
+        }
       } catch (error) {
         return next(new Error(`Failed to save document: ${error}`));
       }
