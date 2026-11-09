@@ -33,7 +33,11 @@ describe('name change summary rows', () => {
         options: {
           sections,
           fieldsConfig: { 'reason-name-change': { mixin: 'radio-group' } },
-          steps: { '/reason-name-change': { fields: ['reason-name-change'] } }
+          steps: {
+            '/reason-name-change': { fields: ['reason-name-change'] },
+            '/new-name': { fields: ['given-name', 'family-name'] },
+            '/new-name-evidence': { fields: ['file-upload'] }
+          }
         }
       }
     };
@@ -43,6 +47,7 @@ describe('name change summary rows', () => {
       fs.readFileSync(path.join(views, 'check-your-answers-name.html'), 'utf8')
     );
     const html = template.render({
+      baseUrl: req.baseUrl,
       rows: new SummaryPage().getRowsForSummarySections(req)
     }, {
       'partials-page': hogan.compile('{{$page-content}}{{/page-content}}'),
@@ -55,9 +60,9 @@ describe('name change summary rows', () => {
     expect(html).toContain('An error');
     expect(html).toContain('Alex Smith');
     expect(html).toContain('deed-poll.pdf');
-    expect(html).toContain('href="/changes/reason-name-change"');
-    expect(html).toContain('href="/changes/new-name"');
-    expect(html).toContain('href="/changes/new-name-evidence"');
+    expect(html).toContain('href="/changes/reason-name-change/edit#reason-name-change-error"');
+    expect(html).toContain('href="/changes/new-name/edit#given-name"');
+    expect(html).toContain('href="/changes/new-name-evidence/edit#documents-new-name"');
     expect(html.match(/<a\b/g)).toHaveLength(3);
     expect(html).not.toContain('href="/changes/do-you-need-to-change-your-name"');
   });
@@ -65,8 +70,7 @@ describe('name change summary rows', () => {
   test('shows the reason for the name change', () => {
     expect(reasonRow).toMatchObject({
       step: '/reason-name-change',
-      field: 'reason-name-change',
-      changeLink: '/changes/reason-name-change'
+      field: 'reason-name-change'
     });
   });
 
@@ -89,13 +93,18 @@ describe('name change summary rows', () => {
     ).toBe('deed-poll.pdf\nmarriage-certificate.pdf');
   });
 
-  test('Change links return to each answer page', () => {
-    expect(
-      [reasonRow.changeLink, nameRow.changeLink, evidenceRow.changeLink]
-    ).toEqual([
-      '/changes/reason-name-change',
-      '/changes/new-name',
-      '/changes/new-name-evidence'
-    ]);
-  });
+  test.each([reasonRow, nameRow, evidenceRow])(
+    'uses the default Change link for $field',
+    row => {
+      expect(row.changeLink).toBeUndefined();
+      expect(row.omitChangeLink).toBeUndefined();
+    }
+  );
+
+  test.each([undefined, null, []])(
+    'returns an empty value when evidence is %p',
+    documents => {
+      expect(evidenceRow.parse(documents)).toBe('');
+    }
+  );
 });
