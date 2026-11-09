@@ -12,10 +12,18 @@ class BaseBehaviour {
 
 const Behaviour = EditRouteReturn(BaseBehaviour);
 
-const createRequest = ({ options = {}, values = {}, editReturnPath } = {}) => ({
+const createRequest = ({
+  options = {},
+  values = {},
+  body = {},
+  editReturnPath
+} = {}) => ({
+  body,
   form: { options, values },
   sessionModel: {
-    get: jest.fn(key => (key === 'edit-return-path' ? editReturnPath : undefined))
+    get: jest.fn(key =>
+      key === 'edit-return-path' ? editReturnPath : undefined
+    )
   }
 });
 
@@ -32,12 +40,29 @@ describe('edit route return behaviour', () => {
   });
 
   test('redirects back to the summary page when editing', () => {
-    const req = createRequest({ editReturnPath: '/changes/check-your-answers-add-child-partner' });
+    const req = createRequest({
+      editReturnPath: '/changes/check-your-answers-add-child-partner'
+    });
 
     behaviour.saveValues(req, res, next);
 
-    expect(res.redirect).toHaveBeenCalledWith('/changes/check-your-answers-add-child-partner');
+    expect(res.redirect).toHaveBeenCalledWith(
+      '/changes/check-your-answers-add-child-partner'
+    );
     expect(next).not.toHaveBeenCalled();
+  });
+
+  test('continues to persistence when saving and exiting from edit mode', () => {
+    const req = createRequest({
+      body: { 'save-and-exit': 'save-and-exit' },
+      editReturnPath: '/changes/summary'
+    });
+
+    behaviour.saveValues(req, res, next);
+
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(next).toHaveBeenCalledWith();
+    expect(res.redirect).not.toHaveBeenCalled();
   });
 
   test('continues normally when there is no edit return path', () => {
@@ -62,23 +87,34 @@ describe('edit route return behaviour', () => {
   test.each([
     ['an object', { field: 'choice', value: 'yes' }],
     ['a function', req => req.form.values.choice === 'yes']
-  ])('continues when the selected fork (condition as %s) sets continueOnEdit', (_, condition) => {
-    const req = createRequest({
-      options: { forks: [{ target: '/next', continueOnEdit: true, condition }] },
-      values: { choice: 'yes' },
-      editReturnPath: '/changes/summary'
-    });
+  ])(
+    'continues when the selected fork (condition as %s) sets continueOnEdit',
+    (_, condition) => {
+      const req = createRequest({
+        options: {
+          forks: [{ target: '/next', continueOnEdit: true, condition }]
+        },
+        values: { choice: 'yes' },
+        editReturnPath: '/changes/summary'
+      });
 
-    behaviour.saveValues(req, res, next);
+      behaviour.saveValues(req, res, next);
 
-    expect(next).toHaveBeenCalledWith();
-    expect(res.redirect).not.toHaveBeenCalled();
-  });
+      expect(next).toHaveBeenCalledWith();
+      expect(res.redirect).not.toHaveBeenCalled();
+    }
+  );
 
   test('redirects when the continueOnEdit fork is not selected', () => {
     const req = createRequest({
       options: {
-        forks: [{ target: '/next', continueOnEdit: true, condition: { field: 'choice', value: 'yes' } }]
+        forks: [
+          {
+            target: '/next',
+            continueOnEdit: true,
+            condition: { field: 'choice', value: 'yes' }
+          }
+        ]
       },
       values: { choice: 'no' },
       editReturnPath: '/changes/summary'
@@ -89,14 +125,17 @@ describe('edit route return behaviour', () => {
     expect(res.redirect).toHaveBeenCalledWith('/changes/summary');
   });
 
-  test('passes save errors on without redirecting', () => {
-    saveError = new Error('save failed');
-    const req = createRequest({ editReturnPath: '/changes/summary' });
+  test.each([{}, { 'save-and-exit': 'save-and-exit' }])(
+    'passes save errors on without redirecting with body %j',
+    body => {
+      saveError = new Error('save failed');
+      const req = createRequest({ body, editReturnPath: '/changes/summary' });
 
-    behaviour.saveValues(req, res, next);
+      behaviour.saveValues(req, res, next);
 
-    expect(next).toHaveBeenCalledTimes(1);
-    expect(next).toHaveBeenCalledWith(saveError);
-    expect(res.redirect).not.toHaveBeenCalled();
-  });
+      expect(next).toHaveBeenCalledTimes(1);
+      expect(next).toHaveBeenCalledWith(saveError);
+      expect(res.redirect).not.toHaveBeenCalled();
+    }
+  );
 });

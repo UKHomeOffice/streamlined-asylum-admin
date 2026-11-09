@@ -1,4 +1,5 @@
 const NO_DIGITS_REGEX = /^\D*$/;
+const CHANGE_EDIT_DELETE_REGEX = /\/(change|edit|delete)(?:\/|$)/;
 
 const SAA_BASE_URL = '/changes';
 
@@ -19,5 +20,6 @@ module.exports = {
   NO_DIGITS_REGEX,
   SAA_BASE_URL,
   SECTION_FIELDS,
-  REQUEST_METHODS
+  REQUEST_METHODS,
+  CHANGE_EDIT_DELETE_REGEX
 };

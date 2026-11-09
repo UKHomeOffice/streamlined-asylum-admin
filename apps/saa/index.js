@@ -21,6 +21,8 @@ const EditRouteStart = require('./behaviours/edit-route-start');
 const SummaryLabels = require('./behaviours/summary-labels');
 const ResetSectionSummary = require('./behaviours/reset-section-summary');
 const ResumeFormSession = require('./behaviours/resume-form-session');
+const SaveFormSession = require('./behaviours/save-form-session');
+const InformationGiven = require('./behaviours/information-given');
 
 const documentUploadStep = category => ({
   behaviours: [SaveDocument(category, 'file-upload'), RemoveDocument(category)],
@@ -91,7 +93,7 @@ const steps = {
     backLink: false
   },
   '/information-given': {
-    behaviours: [Summary, SummaryLabels, EditRouteStart],
+    behaviours: [Summary, SummaryLabels, EditRouteStart, InformationGiven],
     sections: require('./sections/summary-data-sections'),
     next: '/claimants-name'
   },
@@ -204,8 +206,7 @@ const steps = {
     template: 'upload-new-name-evidence',
     next: '/check-your-answers-someone-else-name'
   },
-  '/check-your-answers-someone-else-name': {
-  },
+  '/check-your-answers-someone-else-name': {},
   '/change-your-date-of-birth': {
     fields: ['change-your-date-of-birth'],
     forks: [
@@ -235,6 +236,10 @@ const steps = {
     next: '/change-someone-else-date-of-birth'
   },
   '/change-someone-else-date-of-birth': {
+    behaviours: [
+      RequireSelectedSection,
+      ResetSectionSummary(['someoneelsenewdob'], 'change-someone-else-date-of-birth')
+    ],
     fields: ['change-someone-else-date-of-birth'],
     forks: [
       {
@@ -254,7 +259,6 @@ const steps = {
   },
   '/someone-else-correct-date-of-birth': {
     behaviours: [CustomValidation],
-    // provisional document category: documents-someone-else-new-dob
     fields: [
       'someone-else-correct-date-of-birth-given-name',
       'someone-else-correct-date-of-birth-family-name',
@@ -263,9 +267,28 @@ const steps = {
     next: '/someone-else-new-date-of-birth-evidence'
   },
   '/someone-else-new-date-of-birth-evidence': {
+    ...documentUploadStep('documents-someone-else-new-dob'),
+    template: 'upload-dob-evidence',
     next: '/check-your-answers-someone-else-date-of-birth'
   },
   '/check-your-answers-someone-else-date-of-birth': {
+    backLink: false,
+    behaviours: [
+      AggregateSaveUpdate,
+      LimitAggregateItems,
+      ParseSummaryFields(aggregatorSummaries.someoneelsenewdob),
+      EditRouteReturn
+    ],
+    aggregateTo: 'someoneelsenewdob',
+    aggregateFrom: [
+      'relationship-date-of-birth',
+      'someone-else-correct-date-of-birth-given-name',
+      'someone-else-correct-date-of-birth-family-name',
+      'someone-else-correct-date-of-birth',
+      'documents-someone-else-new-dob'
+    ],
+    addStep: 'relationship-date-of-birth',
+    aggregateLimit: config.aggregateLimits.someoneElseNewDob,
     next: '/nationality-change'
   },
   '/nationality-change': {
@@ -297,10 +320,6 @@ const steps = {
     // provisional document category: documents-someone-else-nationality
     next: '/provide-photo-identity'
   },
-  '/provide-photo-identity': {
-    // provisional document category: documents-update-contact
-    next: '/change-uk-address'
-  },
   '/change-uk-address': {
     next: '/home-address'
   },
@@ -322,10 +341,26 @@ const steps = {
     next: '/your-phone-number'
   },
   '/your-phone-number': {
+    fields: ['your-phone-number', 'whose-phone-number'],
     next: '/new-phone-number'
   },
   '/new-phone-number': {
-    next: '/declaration'
+    behaviours: [CustomValidation],
+    fields: [
+      'old-phone-number',
+      'new-phone-number',
+      'confirm-new-phone-number'
+    ],
+    next: '/check-your-answers-phone-number'
+  },
+  '/check-your-answers-phone-number': {
+    behaviours: [Summary, SummaryLabels, EditRouteReturn],
+    sections: require('./sections/summary-data-phone-number'),
+    next: '/provide-photo-identity'
+  },
+  '/provide-photo-identity': {
+    // provisional document category: documents-update-contact
+    next: '/do-you-need-add-remove-dependant'
   },
   '/relationship-to-claimant': {
     fields: ['relationship-to-claimant'],
@@ -389,6 +424,7 @@ const steps = {
     next: '/send-evidence-for-your-claim'
   },
   '/add-remove-child-partner': {
+    continueOnEdit: true,
     fields: ['add-remove-child-partner'],
     forks: [
       {
@@ -402,27 +438,33 @@ const steps = {
     next: '/reason-for-removing-child-partner'
   },
   '/reason-for-removing-child-partner': {
+    continueOnEdit: true,
     fields: ['reason-removing-child-partner'],
     next: '/relationship-to-child-partner'
   },
   '/relationship-to-child-partner': {
+    continueOnEdit: true,
     fields: ['relationship-to-child-partner'],
     next: '/child-partner-name'
   },
   '/child-partner-name': {
+    continueOnEdit: true,
     behaviours: [CustomValidation],
     fields: ['child-partner-given-name', 'child-partner-family-name'],
     next: '/child-partner-date-of-birth'
   },
   '/child-partner-date-of-birth': {
+    continueOnEdit: true,
     fields: ['child-partner-date-of-birth'],
     next: '/child-partner-nationality'
   },
   '/child-partner-nationality': {
+    continueOnEdit: true,
     fields: ['child-partner-nationality'],
     next: '/evidence-child-partner'
   },
   '/evidence-child-partner': {
+    continueOnEdit: true,
     ...documentUploadStep('documents-child-partner'),
     next: '/check-your-answers-add-child-partner'
   },
@@ -521,25 +563,31 @@ const steps = {
     next: '/something-else'
   },
   '/about-who-has-died': {
+    continueOnEdit: true,
     next: '/main-claimant-died'
   },
   '/main-claimant-died': {
+    continueOnEdit: true,
     fields: ['main-claimant-died'],
     next: '/name-person-who-died'
   },
   '/name-person-who-died': {
+    continueOnEdit: true,
     fields: ['given-name-person-who-died', 'family-name-person-who-died'],
     next: '/date-of-birth-person-who-died'
   },
   '/date-of-birth-person-who-died': {
+    continueOnEdit: true,
     fields: ['date-of-birth-person-who-died'],
     next: '/nationality-person-who-died'
   },
   '/nationality-person-who-died': {
+    continueOnEdit: true,
     fields: ['nationality-person-who-died'],
     next: '/upload-death-certificate'
   },
   '/upload-death-certificate': {
+    continueOnEdit: true,
     ...documentUploadStep('documents-death-certificate'),
     template: 'upload-supporting-evidence',
     next: '/check-your-answers-death'
@@ -574,8 +622,7 @@ const steps = {
   '/declaration': {
     next: '/submitted'
   },
-  '/submitted': {
-  },
+  '/submitted': {},
   '/something-else': {
     behaviours: [somethingElseFork],
     fields: ['something-else'],
@@ -589,11 +636,12 @@ const steps = {
   '/no-options': {
     backLink: 'something-else'
   },
-  '/page-not-found': {},
   '/service-unavailable': {},
-  '/problem-with-service': {},
   '/session-ended': {},
-  '/form-saved': {},
+  '/form-saved': {
+    clearSession: true,
+    backLink: false
+  },
   '/expired-link': {}
 };
 
@@ -655,5 +703,6 @@ module.exports = {
   fields: 'apps/saa/fields',
   views: 'apps/saa/views',
   translations: 'apps/saa/translations',
-  steps: steps
+  steps: steps,
+  behaviours: [SaveFormSession]
 };

@@ -348,5 +348,48 @@ module.exports = {
     validate: ['required'],
     className: ['govuk-radios'],
     isPageHeading: true
+  },
+  'your-phone-number': {
+    mixin: 'radio-group',
+    options: [
+      'yes',
+      {
+        value: 'no',
+        toggle: 'whose-phone-number',
+        child: 'textarea'
+      }
+    ],
+    validate: ['required'],
+    className: ['govuk-radios'],
+    isPageHeading: true
+  },
+  'whose-phone-number': {
+    mixin: 'textarea',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 500 }],
+    attributes: [{ attribute: 'rows', value: 5 }],
+    labelClassName: 'govuk-label--s',
+    dependent: {
+      field: 'your-phone-number',
+      value: 'no'
+    }
+  },
+  'old-phone-number': {
+    mixin: 'input-text',
+    validate: ['required', 'internationalPhoneNumber'],
+    className: ['govuk-input', 'govuk-input--width-20'],
+    labelClassName: 'govuk-label--s'
+  },
+  'new-phone-number': {
+    mixin: 'input-text',
+    validate: ['required', 'internationalPhoneNumber'],
+    className: ['govuk-input', 'govuk-input--width-20'],
+    labelClassName: 'govuk-label--s'
+  },
+  'confirm-new-phone-number': {
+    mixin: 'input-text',
+    validate: ['required', 'internationalPhoneNumber'],
+    matchField: 'new-phone-number',
+    className: ['govuk-input', 'govuk-input--width-20'],
+    labelClassName: 'govuk-label--s'
   }
 };
