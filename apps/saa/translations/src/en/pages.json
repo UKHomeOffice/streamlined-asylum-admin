@@ -244,7 +244,8 @@
     "header": "Your session has ended"
   },
   "form-saved": {
-    "header": "Your form has been saved"
+    "header": "Your form has been saved",
+    "intro": "Your information will be saved for 7 days."
   },
   "cannot-use-form": {
     "header": "You cannot use this form"

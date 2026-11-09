@@ -1,5 +1,8 @@
 {
   "start-now": "Start now",
+  "continue": "Continue",
+  "save-and-exit": "Save and return later",
+  "continue-saved-form": "Continue to your saved form",
   "send-secure-link": "Send secure link",
   "enter-form": "Enter form",
   "resend-link": "Resend link",

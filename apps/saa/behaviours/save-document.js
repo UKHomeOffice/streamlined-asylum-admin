@@ -92,6 +92,10 @@ const saveDocument = (documentCategory, fieldName) => superclass =>
             ...documents,
             upload.toJSON()
           ]);
+            // Explicit Save-and-exit uploads must continue to draft persistence.
+            if (!req.body['save-and-exit']) {
+                return res.redirect(`${req.baseUrl}${req.path}`);
+            }
           return res.redirect(`${req.baseUrl}${req.path}`);
         } catch (error) {
           return next(new Error(`Failed to save document: ${error}`));
