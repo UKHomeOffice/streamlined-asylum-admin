@@ -114,10 +114,15 @@
     "captionHeading": "Update personal details"
   },
   "your-phone-number": {
-    "header": "Is the new phone number your own?"
+    "captionHeading": "Update personal details"
   },
   "new-phone-number": {
-    "header": "Change your phone number"
+    "header": "Change your phone number",
+    "captionHeading": "Update personal details"
+  },
+  "check-your-answers-phone-number": {
+    "header": "Check your answers",
+    "captionHeading": "Update personal details"
   },
   "declaration": {
     "header": "Declaration"
@@ -216,7 +221,7 @@
   "check-your-answers-death": {
     "item-title": "Tell us about the person who died",
     "captionHeading": "Tell us someone has died",
-    "limit-exceeded": "You have added the maximum number of deaths. You cannot add any more.",
+    "limit-exceeded": "You have added the maximum number of {{maxItems}} deaths. You cannot add any more.",
     "header": "Check your answers"
   },
   "contact-us-by-email": {
@@ -271,6 +276,9 @@
       },
       "email-address": {
         "header": "Change your email address"
+      },
+      "phone-number": {
+        "header": "Change your phone number"
       },
       "add-or-remove-dependants": {
         "header": "Add or remove dependants"

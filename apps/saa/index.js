@@ -296,10 +296,6 @@ const steps = {
     // provisional document category: documents-someone-else-nationality
     next: '/provide-photo-identity'
   },
-  '/provide-photo-identity': {
-    // provisional document category: documents-update-contact
-    next: '/change-uk-address'
-  },
   '/change-uk-address': {
     next: '/home-address'
   },
@@ -321,10 +317,26 @@ const steps = {
     next: '/your-phone-number'
   },
   '/your-phone-number': {
+    fields: ['your-phone-number', 'whose-phone-number'],
     next: '/new-phone-number'
   },
   '/new-phone-number': {
-    next: '/declaration'
+    behaviours: [CustomValidation],
+    fields: [
+      'old-phone-number',
+      'new-phone-number',
+      'confirm-new-phone-number'
+    ],
+    next: '/check-your-answers-phone-number'
+  },
+  '/check-your-answers-phone-number': {
+    behaviours: [Summary, SummaryLabels, EditRouteReturn],
+    sections: require('./sections/summary-data-phone-number'),
+    next: '/provide-photo-identity'
+  },
+  '/provide-photo-identity': {
+    // provisional document category: documents-update-contact
+    next: '/do-you-need-add-remove-dependant'
   },
   '/relationship-to-claimant': {
     fields: ['relationship-to-claimant'],
