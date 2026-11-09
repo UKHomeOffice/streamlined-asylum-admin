@@ -5,13 +5,11 @@ module.exports = {
     steps: [
       {
         step: '/reason-name-change',
-        field: 'reason-name-change',
-        omitChangeLink: true
+        field: 'reason-name-change'
       },
       {
         step: '/new-name',
         field: 'given-name',
-        omitChangeLink: true,
         parse: (value, req) =>
           [
             req.sessionModel.get('given-name'),
@@ -23,7 +21,6 @@ module.exports = {
       {
         step: '/new-name-evidence',
         field: 'documents-new-name',
-        omitChangeLink: true,
         parse: documents =>
           (documents || []).map(document => document.name).join('\n')
       }

@@ -11,7 +11,7 @@ const [reasonRow, nameRow, evidenceRow] =
   sections['change-your-name'].steps;
 
 describe('name change summary rows', () => {
-  test('renders the answers with only one Change link beside the section heading', () => {
+  test('renders the answers with a Change link beside each field', () => {
     const values = {
       'reason-name-change': 'error',
       'given-name': 'Alex',
@@ -43,8 +43,7 @@ describe('name change summary rows', () => {
       fs.readFileSync(path.join(views, 'check-your-answers-name.html'), 'utf8')
     );
     const html = template.render({
-      rows: new SummaryPage().getRowsForSummarySections(req),
-      sectionChangeLink: '/changes/do-you-need-to-change-your-name'
+      rows: new SummaryPage().getRowsForSummarySections(req)
     }, {
       'partials-page': hogan.compile('{{$page-content}}{{/page-content}}'),
       'partials-summary-table': hogan.compile(
@@ -56,18 +55,18 @@ describe('name change summary rows', () => {
     expect(html).toContain('An error');
     expect(html).toContain('Alex Smith');
     expect(html).toContain('deed-poll.pdf');
-    expect(html).toContain('href="/changes/do-you-need-to-change-your-name"');
-    expect(html.match(/<a\b/g)).toHaveLength(1);
-    expect(html).toMatch(
-      /<h2[^>]*>Change your name<\/h2>\s*<div[^>]*>\s*<a[^>]*href="\/changes\/do-you-need-to-change-your-name"/
-    );
+    expect(html).toContain('href="/changes/reason-name-change"');
+    expect(html).toContain('href="/changes/new-name"');
+    expect(html).toContain('href="/changes/new-name-evidence"');
+    expect(html.match(/<a\b/g)).toHaveLength(3);
+    expect(html).not.toContain('href="/changes/do-you-need-to-change-your-name"');
   });
 
   test('shows the reason for the name change', () => {
     expect(reasonRow).toMatchObject({
       step: '/reason-name-change',
       field: 'reason-name-change',
-      omitChangeLink: true
+      changeLink: '/changes/reason-name-change'
     });
   });
 
@@ -90,7 +89,13 @@ describe('name change summary rows', () => {
     ).toBe('deed-poll.pdf\nmarriage-certificate.pdf');
   });
 
-  test('omits Change links for every answer', () => {
-    expect([reasonRow, nameRow, evidenceRow].every(row => row.omitChangeLink)).toBe(true);
+  test('Change links return to each answer page', () => {
+    expect(
+      [reasonRow.changeLink, nameRow.changeLink, evidenceRow.changeLink]
+    ).toEqual([
+      '/changes/reason-name-change',
+      '/changes/new-name',
+      '/changes/new-name-evidence'
+    ]);
   });
 });
