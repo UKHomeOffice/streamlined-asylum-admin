@@ -14,9 +14,16 @@ describe('evidence summary sections', () => {
     expect(filesRow.parse(documents)).toBe('letter.pdf\nphoto.png');
   });
 
-  test('returns an empty value when no files were uploaded', () => {
-    expect(filesRow.parse(undefined)).toBe('');
-  });
+  test.each([[undefined], [null], [[]]])(
+    'returns the translated fallback for %p',
+    documents => {
+      const req = { translate: jest.fn().mockReturnValue('No files uploaded') };
+      expect(filesRow.parse(documents, req)).toBe('No files uploaded');
+      expect(req.translate).toHaveBeenCalledWith(
+        'fields.file-upload.no-files-uploaded'
+      );
+    }
+  );
 
   test('each answer links to the page where it was given', () => {
     expect(filesRow).toMatchObject({

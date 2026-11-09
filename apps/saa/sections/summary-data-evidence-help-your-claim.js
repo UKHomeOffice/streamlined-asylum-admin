@@ -1,4 +1,5 @@
 const { SAA_BASE_URL } = require('../../../utils/constants');
+const { formatUploadedDocuments } = require('../../../utils');
 
 module.exports = {
   evidence: {
@@ -8,8 +9,7 @@ module.exports = {
         step: '/upload-supporting-evidence',
         field: 'documents-help-your-claim',
         changeLink: `${SAA_BASE_URL}/upload-supporting-evidence`,
-        parse: documents =>
-          (documents || []).map(document => document.name).join('\n')
+        parse: formatUploadedDocuments
       },
       {
         step: '/violent-upsetting-images',

@@ -131,6 +131,17 @@ const formatDate = date => {
 };
 
 /**
+ * Formats uploaded filenames on separate lines, or translates the empty-upload message.
+ *
+ * @param {Array<{name: string}>|null|undefined} documents - Uploaded documents.
+ * @param {object} req - The HOF request providing translate.
+ * @returns {string} The filenames or translated empty-upload message.
+ */
+const formatUploadedDocuments = (documents, req) =>
+  (documents ?? []).map(document => document.name).join('\n') ||
+  req.translate('fields.file-upload.no-files-uploaded');
+
+/**
  * Checks the normalised UAN contract without changing the input.
  *
  * @param {*} uan - The value to check.
@@ -160,6 +171,7 @@ module.exports = {
   isTeamOnlyNotifyError,
   hasSelectedSection,
   formatDate,
+  formatUploadedDocuments,
   isValidUan,
   formatUanForDisplay
 };
