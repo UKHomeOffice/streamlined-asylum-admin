@@ -15,6 +15,11 @@ jest.mock('../../../../../utils/application-service', () => ({
 }));
 
 const SaveDocument = require('../../../../../apps/saa/behaviours/save-document');
+const SaveFormSession = require('../../../../../apps/saa/behaviours/save-form-session');
+const { saveApplication } = require('../../../../../utils/application-service');
+const Session = require('hof/controller/behaviour-session');
+const BaseController = require('hof/controller/base-controller');
+const Model = require('hof/model');
 const FileUpload = require('../../../../../utils/file-upload');
 const uploadConfig = require('../../../../../assets/js/file-upload-config');
 
@@ -82,14 +87,6 @@ describe.each([
     mockUploadSave.mockResolvedValue(undefined);
     mockUploadToJSON.mockReturnValue({ id: 'upload-id', name: 'evidence.pdf' });
   });
-
-  const SaveFormSession = require('../../../../../apps/saa/behaviours/save-form-session');
-  const {
-    saveApplication
-  } = require('../../../../../utils/application-service');
-  const Session = require('hof/controller/behaviour-session');
-  const BaseController = require('hof/controller/base-controller');
-  const Model = require('hof/model');
 
   test('adds the uploaded filename to form values during processing', () => {
     const req = createRequest({
@@ -451,100 +448,103 @@ describe.each([
 
     expect(baseSaveValues).toHaveBeenCalledWith(req, {}, expect.any(Function));
   });
+});
 
-  describe('Save-and-exit upload persistence', () => {
-    const documentCategory = 'documents-help-your-claim';
-    const Behaviour = SaveDocument(
-      documentCategory,
-      'file-upload'
-    )(SaveFormSession(Session(BaseController)));
-    let behaviour;
-    let req;
-    let res;
-    let next;
+describe('Save-and-exit upload persistence', () => {
+  const documentCategory = 'documents-help-your-claim';
+  const Behaviour = SaveDocument(
+    documentCategory,
+    'file-upload'
+  )(SaveFormSession(Session(BaseController)));
+  let behaviour;
+  let req;
+  let res;
+  let next;
 
-    beforeEach(() => {
-      behaviour = new Behaviour({ next: '/violent-upsetting-images' });
-      mockUploadSave.mockResolvedValue(undefined);
-      mockUploadToJSON.mockReturnValue({
-        id: 'upload-id',
-        name: 'evidence.pdf'
-      });
-      saveApplication.mockReset();
-      req = createRequest({
-        body: { 'save-and-exit': 'save-and-exit' },
-        files: {
-          'file-upload': {
-            name: 'evidence.pdf',
-            data: Buffer.from('evidence'),
-            size: 100,
-            mimetype: 'application/pdf'
-          }
-        },
-        form: {
-          options: { route: '/upload-supporting-evidence' },
-          values: { 'file-upload': 'evidence.pdf' }
-        },
-        sessionModel: new Model({ 'application-id': 9, steps: [] })
-      });
-      res = { redirect: jest.fn() };
-      next = jest.fn();
+  beforeEach(() => {
+    behaviour = new Behaviour({ next: '/violent-upsetting-images' });
+    mockUploadSave.mockResolvedValue(undefined);
+    mockUploadToJSON.mockReturnValue({
+      id: 'upload-id',
+      name: 'evidence.pdf'
     });
+    saveApplication.mockReset();
+    req = createRequest({
+      body: { 'save-and-exit': 'save-and-exit' },
+      files: {
+        'file-upload': {
+          name: 'evidence.pdf',
+          data: Buffer.from('evidence'),
+          size: 100,
+          mimetype: 'application/pdf'
+        }
+      },
+      form: {
+        options: {
+          route: '/upload-supporting-evidence',
+          fields: { 'file-upload': {} }
+        },
+        values: { 'file-upload': 'evidence.pdf' }
+      },
+      sessionModel: new Model({ 'application-id': 9, steps: [] })
+    });
+    res = { redirect: jest.fn() };
+    next = jest.fn();
+  });
 
-    test.each([[], [{ id: 'existing', name: 'existing.pdf' }]])(
-      'saves the new upload with existing documents %j before exiting',
-      async documents => {
-        req.sessionModel.set(documentCategory, documents);
-        expect(behaviour.validateField('file-upload', req)).toBeUndefined();
-        let resolveSave;
-        saveApplication.mockReturnValue(
-          new Promise(resolve => {
-            resolveSave = resolve;
-          })
-        );
-        let finishing;
-
-        await behaviour.saveValues(req, res, error => {
-          expect(error).toBeUndefined();
-          finishing = behaviour.successHandler(req, res, next);
-        });
-
-        expect(saveApplication).toHaveBeenCalledWith(
-          9,
-          expect.objectContaining({
-            [documentCategory]: [
-              ...documents,
-              { id: 'upload-id', name: 'evidence.pdf' }
-            ],
-            'last-saved-route': '/upload-supporting-evidence'
-          })
-        );
-        expect(res.redirect).not.toHaveBeenCalled();
-        resolveSave({ id: 9 });
-        await finishing;
-
-        expect(res.redirect).toHaveBeenCalledTimes(1);
-        expect(res.redirect).toHaveBeenCalledWith('/updates/form-saved');
-        expect(next).not.toHaveBeenCalled();
-      }
-    );
-
-    test('does not exit when draft persistence fails after a successful upload', async () => {
-      const error = new Error('Draft service unavailable');
-      saveApplication.mockRejectedValue(error);
+  test.each([[[]], [[{ id: 'existing', name: 'existing.pdf' }]]])(
+    'saves the new upload with existing documents %j before exiting',
+    async documents => {
+      req.sessionModel.set(documentCategory, documents);
+      expect(behaviour.validateField('file-upload', req)).toBeNull();
+      let resolveSave;
+      saveApplication.mockReturnValue(
+        new Promise(resolve => {
+          resolveSave = resolve;
+        })
+      );
       let finishing;
 
-      await behaviour.saveValues(req, res, uploadError => {
-        expect(uploadError).toBeUndefined();
+      await behaviour.saveValues(req, res, error => {
+        expect(error).toBeUndefined();
         finishing = behaviour.successHandler(req, res, next);
       });
+
+      expect(saveApplication).toHaveBeenCalledWith(
+        9,
+        expect.objectContaining({
+          [documentCategory]: [
+            ...documents,
+            { id: 'upload-id', name: 'evidence.pdf' }
+          ],
+          'last-saved-route': '/upload-supporting-evidence'
+        })
+      );
+      expect(res.redirect).not.toHaveBeenCalled();
+      resolveSave({ id: 9 });
       await finishing;
 
-      expect(req.sessionModel.get(documentCategory)).toEqual([
-        { id: 'upload-id', name: 'evidence.pdf' }
-      ]);
-      expect(next).toHaveBeenCalledWith(error);
-      expect(res.redirect).not.toHaveBeenCalled();
+      expect(res.redirect).toHaveBeenCalledTimes(1);
+      expect(res.redirect).toHaveBeenCalledWith('/updates/form-saved');
+      expect(next).not.toHaveBeenCalled();
+    }
+  );
+
+  test('does not exit when draft persistence fails after a successful upload', async () => {
+    const error = new Error('Draft service unavailable');
+    saveApplication.mockRejectedValue(error);
+    let finishing;
+
+    await behaviour.saveValues(req, res, uploadError => {
+      expect(uploadError).toBeUndefined();
+      finishing = behaviour.successHandler(req, res, next);
     });
+    await finishing;
+
+    expect(req.sessionModel.get(documentCategory)).toEqual([
+      { id: 'upload-id', name: 'evidence.pdf' }
+    ]);
+    expect(next).toHaveBeenCalledWith(error);
+    expect(res.redirect).not.toHaveBeenCalled();
   });
 });
