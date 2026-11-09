@@ -68,13 +68,13 @@ const options = {
   combineFields: { 'child-partner-given-name': ['child-partner-family-name'] }
 };
 
-const createBehaviour = items => {
+const createBehaviour = (items, summaryOptions = options) => {
   class BaseBehaviour {
     locals() {
       return { items };
     }
   }
-  const Behaviour = ParseSummaryFields(options)(BaseBehaviour);
+  const Behaviour = ParseSummaryFields(summaryOptions)(BaseBehaviour);
   return new Behaviour();
 };
 
@@ -269,6 +269,107 @@ describe('parse section summary fields behaviour', () => {
     const items = new Behaviour().locals(titleReq, {}).items;
 
     expect(items.map(item => item.joinTitle)).toEqual(['Evidence', 'Evidence']);
+  });
+
+  describe('opt-in title numbering', () => {
+    const summaryOptions = require('../../../../../apps/saa/config/aggregator-summaries')
+      .someoneelsenewdob;
+    const title = "Change someone else's date of birth";
+    const titleReq = {
+      ...req,
+      translate: keys => keys === summaryOptions.itemTitle ? title : translate(keys)
+    };
+    const formatItems = (items, settings = summaryOptions) =>
+      createBehaviour(items, settings).locals(titleReq, {}).items;
+    const finalItems = (items, settings = summaryOptions) =>
+      ParseSummaryFields.formatAggregateForSummary(
+        { aggregatedValues: items }, titleReq, settings
+      );
+
+    test.each([
+      [0, []],
+      [1, [title]],
+      [3, [title, `${title} 2`, `${title} 3`]]
+    ])('numbers %i items consistently in mini and final summaries', (count, expected) => {
+      const items = Array.from({ length: count }, () => createItem('add-child-partner'));
+
+      expect(formatItems(items).map(item => item.joinTitle)).toEqual(expected);
+      if (count === 0) {
+        expect(finalItems(items)).toBeNull();
+      } else {
+        expect(finalItems(items).aggregatedValues.map(item => item.fields[0].parsed))
+          .toEqual(expected);
+      }
+    });
+
+    test.each([undefined, false])('leaves titles unchanged when addIncrement is %p', addIncrement => {
+      const items = Array.from({ length: 3 }, () => createItem('add-child-partner'));
+      const settings = { ...summaryOptions, addIncrement };
+
+      expect(formatItems(items, settings).map(item => item.joinTitle))
+        .toEqual([title, title, title]);
+      expect(finalItems(items, settings).aggregatedValues.map(item => item.fields[0].parsed))
+        .toEqual([title, title, title]);
+    });
+
+    test('preserves all field formatting and Change links when numbering is enabled', () => {
+      const items = Array.from({ length: 3 }, () => createItem('add-child-partner'));
+      const settings = {
+        ...options,
+        itemTitle: summaryOptions.itemTitle,
+        addIncrement: true,
+        changeLink: '/changes/check-your-answers-someone-else-date-of-birth'
+      };
+      const unnumbered = { ...settings, addIncrement: false };
+      const mini = formatItems(items, settings);
+      const final = finalItems(items, settings).aggregatedValues;
+
+      expect(mini.map(item => item.fields))
+        .toEqual(formatItems(items, unnumbered).map(item => item.fields));
+      expect(final.map(item => item.fields.slice(1)))
+        .toEqual(finalItems(items, unnumbered).aggregatedValues.map(item => item.fields.slice(1)));
+      expect(final.map(item => item.fields[0].aggregatorTitleChangeLink))
+        .toEqual(Array(3).fill(settings.changeLink));
+    });
+
+    test('recalculates numbering after deletion using current positions, not saved indexes', () => {
+      const items = Array.from({ length: 3 }, (_, index) => ({
+        ...createItem('add-child-partner'), index
+      }));
+      const remaining = items.slice(1);
+
+      expect(formatItems(remaining).map(item => item.joinTitle)).toEqual([title, `${title} 2`]);
+      expect(finalItems(remaining).aggregatedValues.map(item => item.fields[0].parsed))
+        .toEqual([title, `${title} 2`]);
+    });
+
+    test('does not mutate saved items or accumulate suffixes on repeated rendering', () => {
+      const items = Array.from({ length: 3 }, () => createItem('add-child-partner'));
+      const saved = structuredClone(items);
+      const mini = formatItems(items);
+      const final = finalItems(items);
+
+      expect(formatItems(items)).toEqual(mini);
+      expect(finalItems(items)).toEqual(final);
+      expect(items).toEqual(saved);
+    });
+
+    test.each([
+      [req, ['add-child-partner', 'remove-child-partner'], [
+        'Add a child or partner as a dependant',
+        'Remove a child or partner as a dependant 2'
+      ]],
+      [{ ...req, form: { options: {} } }, ['Sam', 'Alex'], ['Sam', 'Alex 2']]
+    ])('supports numbering option-based and saved titles (%p)', (request, choices, expected) => {
+      const items = choices.map(createItem);
+      const settings = { addIncrement: true };
+
+      expect(createBehaviour(items, settings).locals(request, {}).items.map(item => item.joinTitle))
+        .toEqual(expected);
+      expect(ParseSummaryFields.formatAggregateForSummary(
+        { aggregatedValues: items }, request, settings
+      ).aggregatedValues.map(item => item.fields[0].parsed)).toEqual(expected);
+    });
   });
 
   describe('formatAggregateForSummary', () => {

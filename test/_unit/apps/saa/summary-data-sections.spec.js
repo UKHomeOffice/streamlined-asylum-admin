@@ -87,6 +87,49 @@ describe('summary data sections', () => {
       '/changes/check-your-answers-date-of-birth'
     ]);
   });
+
+  test('HOF displays numbered DOB titles with links back to the mini summary', () => {
+    const dobRow = sections['someone-else-date-of-birth'].steps.find(
+      entry => entry.field === 'someoneelsenewdob'
+    );
+    const pages = require('../../../../apps/saa/translations/src/en/pages.json');
+    const title = pages['check-your-answers-someone-else-date-of-birth']['item-title'];
+    const titleKey = 'pages.check-your-answers-someone-else-date-of-birth.item-title';
+    const session = {
+      'change-someone-else-date-of-birth': 'yes',
+      someoneelsenewdob: {
+        aggregatedValues: Array.from({ length: 3 }, (_, index) => ({
+          joinTitle: `Saved title ${index}`,
+          fields: [{
+            field: 'someone-else-correct-date-of-birth',
+            value: '2020-03-27',
+            parsed: '2020-03-27'
+          }]
+        }))
+      }
+    };
+    const req = {
+      baseUrl: '/changes',
+      sessionModel: { get: key => session[key] },
+      translate: keys => keys === titleKey ? title : [].concat(keys)[0],
+      form: { options: { fieldsConfig: {}, steps: {} } }
+    };
+    const ConfirmPage = SummaryLabels(Summary(class {}));
+    const fields = new ConfirmPage().getFieldsForRow([dobRow], req);
+    const titles = fields.filter(field => field.isAggregatorTitle);
+
+    expect(dobRow).toMatchObject({
+      step: '/check-your-answers-someone-else-date-of-birth',
+      dependsOn: 'change-someone-else-date-of-birth'
+    });
+    expect(titles.map(field => field.value)).toEqual([title, `${title} 2`, `${title} 3`]);
+    expect(titles.every(field =>
+      field.aggregatorTitleChangeLink === '/changes/check-your-answers-someone-else-date-of-birth'
+    )).toBe(true);
+    expect(fields.filter(field => field.isSeparator)).toHaveLength(2);
+    expect(fields.filter(field => field.field === 'someone-else-correct-date-of-birth')
+      .map(field => field.value)).toEqual(Array(3).fill('27 March 2020'));
+  });
 });
 
 describe('evidence rows on the confirm page', () => {

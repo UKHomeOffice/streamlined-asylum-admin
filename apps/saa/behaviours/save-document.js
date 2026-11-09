@@ -29,7 +29,7 @@ const saveDocument = (documentCategory, fieldName) => superclass =>
       const file = req.files?.[fieldName];
       const documents = req.sessionModel.get(documentCategory) || [];
       const validationError = (type, args) =>
-        new this.ValidationError(key, {type, arguments: [args]});
+        new this.ValidationError(key, { type, arguments: [args] });
       const categoryConfig = {
         ...config.upload,
         ...config.upload.documentCategories[documentCategory]
@@ -42,7 +42,7 @@ const saveDocument = (documentCategory, fieldName) => superclass =>
       if (file) {
         const allowedMimeTypes = categoryConfig.allowedMimeTypes;
         const acceptedFileExtensions =
-              categoryConfig.acceptedFileExtensions.split(',');
+          categoryConfig.acceptedFileExtensions.split(',');
         const fileExtension = path.extname(file.name).toLowerCase();
 
         if (file.size === 0) {
@@ -53,7 +53,7 @@ const saveDocument = (documentCategory, fieldName) => superclass =>
         }
         if (
           !allowedMimeTypes.includes(file.mimetype) ||
-              !acceptedFileExtensions.includes(fileExtension)
+          !acceptedFileExtensions.includes(fileExtension)
         ) {
           return validationError('fileType');
         }
@@ -92,11 +92,10 @@ const saveDocument = (documentCategory, fieldName) => superclass =>
             ...documents,
             upload.toJSON()
           ]);
-            // Explicit Save-and-exit uploads must continue to draft persistence.
-            if (!req.body['save-and-exit']) {
-                return res.redirect(`${req.baseUrl}${req.path}`);
-            }
-          return res.redirect(`${req.baseUrl}${req.path}`);
+          // Explicit Save-and-exit uploads must continue to draft persistence.
+          if (!req.body['save-and-exit']) {
+            return res.redirect(`${req.baseUrl}${req.path}`);
+          }
         } catch (error) {
           return next(new Error(`Failed to save document: ${error}`));
         }

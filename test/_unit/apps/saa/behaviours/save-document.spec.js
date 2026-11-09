@@ -73,348 +73,324 @@ const createRequest = (overrides = {}) => ({
 });
 
 describe.each([
-  ['documents-help-your-claim', '/upload-supporting-evidence'],
-  ['documents-child-partner', '/evidence-child-partner']
-])('save document behaviour for %s', (documentCategory, uploadPath) => {
-  const Behaviour = SaveDocument(
-    documentCategory,
-    'file-upload'
-  )(BaseBehaviour);
-  let behaviour;
+  ['documents-help-your-claim', '/upload-supporting-evidence', true],
+  ['documents-child-partner', '/evidence-child-partner', false]
+])(
+  'save document behaviour for %s',
+  (documentCategory, uploadPath, required) => {
+    const Behaviour = SaveDocument(
+      documentCategory,
+      'file-upload'
+    )(BaseBehaviour);
+    let behaviour;
 
-  beforeEach(() => {
-    behaviour = new Behaviour();
-    mockUploadSave.mockResolvedValue(undefined);
-    mockUploadToJSON.mockReturnValue({ id: 'upload-id', name: 'evidence.pdf' });
-  });
-
-  test('adds the uploaded filename to form values during processing', () => {
-    const req = createRequest({
-      files: { 'file-upload': { name: 'evidence.pdf' } }
+    beforeEach(() => {
+      behaviour = new Behaviour();
+      mockUploadSave.mockResolvedValue(undefined);
+      mockUploadToJSON.mockReturnValue({
+        id: 'upload-id',
+        name: 'evidence.pdf'
+      });
     });
 
-    behaviour.process(req);
+    test('adds the uploaded filename to form values during processing', () => {
+      const req = createRequest({
+        files: { 'file-upload': { name: 'evidence.pdf' } }
+      });
 
-    expect(req.form.values['file-upload']).toBe('evidence.pdf');
-    expect(baseProcess).toHaveBeenCalledWith(req);
-  });
+      behaviour.process(req);
 
-  test('provides uploaded documents to the view', () => {
-    const documents = [{ id: 'one', name: 'evidence.pdf' }];
-    const req = createRequest();
-    req.sessionModel.get.mockReturnValue(documents);
-
-    expect(behaviour.locals(req, {})).toEqual({
-      existing: true,
-      documents
-    });
-  });
-
-  test('provides the upload field error to the view', () => {
-    const error = {
-      key: 'file-upload',
-      type: 'fileType',
-      message: 'File must be a document'
-    };
-    const req = createRequest({
-      form: { values: {}, errors: { 'file-upload': error } }
+      expect(req.form.values['file-upload']).toBe('evidence.pdf');
+      expect(baseProcess).toHaveBeenCalledWith(req);
     });
 
-    expect(behaviour.locals(req, {}).fileUploadError).toBe(error);
-  });
+    test('provides uploaded documents to the view', () => {
+      const documents = [{ id: 'one', name: 'evidence.pdf' }];
+      const req = createRequest();
+      req.sessionModel.get.mockReturnValue(documents);
 
-  test('requires a file when there are no existing documents', () => {
-    const req = createRequest();
-
-    expect(behaviour.validateField('file-upload', req)).toMatchObject({
-      key: 'file-upload',
-      type: 'required'
+      expect(behaviour.locals(req, {})).toEqual({
+        existing: true,
+        documents
+      });
     });
-  });
 
-  test('allows continuing without a new file when documents already exist', () => {
-    const req = createRequest();
-    req.sessionModel.get.mockReturnValue([{ id: 'one', name: 'evidence.pdf' }]);
+    test('provides the upload field error to the view', () => {
+      const error = {
+        key: 'file-upload',
+        type: 'fileType',
+        message: 'File must be a document'
+      };
+      const req = createRequest({
+        form: { values: {}, errors: { 'file-upload': error } }
+      });
 
-    expect(behaviour.validateField('file-upload', req)).toBeUndefined();
-  });
+      expect(behaviour.locals(req, {}).fileUploadError).toBe(error);
+    });
 
-  test('validates the submitted file when there are no existing documents', () => {
-    const req = createRequest({
-      files: {
-        'file-upload': {
-          name: 'evidence.pdf',
-          size: 100,
-          mimetype: 'application/pdf'
-        }
+    test('uses the category requirement when there are no existing documents', () => {
+      const req = createRequest();
+
+      if (required) {
+        expect(behaviour.validateField('file-upload', req)).toMatchObject({
+          key: 'file-upload',
+          type: 'required'
+        });
+      } else {
+        expect(behaviour.validateField('file-upload', req)).toBeUndefined();
+        expect(baseValidateField).toHaveBeenCalledWith('file-upload', req);
       }
     });
 
-    expect(behaviour.validateField('file-upload', req)).toBeUndefined();
-  });
+    test('allows continuing without a new file when documents already exist', () => {
+      const req = createRequest();
+      req.sessionModel.get.mockReturnValue([
+        { id: 'one', name: 'evidence.pdf' }
+      ]);
 
-  test('rejects files larger than 25MB', () => {
-    const req = createRequest({
-      files: {
-        'file-upload': {
-          name: 'large.pdf',
-          size: 25 * 1024 * 1024 + 1,
-          mimetype: 'application/pdf'
-        }
-      }
+      expect(behaviour.validateField('file-upload', req)).toBeUndefined();
     });
 
-    expect(behaviour.validateField('file-upload', req).type).toBe(
-      'maxFileSize'
-    );
-  });
-
-  test('rejects empty files', () => {
-    const req = createRequest({
-      files: {
-        'file-upload': {
-          name: 'empty.pdf',
-          size: 0,
-          mimetype: 'application/pdf'
-        }
-      }
-    });
-
-    expect(behaviour.validateField('file-upload', req).type).toBe('emptyFile');
-  });
-
-  test('rejects files truncated by the multipart parser', () => {
-    const req = createRequest({
-      files: {
-        'file-upload': {
-          name: 'truncated.pdf',
-          size: 1,
-          mimetype: 'application/pdf',
-          truncated: true
-        }
-      }
-    });
-
-    expect(behaviour.validateField('file-upload', req).type).toBe(
-      'maxFileSize'
-    );
-  });
-
-  test('rejects unsupported file types', () => {
-    const req = createRequest({
-      files: {
-        'file-upload': {
-          name: 'evidence.exe',
-          size: 100,
-          mimetype: 'application/x-msdownload'
-        }
-      }
-    });
-
-    expect(behaviour.validateField('file-upload', req).type).toBe('fileType');
-  });
-
-  test.each([['evidence.exe'], ['evidence'], ['evidence.pdf.exe']])(
-    'rejects %s with an allowed MIME type',
-    name => {
+    test('validates the submitted file when there are no existing documents', () => {
       const req = createRequest({
         files: {
           'file-upload': {
-            name,
+            name: 'evidence.pdf',
             size: 100,
             mimetype: 'application/pdf'
+          }
+        }
+      });
+
+      expect(behaviour.validateField('file-upload', req)).toBeUndefined();
+    });
+
+    test('rejects files larger than 25MB', () => {
+      const req = createRequest({
+        files: {
+          'file-upload': {
+            name: 'large.pdf',
+            size: 25 * 1024 * 1024 + 1,
+            mimetype: 'application/pdf'
+          }
+        }
+      });
+
+      expect(behaviour.validateField('file-upload', req).type).toBe(
+        'maxFileSize'
+      );
+    });
+
+    test('rejects empty files', () => {
+      const req = createRequest({
+        files: {
+          'file-upload': {
+            name: 'empty.pdf',
+            size: 0,
+            mimetype: 'application/pdf'
+          }
+        }
+      });
+
+      expect(behaviour.validateField('file-upload', req).type).toBe(
+        'emptyFile'
+      );
+    });
+
+    test('rejects files truncated by the multipart parser', () => {
+      const req = createRequest({
+        files: {
+          'file-upload': {
+            name: 'truncated.pdf',
+            size: 1,
+            mimetype: 'application/pdf',
+            truncated: true
+          }
+        }
+      });
+
+      expect(behaviour.validateField('file-upload', req).type).toBe(
+        'maxFileSize'
+      );
+    });
+
+    test('rejects unsupported file types', () => {
+      const req = createRequest({
+        files: {
+          'file-upload': {
+            name: 'evidence.exe',
+            size: 100,
+            mimetype: 'application/x-msdownload'
           }
         }
       });
 
       expect(behaviour.validateField('file-upload', req).type).toBe('fileType');
-    }
-  );
-
-  test('accepts an allowed extension regardless of case', () => {
-    const req = createRequest({
-      files: {
-        'file-upload': {
-          name: 'EVIDENCE.PDF',
-          size: 100,
-          mimetype: 'application/pdf'
-        }
-      }
     });
 
-    expect(behaviour.validateField('file-upload', req)).toBeUndefined();
-  });
+    test.each([['evidence.exe'], ['evidence'], ['evidence.pdf.exe']])(
+      'rejects %s with an allowed MIME type',
+      name => {
+        const req = createRequest({
+          files: {
+            'file-upload': {
+              name,
+              size: 100,
+              mimetype: 'application/pdf'
+            }
+          }
+        });
 
-  test.each([
-    ['evidence.doc', 'application/msword'],
-    [
-      'evidence.docx',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    ],
-    ['evidence.pdf', 'application/pdf'],
-    ['evidence.rtf', 'application/rtf'],
-    ['evidence.rtf', 'text/rtf'],
-    ['evidence.txt', 'text/plain'],
-    ['evidence.odt', 'application/vnd.oasis.opendocument.text'],
-    ['evidence.jpeg', 'image/jpeg'],
-    ['evidence.jpg', 'image/jpeg'],
-    ['evidence.png', 'image/png']
-  ])('accepts %s with MIME type %s', (name, mimetype) => {
-    const req = createRequest({
-      files: {
-        'file-upload': {
-          name,
-          size: 100,
-          mimetype
-        }
+        expect(behaviour.validateField('file-upload', req).type).toBe(
+          'fileType'
+        );
       }
-    });
+    );
 
-    expect(behaviour.validateField('file-upload', req)).toBeUndefined();
-  });
-
-  test.each([5, 6])(
-    'validates an upload with %i existing files against the six-file limit',
-    documentCount => {
-      expect(uploadConfig.limit).toBe(6);
+    test('accepts an allowed extension regardless of case', () => {
       const req = createRequest({
         files: {
           'file-upload': {
-            name: 'another.pdf',
+            name: 'EVIDENCE.PDF',
             size: 100,
             mimetype: 'application/pdf'
           }
         }
       });
-      req.sessionModel.get.mockReturnValue(
-        Array.from({ length: documentCount }, (_, index) => ({
-          id: `${index}`,
-          name: `${index}.pdf`
-        }))
-      );
 
-      if (documentCount === 5) {
-        expect(behaviour.validateField('file-upload', req)).toBeUndefined();
-        return;
+      expect(behaviour.validateField('file-upload', req)).toBeUndefined();
+    });
+
+    test.each([
+      ['evidence.doc', 'application/msword'],
+      [
+        'evidence.docx',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ],
+      ['evidence.pdf', 'application/pdf'],
+      ['evidence.rtf', 'application/rtf'],
+      ['evidence.rtf', 'text/rtf'],
+      ['evidence.txt', 'text/plain'],
+      ['evidence.odt', 'application/vnd.oasis.opendocument.text'],
+      ['evidence.jpeg', 'image/jpeg'],
+      ['evidence.jpg', 'image/jpeg'],
+      ['evidence.png', 'image/png']
+    ])('accepts %s with MIME type %s', (name, mimetype) => {
+      const req = createRequest({
+        files: {
+          'file-upload': {
+            name,
+            size: 100,
+            mimetype
+          }
+        }
+      });
+
+      expect(behaviour.validateField('file-upload', req)).toBeUndefined();
+    });
+
+    test.each([5, 6])(
+      'validates an upload with %i existing files against the six-file limit',
+      documentCount => {
+        expect(uploadConfig.limit).toBe(6);
+        const req = createRequest({
+          files: {
+            'file-upload': {
+              name: 'another.pdf',
+              size: 100,
+              mimetype: 'application/pdf'
+            }
+          }
+        });
+        req.sessionModel.get.mockReturnValue(
+          Array.from({ length: documentCount }, (_, index) => ({
+            id: `${index}`,
+            name: `${index}.pdf`
+          }))
+        );
+
+        if (documentCount === 5) {
+          expect(behaviour.validateField('file-upload', req)).toBeUndefined();
+          return;
+        }
+
+        expect(behaviour.validateField('file-upload', req)).toMatchObject({
+          type: 'fileCountLimit',
+          arguments: [6]
+        });
       }
+    );
+
+    test('rejects a duplicate filename', () => {
+      const req = createRequest({
+        files: {
+          'file-upload': {
+            name: 'evidence.pdf',
+            size: 100,
+            mimetype: 'application/pdf'
+          }
+        }
+      });
+      req.sessionModel.get.mockReturnValue([
+        { id: 'one', name: 'evidence.pdf' }
+      ]);
 
       expect(behaviour.validateField('file-upload', req)).toMatchObject({
-        type: 'fileCountLimit',
-        arguments: [6]
+        type: 'isDuplicateFileName',
+        arguments: ['evidence.pdf']
       });
-    }
-  );
-
-  test('rejects a duplicate filename', () => {
-    const req = createRequest({
-      files: {
-        'file-upload': {
-          name: 'evidence.pdf',
-          size: 100,
-          mimetype: 'application/pdf'
-        }
-      }
-    });
-    req.sessionModel.get.mockReturnValue([{ id: 'one', name: 'evidence.pdf' }]);
-
-    expect(behaviour.validateField('file-upload', req)).toMatchObject({
-      type: 'isDuplicateFileName',
-      arguments: ['evidence.pdf']
-    });
-  });
-
-  test('delegates validation for a valid file', () => {
-    const req = createRequest({
-      files: {
-        'file-upload': {
-          name: 'evidence.pdf',
-          size: 100,
-          mimetype: 'application/pdf'
-        }
-      }
     });
 
-    behaviour.validateField('file-upload', req);
-
-    expect(baseValidateField).toHaveBeenCalledWith('file-upload', req);
-  });
-
-  test('uploads the file, updates the session and redirects back to the step', async () => {
-    const file = {
-      name: 'evidence.pdf',
-      data: Buffer.from('evidence'),
-      mimetype: 'application/pdf'
-    };
-    const existingDocument = { id: 'existing', name: 'existing.pdf' };
-    const req = createRequest({
-      path: uploadPath,
-      files: { 'file-upload': file }
-    });
-    req.sessionModel.get.mockReturnValue([existingDocument]);
-    const res = { redirect: jest.fn() };
-    const next = jest.fn();
-
-    await behaviour.saveValues(req, res, next);
-
-    expect(FileUpload).toHaveBeenCalledWith(file);
-    expect(mockUploadSave).toHaveBeenCalled();
-    expect(req.sessionModel.get).toHaveBeenCalledWith(documentCategory);
-    expect(req.sessionModel.set).toHaveBeenCalledWith(documentCategory, [
-      existingDocument,
-      { id: 'upload-id', name: 'evidence.pdf' }
-    ]);
-    expect(res.redirect).toHaveBeenCalledWith(`/updates${uploadPath}`);
-    expect(next).not.toHaveBeenCalled();
-  });
-
-  test('waits for a Save-and-exit upload before continuing to persistence', async () => {
-    const req = createRequest({
-      path: uploadPath,
-      body: { 'save-and-exit': 'save-and-exit' },
-      files: {
-        'file-upload': {
-          name: 'evidence.pdf',
-          data: Buffer.from('evidence'),
-          mimetype: 'application/pdf'
-        }
-      }
-    });
-    const existingDocument = { id: 'existing', name: 'existing.pdf' };
-    req.sessionModel.get.mockReturnValue([existingDocument]);
-    let resolveUpload;
-    mockUploadSave.mockReturnValue(
-      new Promise(resolve => {
-        resolveUpload = resolve;
-      })
-    );
-    const res = { redirect: jest.fn() };
-    const next = jest.fn();
-    baseSaveValues.mockImplementationOnce((request, response, callback) =>
-      callback()
-    );
-
-    const saving = behaviour.saveValues(req, res, next);
-
-    expect(req.sessionModel.set).not.toHaveBeenCalled();
-    expect(baseSaveValues).not.toHaveBeenCalled();
-    expect(next).not.toHaveBeenCalled();
-    resolveUpload();
-    await saving;
-
-    expect(req.sessionModel.set).toHaveBeenCalledWith(documentCategory, [
-      existingDocument,
-      { id: 'upload-id', name: 'evidence.pdf' }
-    ]);
-    expect(baseSaveValues).toHaveBeenCalledWith(req, res, next);
-    expect(next).toHaveBeenCalledTimes(1);
-    expect(res.redirect).not.toHaveBeenCalled();
-  });
-
-  test.each([false, true])(
-    'passes upload failures to the next error handler with Save-and-exit %p',
-    async exit => {
+    test('delegates validation for a valid file', () => {
       const req = createRequest({
-        body: exit ? { 'save-and-exit': 'save-and-exit' } : {},
+        files: {
+          'file-upload': {
+            name: 'evidence.pdf',
+            size: 100,
+            mimetype: 'application/pdf'
+          }
+        }
+      });
+
+      behaviour.validateField('file-upload', req);
+
+      expect(baseValidateField).toHaveBeenCalledWith('file-upload', req);
+    });
+
+    test('uploads the file, updates the session and redirects back to the step', async () => {
+      const file = {
+        name: 'evidence.pdf',
+        data: Buffer.from('evidence'),
+        mimetype: 'application/pdf'
+      };
+      const existingDocument = { id: 'existing', name: 'existing.pdf' };
+      const req = createRequest({
+        path: uploadPath,
+        files: { 'file-upload': file }
+      });
+      req.sessionModel.get.mockReturnValue([existingDocument]);
+      const res = { redirect: jest.fn() };
+      const next = jest.fn();
+
+      await behaviour.saveValues(req, res, next);
+
+      expect(FileUpload).toHaveBeenCalledWith(file);
+      expect(mockUploadSave).toHaveBeenCalled();
+      expect(req.sessionModel.get).toHaveBeenCalledWith(documentCategory);
+      expect(req.sessionModel.set).toHaveBeenCalledWith(documentCategory, [
+        existingDocument,
+        { id: 'upload-id', name: 'evidence.pdf' }
+      ]);
+      expect(res.redirect).toHaveBeenCalledWith(`/updates${uploadPath}`);
+      expect(res.redirect).toHaveBeenCalledTimes(1);
+      expect(baseSaveValues).not.toHaveBeenCalled();
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    test('waits for a Save-and-exit upload before continuing to persistence', async () => {
+      const req = createRequest({
+        path: uploadPath,
+        body: { 'save-and-exit': 'save-and-exit' },
         files: {
           'file-upload': {
             name: 'evidence.pdf',
@@ -423,32 +399,89 @@ describe.each([
           }
         }
       });
-      const error = new Error('vault unavailable');
-      mockUploadSave.mockRejectedValue(error);
-      const next = jest.fn();
-      const res = { redirect: jest.fn() };
-
-      await behaviour.saveValues(req, res, next);
-
-      expect(next).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: `Failed to save document: ${error}`
+      const existingDocument = { id: 'existing', name: 'existing.pdf' };
+      req.sessionModel.get.mockReturnValue([existingDocument]);
+      let resolveUpload;
+      mockUploadSave.mockReturnValue(
+        new Promise(resolve => {
+          resolveUpload = resolve;
         })
       );
+      const res = { redirect: jest.fn() };
+      const next = jest.fn();
+      baseSaveValues.mockImplementationOnce((request, response, callback) =>
+        callback()
+      );
+
+      const saving = behaviour.saveValues(req, res, next);
+
       expect(req.sessionModel.set).not.toHaveBeenCalled();
       expect(baseSaveValues).not.toHaveBeenCalled();
+      expect(next).not.toHaveBeenCalled();
+      resolveUpload();
+      await saving;
+
+      expect(req.sessionModel.set).toHaveBeenCalledWith(documentCategory, [
+        existingDocument,
+        { id: 'upload-id', name: 'evidence.pdf' }
+      ]);
+      expect(baseSaveValues).toHaveBeenCalledWith(req, res, next);
+      expect(baseSaveValues).toHaveBeenCalledTimes(1);
+      expect(next).toHaveBeenCalledTimes(1);
       expect(res.redirect).not.toHaveBeenCalled();
-    }
-  );
+    });
 
-  test('delegates saving when no file was submitted', async () => {
-    const req = createRequest();
+    test.each([false, true])(
+      'passes upload failures to the next error handler with Save-and-exit %p',
+      async exit => {
+        const req = createRequest({
+          body: exit ? { 'save-and-exit': 'save-and-exit' } : {},
+          files: {
+            'file-upload': {
+              name: 'evidence.pdf',
+              data: Buffer.from('evidence'),
+              mimetype: 'application/pdf'
+            }
+          }
+        });
+        const error = new Error('vault unavailable');
+        mockUploadSave.mockRejectedValue(error);
+        const next = jest.fn();
+        const res = { redirect: jest.fn() };
 
-    await behaviour.saveValues(req, {}, jest.fn());
+        await behaviour.saveValues(req, res, next);
 
-    expect(baseSaveValues).toHaveBeenCalledWith(req, {}, expect.any(Function));
-  });
-});
+        expect(next).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: `Failed to save document: ${error}`
+          })
+        );
+        expect(req.sessionModel.set).not.toHaveBeenCalled();
+        expect(baseSaveValues).not.toHaveBeenCalled();
+        expect(res.redirect).not.toHaveBeenCalled();
+      }
+    );
+
+    test.each([false, true])(
+      'delegates saving without a file with Save-and-exit %p',
+      async exit => {
+        const req = createRequest({
+          body: exit ? { 'save-and-exit': 'save-and-exit' } : {},
+          files: undefined
+        });
+        const res = { redirect: jest.fn() };
+        const next = jest.fn();
+
+        await behaviour.saveValues(req, res, next);
+
+        expect(baseSaveValues).toHaveBeenCalledWith(req, res, next);
+        expect(baseSaveValues).toHaveBeenCalledTimes(1);
+        expect(mockUploadSave).not.toHaveBeenCalled();
+        expect(res.redirect).not.toHaveBeenCalled();
+      }
+    );
+  }
+);
 
 describe('Save-and-exit upload persistence', () => {
   const documentCategory = 'documents-help-your-claim';
@@ -529,6 +562,49 @@ describe('Save-and-exit upload persistence', () => {
       expect(next).not.toHaveBeenCalled();
     }
   );
+
+  test('redirects ordinary uploads back once without entering draft persistence', async () => {
+    req.body = {};
+
+    await behaviour.saveValues(req, res, next);
+
+    expect(req.sessionModel.get(documentCategory)).toEqual([
+      { id: 'upload-id', name: 'evidence.pdf' }
+    ]);
+    expect(res.redirect).toHaveBeenCalledTimes(1);
+    expect(res.redirect).toHaveBeenCalledWith(
+      '/updates/upload-supporting-evidence'
+    );
+    expect(saveApplication).not.toHaveBeenCalled();
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  test('persists existing documents and exits once when no new file is selected', async () => {
+    const documents = [{ id: 'existing', name: 'existing.pdf' }];
+    req.files = undefined;
+    req.form.values = {};
+    req.sessionModel.set(documentCategory, documents);
+    saveApplication.mockResolvedValue({ id: 9 });
+    let finishing;
+
+    await behaviour.saveValues(req, res, error => {
+      expect(error).toBeUndefined();
+      finishing = behaviour.successHandler(req, res, next);
+    });
+    await finishing;
+
+    expect(mockUploadSave).not.toHaveBeenCalled();
+    expect(saveApplication).toHaveBeenCalledTimes(1);
+    expect(saveApplication).toHaveBeenCalledWith(
+      9,
+      expect.objectContaining({
+        [documentCategory]: documents
+      })
+    );
+    expect(res.redirect).toHaveBeenCalledTimes(1);
+    expect(res.redirect).toHaveBeenCalledWith('/updates/form-saved');
+    expect(next).not.toHaveBeenCalled();
+  });
 
   test('does not exit when draft persistence fails after a successful upload', async () => {
     const error = new Error('Draft service unavailable');
