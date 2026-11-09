@@ -28,6 +28,7 @@ const documentUploadStep = category => ({
   locals: {
     documentCategory: {
       name: category,
+      required: config.upload.required,
       acceptedFileExtensions: config.upload.acceptedFileExtensions,
       limit: config.upload.limit,
       limitValidationError: config.upload.limitValidationError,

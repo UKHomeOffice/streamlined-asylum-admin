@@ -19,10 +19,39 @@ jest.mock('../../../apps/saa/behaviours/remove-document', () =>
 const app = require('../../../apps/saa');
 
 describe('file upload configuration', () => {
-  test('uses the global six-file limit when there are no category overrides', () => {
+  test('defaults to required uploads and a six-file limit', () => {
+    expect(uploadConfig.required).toBe(true);
     expect(uploadConfig.limit).toBe(6);
     expect(uploadConfig.limitValidationError).toBe('fileCountLimit');
-    expect(uploadConfig.documentCategories).toEqual({});
+  });
+
+  test('only requires the photo identity and supporting evidence categories', () => {
+    const requiredCategories = Object.entries(uploadConfig.documentCategories)
+      .filter(([, category]) => category.required)
+      .map(([name]) => name);
+
+    expect(requiredCategories).toEqual([
+      'documents-update-contact',
+      'documents-help-your-claim'
+    ]);
+  });
+
+  test.each([
+    ['/new-name-evidence', 'documents-new-name', false],
+    [
+      '/someone-else-new-name-evidence',
+      'documents-someone-else-new-name',
+      false
+    ],
+    ['/new-date-of-birth-evidence', 'documents-new-dob', false],
+    ['/evidence-child-partner', 'documents-child-partner', false],
+    ['/upload-death-certificate', 'documents-death-certificate', false],
+    ['/upload-supporting-evidence', 'documents-help-your-claim', true]
+  ])('exposes the upload requirement for %s', (route, category, required) => {
+    expect(app.steps[route].locals.documentCategory).toMatchObject({
+      name: category,
+      required
+    });
   });
 
   test('wires the child/partner evidence route to its upload category', () => {
@@ -35,6 +64,7 @@ describe('file upload configuration', () => {
     ]);
     expect(step.locals.documentCategory).toMatchObject({
       name: 'documents-child-partner',
+      required: false,
       limit: 6,
       limitValidationError: 'fileCountLimit'
     });

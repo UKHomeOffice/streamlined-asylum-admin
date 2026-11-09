@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = {
+  required: true,
   maxFileSizeInBytes: 25 * 1024 * 1024,
   acceptedFileExtensions: '.doc,.docx,.pdf,.rtf,.txt,.odt,.jpeg,.jpg,.png',
   allowedMimeTypes: [
@@ -17,6 +18,14 @@ module.exports = {
   limit: 6,
   limitValidationError: 'fileCountLimit',
   documentCategories: {
-    // Add document categories override here if required
+    'documents-new-name': { required: false },
+    'documents-someone-else-new-name': { required: false },
+    'documents-new-dob': { required: false },
+    'documents-nationality': { required: false },
+    'documents-someone-else-nationality': { required: false },
+    'documents-child-partner': { required: false },
+    'documents-death-certificate': { required: false },
+    'documents-update-contact': { required: true },
+    'documents-help-your-claim': { required: true }
   }
 };
