@@ -169,6 +169,11 @@ module.exports = {
           routes: [
             '/new-email-address',
             '/check-your-answers-email'
+          ],
+          fieldsToUnset: [
+            'old-email-address',
+            'new-email-address',
+            'confirm-new-email-address'
           ]
         }
       ]
@@ -185,6 +190,13 @@ module.exports = {
             '/your-phone-number',
             '/new-phone-number',
             '/check-your-answers-phone-number'
+          ],
+          fieldsToUnset: [
+            'your-phone-number',
+            'whose-phone-number',
+            'old-phone-number',
+            'new-phone-number',
+            'confirm-new-phone-number'
           ]
         }
       ]

@@ -229,5 +229,26 @@
   },
   "relationship-date-of-birth": {
     "required": "Select how they are related to you"
+  },
+  "your-phone-number": {
+    "required": "Select if it is your own phone number"
+  },
+  "whose-phone-number": {
+    "required": "Text must be between 1 and 500 characters",
+    "maxlength": "Text must be between 1 and 500 characters",
+    "notUrl": "Text must not contain a URL"
+  },
+  "old-phone-number": {
+    "required": "Enter your old phone number",
+    "internationalPhoneNumber": "Enter a real old phone number"
+  },
+  "new-phone-number": {
+    "required": "Enter your new phone number",
+    "internationalPhoneNumber": "Enter a real new phone number"
+  },
+  "confirm-new-phone-number": {
+    "required": "Confirm your new phone number",
+    "internationalPhoneNumber": "Enter a real new phone number",
+    "matchField": "Number must be the same"
   }
 }
