@@ -401,12 +401,14 @@
     }
   },
   "someone-else-correct-date-of-birth-given-name": {
+    "summary-label": "Name",
     "label": "Given name"
   },
   "someone-else-correct-date-of-birth-family-name": {
     "label": "Family name"
   },
   "someone-else-correct-date-of-birth": {
+    "summary-label": "Correct date of birth",
     "legend": "Date of birth",
     "hint": "For example, 27 3 2020"
   },
@@ -443,5 +445,8 @@
   },
   "confirm-new-phone-number": {
     "label": "Confirm new phone number"
+  },
+  "documents-someone-else-new-dob": {
+    "summary-label": "Files uploaded"
   }
 }
