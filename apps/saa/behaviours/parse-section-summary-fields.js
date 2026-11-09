@@ -55,7 +55,7 @@ const getItemTitle = (item, values, ctx) => {
 };
 
 // Returns a copy so the saved field names stay unchanged for editing.
-const parseItem = (item, ctx) => {
+const parseItem = (item, ctx, index) => {
   const values = Object.fromEntries(
     item.fields.map(({ field, value }) => [field, value])
   );
@@ -74,7 +74,11 @@ const parseItem = (item, ctx) => {
       ctx.combinedFields.has(original.field)
   }));
 
-  return { ...item, joinTitle: getItemTitle(item, values, ctx), fields };
+  const title = getItemTitle(item, values, ctx);
+  // First item is unnumbered, then "Title 2", "Title 3", ...
+  const joinTitle = ctx.addIncrement && index > 0 ? `${title} ${index + 1}` : title;
+
+  return { ...item, joinTitle, fields };
 };
 
 const buildContext = (req, options) => {
@@ -94,7 +98,8 @@ const buildContext = (req, options) => {
     titleField: [
       options.titleField || req.form.options.titleField || []
     ].flat()[0],
-    itemTitle: options.itemTitle
+    itemTitle: options.itemTitle,
+    addIncrement: options.addIncrement
   };
 };
 
@@ -120,8 +125,8 @@ const formatAggregateForSummary = (aggregate, req, options = {}) => {
   const ctx = buildContext(req, options);
 
   return {
-    aggregatedValues: items.map(item =>
-      toSummaryItem(parseItem(item, ctx), ctx, options.changeLink)
+    aggregatedValues: items.map((item, index) =>
+      toSummaryItem(parseItem(item, ctx, index), ctx, options.changeLink)
     )
   };
 };
@@ -134,7 +139,7 @@ const parseSectionSummaryFields =
           const locals = super.locals(req, res);
           const ctx = buildContext(req, options);
 
-          locals.items = locals.items.map(item => parseItem(item, ctx));
+          locals.items = locals.items.map((item, index) => parseItem(item, ctx, index));
           return locals;
         }
       };
