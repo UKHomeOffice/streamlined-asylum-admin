@@ -44,6 +44,11 @@ describe('file upload configuration', () => {
       false
     ],
     ['/new-date-of-birth-evidence', 'documents-new-dob', false],
+    [
+      '/someone-else-new-date-of-birth-evidence',
+      'documents-someone-else-new-dob',
+      false
+    ],
     ['/evidence-child-partner', 'documents-child-partner', false],
     ['/upload-death-certificate', 'documents-death-certificate', false],
     ['/upload-supporting-evidence', 'documents-help-your-claim', true]

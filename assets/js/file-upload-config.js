@@ -21,6 +21,7 @@ module.exports = {
     'documents-new-name': { required: false },
     'documents-someone-else-new-name': { required: false },
     'documents-new-dob': { required: false },
+    'documents-someone-else-new-dob': { required: false },
     'documents-nationality': { required: false },
     'documents-someone-else-nationality': { required: false },
     'documents-child-partner': { required: false },

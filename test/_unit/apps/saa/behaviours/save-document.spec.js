@@ -74,6 +74,11 @@ const createRequest = (overrides = {}) => ({
 
 describe.each([
   ['documents-help-your-claim', '/upload-supporting-evidence', true],
+  [
+    'documents-someone-else-new-dob',
+    '/someone-else-new-date-of-birth-evidence',
+    false
+  ],
   ['documents-child-partner', '/evidence-child-partner', false]
 ])(
   'save document behaviour for %s',
