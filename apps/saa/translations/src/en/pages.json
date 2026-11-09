@@ -76,9 +76,10 @@
     "captionHeading": "Update personal details"
   },
   "check-your-answers-someone-else-date-of-birth": {
+    "item-title": "Change someone else's date of birth",
     "header": "Check your answers",
     "captionHeading": "Update personal details",
-    "limit-exceeded": "You have changed the maximum number of 15 dates of birth. You cannot add any more."
+    "limit-exceeded": "You have changed the maximum number of {{maxItems}} dates of birth. You cannot add any more."
   },
   "whose-nationality-to-change": {
     "header": "Do you need to change your nationality?"

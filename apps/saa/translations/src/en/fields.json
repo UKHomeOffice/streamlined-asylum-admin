@@ -413,7 +413,6 @@
     "hint": "For example, 27 3 2020"
   },
   "relationship-date-of-birth": {
-    "summary-label": "How are they related to you?",
     "legend": "How are they related to you?",
     "options": {
       "my-child": {

@@ -26,7 +26,7 @@ module.exports = {
     combineFields: {
       'someone-else-correct-date-of-birth-given-name': ['someone-else-correct-date-of-birth-family-name']
     },
-    itemTitle: 'Change someone else\'s date of birth',
+    itemTitle: 'pages.check-your-answers-someone-else-date-of-birth.item-title',
     addIncrement: true
   }
 };
