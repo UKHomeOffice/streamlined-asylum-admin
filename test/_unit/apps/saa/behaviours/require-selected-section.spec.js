@@ -42,17 +42,14 @@ describe('require-selected-section behaviour', () => {
     expect(instance.getNextStep(req, {})).toBe('/changes/confirm');
   });
 
-  it('goes to no-options instead of confirm when every section is no', () => {
-    const req = buildReq({ ...allNo, 'something-else': 'no' });
+  it.each(['no', 'yes', undefined])(
+    'revisits something-else when every section is no and its previous answer is %p',
+    answer => {
+      const req = buildReq({ ...allNo, 'something-else': answer });
 
-    expect(instance.getNextStep(req, {})).toBe('/changes/no-options');
-  });
-
-  it('goes to contact-us-by-email instead of confirm when every section is no and something else is yes', () => {
-    const req = buildReq({ ...allNo, 'something-else': 'yes' });
-
-    expect(instance.getNextStep(req, {})).toBe('/changes/contact-us-by-email');
-  });
+      expect(instance.getNextStep(req, {})).toBe('/changes/something-else');
+    }
+  );
 
   it('keeps the next step when it is not confirm', () => {
     baseGetNextStep.mockReturnValue('/changes/something-else/edit');

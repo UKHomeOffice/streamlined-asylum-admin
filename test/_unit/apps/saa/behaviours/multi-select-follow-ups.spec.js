@@ -339,11 +339,40 @@ describe('multi-select follow-ups behaviour', () => {
     });
   });
 
+  test.each([
+    [{}, ['/second-start'], '/changes/second-start'],
+    [{ action: 'edit' }, ['/second-start'], '/changes/confirm'],
+    [{ action: 'edit' }, [], '/changes/second-start/edit']
+  ])('completion honours HOF edit history with params %p and steps %p', (params, steps, nextRoute) => {
+    const controller = buildController('/first-end');
+    const req = {
+      baseUrl: '/changes',
+      params,
+      form: { options: {}, values: {} },
+      sessionModel: buildSessionModel({
+        steps,
+        'changes-follow-ups': {
+          selections: ['first', 'second'],
+          activeSections: ['first', 'second'],
+          completedSections: []
+        }
+      })
+    };
+
+    controller.saveValues(req, {}, err => expect(err).toBeUndefined());
+    expect(controller.getNextStep(req, {})).toBe(nextRoute);
+    expect(req.sessionModel.get('changes-follow-ups').completedSections).toEqual(['first']);
+    if (nextRoute === '/changes/confirm') {
+      expect(req.sessionModel.get('changes-follow-ups').sectionStartRoute).toBeUndefined();
+    }
+  });
+
   test('exit page back link returns to the last completed section route', () => {
     const controller = buildController('/exit');
     const req = {
       baseUrl: '/changes',
       sessionModel: buildSessionModel({
+        changes: ['first'],
         'changes-follow-ups': {
           selections: ['first'],
           activeSections: ['first'],
@@ -358,7 +387,7 @@ describe('multi-select follow-ups behaviour', () => {
     });
   });
 
-  test('exit page back link falls back to the entry page when no section has completed', () => {
+  test('exit page leaves the normal Back link unchanged when nothing is selected', () => {
     const controller = buildController('/exit');
     const req = {
       baseUrl: '/changes',
@@ -371,9 +400,7 @@ describe('multi-select follow-ups behaviour', () => {
       })
     };
 
-    expect(controller.locals(req, {})).toEqual({
-      backLink: '/changes/changes'
-    });
+    expect(controller.locals(req, {})).toEqual({});
   });
 
   test('section start page back link falls back to the entry page', () => {
@@ -586,7 +613,9 @@ describe('multi-select follow-ups behaviour', () => {
       expect(
         req.sessionModel.get('changes-follow-ups').completedSections
       ).toEqual(['first', 'second']);
-      expect(controller.getNextStep(req, {})).toBe('/changes/exit');
+      expect(controller.getNextStep(req, {})).toBe(
+        params.action === 'edit' ? '/changes/confirm' : '/changes/exit'
+      );
 
       req.form.values = { 'second-question': 'yes' };
       await save(controller);

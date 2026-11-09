@@ -400,6 +400,17 @@
       }
     }
   },
+  "no-changes-made": {
+    "legend": "{{noChangesHeader}}",
+    "options": {
+      "yes": {
+        "label": "Yes, continue"
+      },
+      "no": {
+        "label": "No, cancel and return to make a change"
+      }
+    }
+  },
   "someone-else-correct-date-of-birth-given-name": {
     "summary-label": "Name",
     "label": "Given name"

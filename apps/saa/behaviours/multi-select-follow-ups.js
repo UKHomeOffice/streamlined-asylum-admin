@@ -129,6 +129,39 @@ const getActiveRoutes = (config, selections) =>
     )
   );
 
+const getCompletionRoute = completion =>
+  typeof completion === 'string' ? completion : completion.route;
+
+const getOwnedRoutes = section =>
+  unique(
+    [section.start]
+      .concat(getRoutesForSection(section))
+      .concat(asArray(section.completeOn).map(getCompletionRoute))
+      .filter(Boolean)
+  );
+
+const getOwnedRoutesForSections = sections =>
+  unique(
+    sections.reduce(
+      (routes, section) => routes.concat(getOwnedRoutes(section)),
+      []
+    )
+  );
+
+const routeIsInactive = inactiveRoutes => route =>
+  inactiveRoutes.includes(route);
+
+// Drops Back-link history that points into or out of sections no longer selected.
+const pruneBackLinks = (backLinks, inactiveRoutes) => {
+  const isInactive = routeIsInactive(inactiveRoutes);
+
+  return Object.fromEntries(
+    Object.entries(backLinks || {}).filter(
+      ([start, backLink]) => !isInactive(start) && !isInactive(backLink)
+    )
+  );
+};
+
 /*
  * Clean-up is deliberately neutral. If a service wants de selecting an option to
  * clear stale answers, it can provide `fieldsToUnset`. The behaviour does not
@@ -156,10 +189,10 @@ const getFieldsToUnset = (config, inactiveSections, removedSelections) =>
  * - `completedSections`: active sections whose `completeOn` route has posted
  * - `addedSections`: newly selected sections, used to prioritise edit journeys
  * - `inactiveSections`: previously active sections that are no longer selected
+ * - `noChangesSection` / `noChangesFrom`: the section that reported no changes, and its reporting page
+ * - `noChangesNextRoute`: resume destination after confirming that nothing changed
  *
- * Page-specific controllers can later use this same state when they need to
- * programmatically remove a selection, but the rule deciding when to do that
- * should remain local to that page/section.
+ * The service config owns the rules for reporting no changes and clearing data.
  */
 const createState = (config, previousState, selections) => {
   const previousSelections = asArray(previousState.selections);
@@ -179,17 +212,31 @@ const createState = (config, previousState, selections) => {
   const completedSections = asArray(previousState.completedSections).filter(
     section => activeSectionIds.includes(section)
   );
+  const activeOwnedRoutes = getOwnedRoutesForSections(activeSections);
+  const inactiveRoutes = getOwnedRoutesForSections(
+    getActiveSections(config, previousSelections).filter(
+      sectionIsInactive(inactiveSections)
+    )
+  ).filter(route => !activeOwnedRoutes.includes(route));
+  const lastCompletionRoute =
+    completedSections.length &&
+    !inactiveRoutes.includes(previousState.lastCompletionRoute)
+      ? previousState.lastCompletionRoute
+      : undefined;
 
   return {
     selections: asArray(selections),
     activeSections: activeSectionIds,
     activeRoutes,
     completedSections,
-    lastCompletionRoute: completedSections.length
-      ? previousState.lastCompletionRoute
-      : undefined,
+    lastCompletionRoute,
+    sectionStartBackLinks: pruneBackLinks(
+      previousState.sectionStartBackLinks,
+      inactiveRoutes
+    ),
     addedSections,
     inactiveSections,
+    inactiveRoutes,
     fieldsToUnset: getFieldsToUnset(config, inactiveSections, removedSelections)
   };
 };
@@ -202,19 +249,25 @@ const nextIncompleteSection = (sections, state) =>
     section => !asArray(state.completedSections).includes(section.id)
   );
 
-const getCompletionRoute = completion =>
-  typeof completion === 'string' ? completion : completion.route;
-
-const completionConditionMet = (completion, req) => {
-  if (typeof completion === 'string' || !completion.condition) {
-    return true;
+const fieldConditionMet = (condition, req) => {
+  if (typeof condition === 'function') {
+    return condition(req);
   }
 
   const value =
-    req.form?.values?.[completion.condition.field] ||
-    req.sessionModel.get(completion.condition.field);
-  return value === completion.condition.value;
+    req.form?.values?.[condition.field] ??
+    req.sessionModel.get(condition.field);
+  return value === condition.value;
 };
+
+// A condition is a HOF-style field condition, a function, or a list that must all match.
+const conditionsMet = (conditions, req) =>
+  [conditions].flat().every(condition => fieldConditionMet(condition, req));
+
+const completionConditionMet = (completion, req) =>
+  typeof completion === 'string' ||
+  !completion.condition ||
+  conditionsMet(completion.condition, req);
 
 const sectionCompletesOnRoute = (section, route, req) =>
   asArray(section.completeOn).some(
@@ -333,13 +386,100 @@ const getSectionStartBackLink = (state, route) =>
   state.sectionStartBackLinks?.[route] ||
   (state.sectionStartRoute === route ? state.sectionStartBackLink : undefined);
 
-const getCompletionNextRoute = (config, activeSections, state) =>
-  nextIncompleteSection(activeSections, state)?.start || config.exitPoint;
+const isEdit = req => req.params?.action === 'edit';
+
+const getCompletionNextRoute = (req, config, activeSections, state) => {
+  const completedSteps = asArray(req.sessionModel.get('steps'));
+  // Match HOF edit navigation: only unseen follow-up sections need continuing.
+  const remainingSections = isEdit(req)
+    ? activeSections.filter(section => !completedSteps.includes(section.start))
+    : activeSections;
+
+  return nextIncompleteSection(remainingSections, state)?.start || config.exitPoint;
+};
+
+const getAllSections = config =>
+  getActiveSections(
+    config,
+    config.options.map(option => option.value)
+  );
+
+// A section reports "nothing changed" when every `noChanges.when` condition matches on its `noChanges.route`.
+const getNoChangesSection = (sections, route, req) =>
+  sections.find(
+    section =>
+      (section.noChanges?.route === route ||
+        (isEdit(req) && section.noChanges?.editRoute === route)) &&
+      conditionsMet(section.noChanges.when, req)
+  );
+
+const markNoChanges = (state, section, route) => ({
+  ...state,
+  completedSections: asArray(state.completedSections).filter(
+    sectionId => sectionId !== section.id
+  ),
+  lastCompletionRoute:
+    state.lastCompletionRoute === route ? undefined : state.lastCompletionRoute,
+  noChangesSection: section.id,
+  noChangesFrom: route,
+  noChangesNextRoute: undefined
+});
+
+const optionHasSection = sectionId => option =>
+  getSectionsForOption(option).some(section => section.id === sectionId);
+
+const clearInactiveValues = (req, state) => {
+  if (state.fieldsToUnset.length) {
+    req.sessionModel.unset(state.fieldsToUnset);
+  }
+
+  const steps = req.sessionModel.get('steps');
+  if (Array.isArray(steps) && state.inactiveRoutes.length) {
+    req.sessionModel.set(
+      'steps',
+      steps.filter(route => !state.inactiveRoutes.includes(route))
+    );
+  }
+};
+
+// Unticks the options behind a section, as if the user had deselected them on the entry page.
+const removeSectionSelection = (req, config, state, sectionId) => {
+  const removedValues = new Set(config.options
+    .filter(optionHasSection(sectionId))
+    .map(option => option.value));
+  const selections = asArray(state.selections).filter(
+    value => !removedValues.has(value)
+  );
+  const nextState = createState(config, state, selections);
+
+  clearInactiveValues(req, nextState);
+
+  if (selections.length) {
+    req.sessionModel.set(config.field, selections);
+  } else {
+    req.sessionModel.unset(config.field);
+    config.onNoneSelected?.(req);
+  }
+
+  return nextState;
+};
 
 const multiSelectFollowUps = behaviourConfig => SuperClass =>
   class MultiSelectFollowUps extends SuperClass {
     getMultiSelectFollowUpsConfig() {
       return behaviourConfig ? normaliseConfig(behaviourConfig) : false;
+    }
+
+    configure(req, res, next) {
+      const config = this.getMultiSelectFollowUpsConfig();
+      if (config && this.options.route === config.noChangesPoint?.route) {
+        const state = req.sessionModel.get(config.stateKey) || {};
+        if (!state.noChangesSection) {
+          // A saved POST can resume here after the option has already been removed.
+          return res.redirect(this.getNextStep(req, res));
+        }
+      }
+      return super.configure(req, res, next);
     }
 
     saveValues(req, res, callback) {
@@ -389,77 +529,228 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
             config.entryPoint
           );
 
-          if (state.fieldsToUnset.length) {
-            req.sessionModel.unset(state.fieldsToUnset);
+          clearInactiveValues(req, state);
+        } else if (this.options.route === config.noChangesPoint?.route) {
+          if (!previousState.noChangesSection) {
+            callback(new Error('No follow-up section is awaiting a no-changes decision'));
+            return;
           }
+          state = this.resolveNoChanges(req, config, previousState);
         } else {
-          /*
-           * Completion is section-boundary based. Posting any configured
-           * `completeOn` route marks that section complete, then `getNextStep`
-           * can move the user to the next incomplete selected section. All pages
-           * before this point remain normal HOF pages.
-           */
-          const activeSections = getActiveSections(
-            config,
-            previousState.selections
-          );
-          const completingSections = getCompletingSections(
-            activeSections,
-            this.options.route,
-            req
-          );
-
-          state = invalidateReopenedSections(
-            previousState,
-            activeSections,
-            this.options.route,
-            req
-          );
-
-          if (completingSections.length) {
-            state = {
-              ...state,
-              completedSections: getCompletedSections(
-                state,
-                completingSections
-              ),
-              lastCompletionRoute: getLastCompletionRoute(
-                state,
-                this.options.route,
-                completingSections
-              )
-            };
-
-            state = withSectionStartBackLink(
-              state,
-              config,
-              getCompletionNextRoute(config, activeSections, state),
-              this.options.route
-            );
-          }
+          state = this.updateSectionState(req, config, previousState);
         }
 
         req.sessionModel.set(config.stateKey, state);
+        if (
+          req.form.options &&
+          (this.options.route === config.entryPoint ||
+            this.options.route === config.noChangesPoint?.route ||
+            getNoChangesSection(
+              getActiveSections(config, state.selections),
+              this.options.route,
+              req
+            ) ||
+            getCompletingSections(
+              getActiveSections(config, state.selections),
+              this.options.route,
+              req
+            ).length)
+        ) {
+          // Let successHandler persist the session before following our boundary route.
+          req.form.options.continueOnEdit = true;
+        }
         callback();
       });
     }
 
+    /*
+     * Completion is section-boundary based. Posting a configured `completeOn`
+     * route marks that section complete, unless the section's `noChanges` rule
+     * matches first, in which case the user is sent to the shared no-changes page.
+     */
+    updateSectionState(req, config, previousState) {
+      const route = this.options.route;
+      const activeSections = getActiveSections(
+        config,
+        previousState.selections
+      );
+      const noChangesSection = getNoChangesSection(activeSections, route, req);
+
+      if (noChangesSection) {
+        return markNoChanges(previousState, noChangesSection, route);
+      }
+
+      const completingSections = getCompletingSections(
+        activeSections,
+        route,
+        req
+      );
+      const resumedState = previousState.noChangesSection
+        ? {
+          ...previousState,
+          noChangesSection: undefined,
+          noChangesFrom: undefined
+        }
+        : previousState;
+      let state = invalidateReopenedSections(
+        resumedState,
+        activeSections,
+        route,
+        req
+      );
+
+      if (!completingSections.length) {
+        return state;
+      }
+
+      state = {
+        ...state,
+        completedSections: getCompletedSections(state, completingSections),
+        lastCompletionRoute: getLastCompletionRoute(
+          state,
+          route,
+          completingSections
+        )
+      };
+
+      const nextRoute = getCompletionNextRoute(req, config, activeSections, state);
+
+      return withSectionStartBackLink(state, config, nextRoute, route);
+    }
+
+    // "Yes" unticks the section's option and moves on; "No" keeps state so getNextStep returns to the section start.
+    resolveNoChanges(req, config, state) {
+      const point = config.noChangesPoint;
+      const continuing = this.isContinuingWithNoChanges(req, config);
+
+      req.sessionModel.unset(point.field);
+
+      if (!state.noChangesSection || !continuing) {
+        return state;
+      }
+
+      const nextState = removeSectionSelection(
+        req, config, state, state.noChangesSection
+      );
+      const nextRoute = getCompletionNextRoute(
+        req,
+        config,
+        getActiveSections(config, nextState.selections),
+        nextState
+      );
+
+      return withSectionStartBackLink(
+        { ...nextState, noChangesNextRoute: nextRoute },
+        config,
+        nextRoute,
+        nextState.lastCompletionRoute || config.entryPoint
+      );
+    }
+
+    isContinuingWithNoChanges(req, config) {
+      const point = config.noChangesPoint;
+      return req.form?.values?.[point.field] === (point.continueValue || 'yes');
+    }
+
+    getEditExitUrl(req, config) {
+      return (
+        config.editReturnUrl?.(req) ||
+        withBaseUrl(req, this.confirmStep || '/confirm')
+      );
+    }
+
+    toNextUrl(req, config, nextRoute) {
+      if (nextRoute === config.exitPoint && isEdit(req)) {
+        return this.getEditExitUrl(req, config);
+      }
+
+      return withEditSuffix(
+        req,
+        config,
+        withBaseUrl(req, nextRoute),
+        nextRoute
+      );
+    }
+
+    getNoChangesNextRoute(req, config, state) {
+      if (!state.noChangesSection) {
+        return state.noChangesNextRoute || config.entryPoint;
+      }
+
+      if (this.isContinuingWithNoChanges(req, config)) {
+        return getCompletionNextRoute(
+          req,
+          config,
+          getActiveSections(config, state.selections),
+          state
+        );
+      }
+
+      return getSectionById(getAllSections(config), state.noChangesSection)
+        ?.start;
+    }
+
+    getNoChangesLocals(req, res, config, state) {
+      const section = getSectionById(
+        getAllSections(config),
+        state.noChangesSection
+      );
+      const headerKey = section?.noChanges?.header;
+      const header =
+        headerKey && typeof req.translate === 'function'
+          ? req.translate(headerKey)
+          : headerKey;
+
+      // Set before HOF builds the page title and legend, which render from res.locals.
+      if (header && res.locals) {
+        res.locals.noChangesHeader = header;
+      }
+
+      return {
+        noChangesHeader: header,
+        backLink: state.noChangesFrom
+          ? withEditSuffix(
+            req,
+            config,
+            withBaseUrl(req, state.noChangesFrom),
+            state.noChangesFrom
+          )
+          : undefined
+      };
+    }
+
     locals(req, res) {
-      const locals = super.locals(req, res);
       const config = this.getMultiSelectFollowUpsConfig();
+      const state = config ? req.sessionModel.get(config.stateKey) || {} : {};
+      const noChangesLocals =
+        config && this.options.route === config.noChangesPoint?.route
+          ? this.getNoChangesLocals(req, res, config, state)
+          : undefined;
+      const locals = super.locals(req, res);
 
       if (!config) {
         return locals;
       }
 
-      const state = req.sessionModel.get(config.stateKey) || {};
+      if (noChangesLocals) {
+        return {
+          ...locals,
+          noChangesHeader: noChangesLocals.noChangesHeader,
+          backLink: noChangesLocals.backLink || locals.backLink
+        };
+      }
+
       const sectionStartBackLink = getSectionStartBackLink(
         state,
         this.options.route
       );
       const isTrackedSectionStart = Boolean(sectionStartBackLink);
+      // The exit page only gets an orchestrated Back link while options are still ticked.
+      const isActiveExitPoint =
+        this.options.route === config.exitPoint &&
+        asArray(req.sessionModel.get(config.field)).length > 0;
 
-      if (this.options.route !== config.exitPoint && !isTrackedSectionStart) {
+      if (!isActiveExitPoint && !isTrackedSectionStart) {
         return locals;
       }
 
@@ -490,38 +781,34 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
 
       const state = req.sessionModel.get(config.stateKey) || {};
       const activeSections = getActiveSections(config, state.selections);
+      const route = this.options.route;
       let nextRoute;
 
-      if (this.options.route === config.entryPoint) {
+      if (route === config.entryPoint) {
         /*
          * After the multi-select page, follow configured order in normal journeys.
          * In edit mode, prioritise a newly added section so adding Email later
          * does not make the user re-enter already completed sections.
          */
         nextRoute = getEntryPointNextRoute(req, config, activeSections, state);
-      } else if (
-        getCompletingSections(activeSections, this.options.route, req).length
-      ) {
+      } else if (route === config.noChangesPoint?.route) {
+        nextRoute = this.getNoChangesNextRoute(req, config, state);
+      } else if (getNoChangesSection(activeSections, route, req)) {
+        nextRoute = config.noChangesPoint?.route;
+      } else if (getCompletingSections(activeSections, route, req).length) {
         /*
          * When a section completion page posts, hand the user to the next selected
          * incomplete section. If every selected section is complete, this behaviour
          * gets out of the way by sending the user to the configured exit point.
          */
-        nextRoute =
-          nextIncompleteSection(activeSections, state)?.start ||
-          config.exitPoint;
+        nextRoute = getCompletionNextRoute(req, config, activeSections, state);
       }
 
       if (!nextRoute) {
         return super.getNextStep(req, res);
       }
 
-      return withEditSuffix(
-        req,
-        config,
-        withBaseUrl(req, nextRoute),
-        nextRoute
-      );
+      return this.toNextUrl(req, config, nextRoute);
     }
   };
 module.exports = multiSelectFollowUps;
