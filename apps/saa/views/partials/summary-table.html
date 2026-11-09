@@ -1,6 +1,16 @@
-<div>
+{{#sectionChangeLink}}
+  <div class="govuk-summary-card__title-wrapper govuk-!-margin-top-6">
+    <h2 class="govuk-summary-card__title">{{section}}</h2>
+    <div class="govuk-summary-card__actions">
+      <a class="govuk-link" href="{{sectionChangeLink}}">{{#t}}buttons.change{{/t}} <span class="visuallyhidden">{{section}}</span></a>
+    </div>
+  </div>
+{{/sectionChangeLink}}
+{{^sectionChangeLink}}
+  <div>
     <h2 class="section-header">{{section}}</h2>
   </div>
+{{/sectionChangeLink}}
   <dl>
     {{#fields}}
     {{^omitFromSummary}}
