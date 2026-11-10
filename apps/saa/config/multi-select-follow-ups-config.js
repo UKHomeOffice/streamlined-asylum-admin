@@ -143,7 +143,16 @@ module.exports = {
                 value: 'no'
               }
             },
-            '/check-your-answers-someone-else-date-of-birth'
+            '/check-your-answers-someone-else-date-of-birth',
+            {
+              route: '/check-your-answers-date-of-birth',
+              condition: [
+                req => req.params?.action === 'edit' ||
+                  Boolean(req.sessionModel.get('edit-return-path')),
+                req => req.sessionModel.get('contact-detail-updates')
+                  ?.completedSections?.includes('date-of-birth')
+              ]
+            }
           ],
           noChanges: {
             route: SOMEONE_ELSE_DOB_ROUTE,

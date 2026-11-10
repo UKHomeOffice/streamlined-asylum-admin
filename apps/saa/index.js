@@ -224,6 +224,8 @@ const steps = {
     next: '/check-your-answers-date-of-birth'
   },
   '/check-your-answers-date-of-birth': {
+    // Incomplete sections still need the someone-else question; completed edits use the configured boundary.
+    continueOnEdit: true,
     behaviours: [Summary, SummaryLabels, EditRouteReturn],
     sections: require('./sections/summary-data-date-of-birth'),
     next: '/change-someone-else-date-of-birth'
@@ -329,7 +331,8 @@ const steps = {
         }
       }
     ],
-    next: '/do-you-need-add-remove-dependant'
+    // Keep unanswered placeholders inside the section until the decision field is implemented.
+    next: '/relationship-nationality-change'
   },
   '/relationship-nationality-change': {
     // Page fields to be added in its story.
