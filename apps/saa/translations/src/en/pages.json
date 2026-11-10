@@ -81,6 +81,13 @@
     "captionHeading": "Update personal details",
     "limit-exceeded": "You have changed the maximum number of {{maxItems}} dates of birth. You cannot add any more."
   },
+  "check-your-answers-someone-else-name": {
+    "item-title": "Change someone else’s name",
+    "header": "Check your answers",
+    "captionHeading": "Update personal details",
+    "limit-exceeded": "You have changed the maximum number of {{maxItems}} names. You cannot add any more.",
+    "add-another-name": "Change another name"
+  },
   "whose-nationality-to-change": {
     "header": "Do you need to change your nationality?"
   },
@@ -285,6 +292,9 @@
       },
       "someone-else-date-of-birth": {
         "header": "Change someone else's date of birth"
+      },
+      "someone-else-new-name": {
+        "header": "Change someone else's name"
       },
       "evidence": {
         "header": "Evidence"

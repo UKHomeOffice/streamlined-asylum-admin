@@ -13,6 +13,7 @@ const Model = require('hof/model');
 const aggregatorSummaryRoutes = [
   '/check-your-answers-add-child-partner',
   '/check-your-answers-death',
+  '/check-your-answers-someone-else-name',
   '/check-your-answers-someone-else-date-of-birth'
 ];
 

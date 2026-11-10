@@ -177,17 +177,25 @@ const steps = {
     next: '/do-you-need-to-change-someone-elses-name'
   },
   '/do-you-need-to-change-someone-elses-name': {
-    behaviours: [multiSelectFollowUpsBehaviour, changeSomeoneElsesNameFork],
+    behaviours: [
+      multiSelectFollowUpsBehaviour,
+      changeSomeoneElsesNameFork,
+      RequireSelectedSection,
+      ResetSectionSummary(['someoneelsenewname'], 'change-someone-elses-name')
+    ],
     fields: ['change-someone-elses-name'],
-    next: '/relationship-name-change'
+    next: '/relationship-name-change',
+    continueOnEdit: true
   },
   '/relationship-name-change': {
     fields: ['relationship-name-change'],
-    next: '/reason-someone-else-name-change'
+    next: '/reason-someone-else-name-change',
+    continueOnEdit: true
   },
   '/reason-someone-else-name-change': {
     fields: ['reason-someone-else-name-change'],
-    next: '/someone-else-new-name'
+    next: '/someone-else-new-name',
+    continueOnEdit: true
   },
   '/someone-else-new-name': {
     behaviours: [CustomValidation],
@@ -197,14 +205,37 @@ const steps = {
       'someone-else-new-given-name',
       'someone-else-new-family-name'
     ],
-    next: '/someone-else-new-name-evidence'
+    next: '/someone-else-new-name-evidence',
+    continueOnEdit: true
   },
   '/someone-else-new-name-evidence': {
     ...documentUploadStep('documents-someone-else-new-name'),
     template: 'upload-new-name-evidence',
-    next: '/check-your-answers-someone-else-name'
+    next: '/check-your-answers-someone-else-name',
+    continueOnEdit: true
   },
-  '/check-your-answers-someone-else-name': {},
+  '/check-your-answers-someone-else-name': {
+    backLink: false,
+    behaviours: [
+      AggregateSaveUpdate,
+      LimitAggregateItems,
+      ParseSummaryFields(aggregatorSummaries.someoneelsenewname),
+      EditRouteReturn
+    ],
+    aggregateTo: 'someoneelsenewname',
+    aggregateFrom: [
+      'relationship-name-change',
+      'reason-someone-else-name-change',
+      'someone-else-old-given-name',
+      'someone-else-old-family-name',
+      'someone-else-new-given-name',
+      'someone-else-new-family-name',
+      'documents-someone-else-new-name'
+    ],
+    aggregateLimit: config.aggregateLimits.someoneElsesName,
+    addStep: 'relationship-name-change',
+    next: '/change-your-date-of-birth'
+  },
   '/change-your-date-of-birth': {
     fields: ['change-your-date-of-birth'],
     forks: [
