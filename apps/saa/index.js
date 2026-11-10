@@ -29,6 +29,7 @@ const documentUploadStep = category => ({
   locals: {
     documentCategory: {
       name: category,
+      required: config.upload.required,
       acceptedFileExtensions: config.upload.acceptedFileExtensions,
       limit: config.upload.limit,
       limitValidationError: config.upload.limitValidationError,
@@ -136,6 +137,8 @@ const steps = {
     next: '/check-your-answers-name'
   },
   '/check-your-answers-name': {
+    // New sections still need the someone-else question; completed edits use the configured boundary.
+    continueOnEdit: true,
     behaviours: [Summary, SummaryLabels, EditRouteReturn],
     sections: require('./sections/summary-data-name'),
     next: '/do-you-need-to-change-someone-elses-name'

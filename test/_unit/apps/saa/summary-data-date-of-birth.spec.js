@@ -16,17 +16,18 @@ describe('date of birth summary rows', () => {
 
   test('lists uploaded evidence names on separate lines', () => {
     expect(
-      evidenceRow.parse([
-        { name: 'letter.pdf' },
-        { name: 'photo.png' }
-      ])
+      evidenceRow.parse([{ name: 'letter.pdf' }, { name: 'photo.png' }])
     ).toBe('letter.pdf\nphoto.png');
   });
 
-  test.each([undefined, null, []])(
-    'returns an empty value when evidence is %p',
+  test.each([[undefined], [null], [[]]])(
+    'returns the translated fallback when evidence is %p',
     documents => {
-      expect(evidenceRow.parse(documents)).toBe('');
+      const req = { translate: jest.fn().mockReturnValue('No files uploaded') };
+      expect(evidenceRow.parse(documents, req)).toBe('No files uploaded');
+      expect(req.translate).toHaveBeenCalledWith(
+        'fields.file-upload.no-files-uploaded'
+      );
     }
   );
 

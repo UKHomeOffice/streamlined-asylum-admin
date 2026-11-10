@@ -9,6 +9,7 @@ const {
   getNotifyErrorMessage,
   isTeamOnlyNotifyError,
   formatDate,
+  formatUploadedDocuments,
   isValidUan,
   formatUanForDisplay,
   logAndThrow
@@ -17,6 +18,46 @@ const {
 describe('SAA utilities tests', () => {
   test('should redact the middle of a filename while keeping the start and extension visible', () => {
     expect(sanitiseFilename('passport-scan.pdf')).toBe('pa**REDACTED**an.pdf');
+  });
+
+  describe('formatUploadedDocuments', () => {
+    const req = { translate: jest.fn() };
+
+    beforeEach(() => {
+      req.translate.mockReset().mockReturnValue('No files uploaded');
+    });
+
+    test.each([[undefined], [null], [[]]])(
+      'translates the empty value %p',
+      documents => {
+        expect(formatUploadedDocuments(documents, req)).toBe(
+          'No files uploaded'
+        );
+        expect(req.translate).toHaveBeenCalledWith(
+          'fields.file-upload.no-files-uploaded'
+        );
+        expect(req.translate).toHaveBeenCalledTimes(1);
+      }
+    );
+
+    test('preserves uploaded filenames and their order without translating', () => {
+      const documents = [{ name: 'letter.pdf' }, { name: 'photo.png' }];
+      const original = structuredClone(documents);
+
+      expect(formatUploadedDocuments(documents, req)).toBe(
+        'letter.pdf\nphoto.png'
+      );
+      expect(req.translate).not.toHaveBeenCalled();
+      expect(documents).toEqual(original);
+    });
+
+    test('uses the requested translation rather than hard-coded fallback text', () => {
+      req.translate.mockReturnValue('Translated empty-upload message');
+
+      expect(formatUploadedDocuments([], req)).toBe(
+        'Translated empty-upload message'
+      );
+    });
   });
 
   test('should preserve the final two characters before the extension', () => {

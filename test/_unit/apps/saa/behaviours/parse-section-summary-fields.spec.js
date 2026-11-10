@@ -3,6 +3,11 @@
 const ParseSummaryFields = require('../../../../../apps/saa/behaviours/parse-section-summary-fields');
 
 const translations = {
+  'fields.file-upload.no-files-uploaded': 'No files uploaded',
+  'fields.documents-child-partner.summary-label': 'Files uploaded',
+  'fields.documents-death-certificate.summary-label': 'Files uploaded',
+  'fields.documents-someone-else-new-dob.summary-label': 'Files uploaded',
+  'fields.documents-someone-else-new-name.summary-label': 'Files uploaded',
   'fields.add-remove-child-partner.options.add-child-partner.summary-label':
     'Add a child or partner as a dependant',
   'fields.add-remove-child-partner.options.remove-child-partner.summary-label':
@@ -68,13 +73,13 @@ const options = {
   combineFields: { 'child-partner-given-name': ['child-partner-family-name'] }
 };
 
-const createBehaviour = items => {
+const createBehaviour = (items, summaryOptions = options) => {
   class BaseBehaviour {
     locals() {
       return { items };
     }
   }
-  const Behaviour = ParseSummaryFields(options)(BaseBehaviour);
+  const Behaviour = ParseSummaryFields(summaryOptions)(BaseBehaviour);
   return new Behaviour();
 };
 
@@ -227,11 +232,77 @@ describe('parse section summary fields behaviour', () => {
       expect(row.omitFromSummary).toBe(false);
     });
 
-    test('hides the row when no files were uploaded', () => {
+    test('hides empty document rows unless configured as documentFields', () => {
       expect(
         rowFor([{ field: 'documents-child-partner', value: [] }])
           .omitFromSummary
       ).toBe(true);
+    });
+
+    describe.each([
+      ['addremovechildpartner', 'documents-child-partner'],
+      ['reportadeath', 'documents-death-certificate'],
+      ['someoneelsenewdob', 'documents-someone-else-new-dob'],
+      ['someoneelsenewname', 'documents-someone-else-new-name']
+    ])('document rows for %s', (aggregateTo, field) => {
+      const settings =
+        require('../../../../../apps/saa/config/aggregator-summaries')[
+          aggregateTo
+        ];
+      const rowsFor = (value, summaryOptions = settings) => {
+        const saved = { joinTitle: 'An item', fields: [{ field, value }] };
+        const original = structuredClone(saved);
+        const mini = createBehaviour([saved], summaryOptions).locals(req, {})
+          .items[0].fields[0];
+        const final = ParseSummaryFields.formatAggregateForSummary(
+          { aggregatedValues: [saved] },
+          req,
+          summaryOptions
+        ).aggregatedValues[0].fields[1];
+
+        expect(saved).toEqual(original);
+        return [mini, final];
+      };
+
+      test.each([[[]], [undefined], [null], ['']])(
+        'shows No files uploaded when the value is %p in mini and final summaries',
+        value => {
+          for (const row of rowsFor(value)) {
+            expect(row).toMatchObject({
+              field,
+              label: 'Files uploaded',
+              parsed: 'No files uploaded',
+              omitFromSummary: false
+            });
+            expect(row.value).toEqual(value);
+          }
+        }
+      );
+
+      test('keeps uploaded filenames one per line', () => {
+        const documents = [{ name: 'evidence.pdf' }, { name: 'photo.png' }];
+
+        for (const row of rowsFor(documents)) {
+          expect(row.parsed).toBe('evidence.pdf\nphoto.png');
+          expect(row.omitFromSummary).toBe(false);
+        }
+      });
+
+      test('keeps explicit omissions hidden', () => {
+        for (const row of rowsFor([], { ...settings, omitFields: [field] })) {
+          expect(row.omitFromSummary).toBe(true);
+        }
+      });
+
+      test('still hides other empty fields', () => {
+        const saved = {
+          fields: [{ field: 'relationship-to-child-partner', value: [] }]
+        };
+        const result = createBehaviour([saved], settings).locals(req, {})
+          .items[0];
+
+        expect(result.fields[0].omitFromSummary).toBe(true);
+      });
     });
 
     test('shows checkbox answers as option labels one per line', () => {
@@ -269,6 +340,159 @@ describe('parse section summary fields behaviour', () => {
     const items = new Behaviour().locals(titleReq, {}).items;
 
     expect(items.map(item => item.joinTitle)).toEqual(['Evidence', 'Evidence']);
+  });
+
+  describe('opt-in title numbering', () => {
+    const summaryOptions =
+      require('../../../../../apps/saa/config/aggregator-summaries').someoneelsenewdob;
+    const title = "Change someone else's date of birth";
+    const titleReq = {
+      ...req,
+      translate: keys =>
+        keys === summaryOptions.itemTitle ? title : translate(keys)
+    };
+    const formatItems = (items, settings = summaryOptions) =>
+      createBehaviour(items, settings).locals(titleReq, {}).items;
+    const finalItems = (items, settings = summaryOptions) =>
+      ParseSummaryFields.formatAggregateForSummary(
+        { aggregatedValues: items },
+        titleReq,
+        settings
+      );
+
+    test.each([
+      [0, []],
+      [1, [title]],
+      [3, [title, `${title} 2`, `${title} 3`]]
+    ])(
+      'numbers %i items consistently in mini and final summaries',
+      (count, expected) => {
+        const items = Array.from({ length: count }, () =>
+          createItem('add-child-partner')
+        );
+
+        expect(formatItems(items).map(item => item.joinTitle)).toEqual(
+          expected
+        );
+        if (count === 0) {
+          expect(finalItems(items)).toBeNull();
+        } else {
+          expect(
+            finalItems(items).aggregatedValues.map(
+              item => item.fields[0].parsed
+            )
+          ).toEqual(expected);
+        }
+      }
+    );
+
+    test.each([undefined, false])(
+      'leaves titles unchanged when addIncrement is %p',
+      addIncrement => {
+        const items = Array.from({ length: 3 }, () =>
+          createItem('add-child-partner')
+        );
+        const settings = { ...summaryOptions, addIncrement };
+
+        expect(
+          formatItems(items, settings).map(item => item.joinTitle)
+        ).toEqual([title, title, title]);
+        expect(
+          finalItems(items, settings).aggregatedValues.map(
+            item => item.fields[0].parsed
+          )
+        ).toEqual([title, title, title]);
+      }
+    );
+
+    test('preserves all field formatting and Change links when numbering is enabled', () => {
+      const items = Array.from({ length: 3 }, () =>
+        createItem('add-child-partner')
+      );
+      const settings = {
+        ...options,
+        itemTitle: summaryOptions.itemTitle,
+        addIncrement: true,
+        changeLink: '/changes/check-your-answers-someone-else-date-of-birth'
+      };
+      const unnumbered = { ...settings, addIncrement: false };
+      const mini = formatItems(items, settings);
+      const final = finalItems(items, settings).aggregatedValues;
+
+      expect(mini.map(item => item.fields)).toEqual(
+        formatItems(items, unnumbered).map(item => item.fields)
+      );
+      expect(final.map(item => item.fields.slice(1))).toEqual(
+        finalItems(items, unnumbered).aggregatedValues.map(item =>
+          item.fields.slice(1)
+        )
+      );
+      expect(
+        final.map(item => item.fields[0].aggregatorTitleChangeLink)
+      ).toEqual(Array(3).fill(settings.changeLink));
+    });
+
+    test('recalculates numbering after deletion using current positions, not saved indexes', () => {
+      const items = Array.from({ length: 3 }, (_, index) => ({
+        ...createItem('add-child-partner'),
+        index
+      }));
+      const remaining = items.slice(1);
+
+      expect(formatItems(remaining).map(item => item.joinTitle)).toEqual([
+        title,
+        `${title} 2`
+      ]);
+      expect(
+        finalItems(remaining).aggregatedValues.map(
+          item => item.fields[0].parsed
+        )
+      ).toEqual([title, `${title} 2`]);
+    });
+
+    test('does not mutate saved items or accumulate suffixes on repeated rendering', () => {
+      const items = Array.from({ length: 3 }, () =>
+        createItem('add-child-partner')
+      );
+      const saved = structuredClone(items);
+      const mini = formatItems(items);
+      const final = finalItems(items);
+
+      expect(formatItems(items)).toEqual(mini);
+      expect(finalItems(items)).toEqual(final);
+      expect(items).toEqual(saved);
+    });
+
+    test.each([
+      [
+        req,
+        ['add-child-partner', 'remove-child-partner'],
+        [
+          'Add a child or partner as a dependant',
+          'Remove a child or partner as a dependant 2'
+        ]
+      ],
+      [{ ...req, form: { options: {} } }, ['Sam', 'Alex'], ['Sam', 'Alex 2']]
+    ])(
+      'supports numbering option-based and saved titles (%p)',
+      (request, choices, expected) => {
+        const items = choices.map(createItem);
+        const settings = { addIncrement: true };
+
+        expect(
+          createBehaviour(items, settings)
+            .locals(request, {})
+            .items.map(item => item.joinTitle)
+        ).toEqual(expected);
+        expect(
+          ParseSummaryFields.formatAggregateForSummary(
+            { aggregatedValues: items },
+            request,
+            settings
+          ).aggregatedValues.map(item => item.fields[0].parsed)
+        ).toEqual(expected);
+      }
+    );
   });
 
   describe('formatAggregateForSummary', () => {

@@ -18,7 +18,13 @@ const formatListValue = (field, value, ctx) =>
 const combineValues = (first, names, values) =>
   [first, ...names.map(name => values[name])].filter(Boolean).join(' ');
 
+const hasValue = value =>
+  Array.isArray(value) ? value.length > 0 : Boolean(value);
+
 const parseValue = ({ field, value, parsed }, values, ctx) => {
+  if (ctx.documentFields.has(field) && !hasValue(value)) {
+    return ctx.translate('fields.file-upload.no-files-uploaded');
+  }
   let result = parsed;
 
   if (Array.isArray(value)) {
@@ -34,9 +40,6 @@ const parseValue = ({ field, value, parsed }, values, ctx) => {
   }
   return result;
 };
-
-const hasValue = value =>
-  Array.isArray(value) ? value.length > 0 : Boolean(value);
 
 const getItemTitle = (item, values, ctx) => {
   const { itemTitle, titleField } = ctx;
@@ -69,14 +72,15 @@ const parseItem = (item, ctx, index) => {
       `fields.${original.field}.legend`
     ]),
     omitFromSummary:
-      !hasValue(original.value) ||
+      (!hasValue(original.value) && !ctx.documentFields.has(original.field)) ||
       ctx.omitFields.has(original.field) ||
       ctx.combinedFields.has(original.field)
   }));
 
   const title = getItemTitle(item, values, ctx);
   // First item is unnumbered, then "Title 2", "Title 3", ...
-  const joinTitle = ctx.addIncrement && index > 0 ? `${title} ${index + 1}` : title;
+  const joinTitle =
+    ctx.addIncrement && index > 0 ? `${title} ${index + 1}` : title;
 
   return { ...item, joinTitle, fields };
 };
@@ -92,6 +96,7 @@ const buildContext = (req, options) => {
     translateOption: (field, option) =>
       translate(`fields.${field}.options.${option}.label`),
     omitFields: new Set(options.omitFields || []),
+    documentFields: new Set(options.documentFields || []),
     dateFields: new Set(options.dateFields || []),
     combineFields,
     combinedFields: new Set(Object.values(combineFields).flat()),
@@ -139,7 +144,9 @@ const parseSectionSummaryFields =
           const locals = super.locals(req, res);
           const ctx = buildContext(req, options);
 
-          locals.items = locals.items.map((item, index) => parseItem(item, ctx, index));
+          locals.items = locals.items.map((item, index) =>
+            parseItem(item, ctx, index)
+          );
           return locals;
         }
       };

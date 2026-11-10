@@ -1,6 +1,7 @@
 'use strict';
 
 const { SAA_BASE_URL } = require('../../../utils/constants');
+const { formatUploadedDocuments } = require('../../../utils');
 
 module.exports = {
   'change-your-name': {
@@ -26,8 +27,7 @@ module.exports = {
         step: '/new-name-evidence',
         field: 'documents-new-name',
         changeLink: `${SAA_BASE_URL}/new-name-evidence`,
-        parse: documents =>
-          (documents || []).map(document => document.name).join('\n')
+        parse: formatUploadedDocuments
       }
     ]
   }

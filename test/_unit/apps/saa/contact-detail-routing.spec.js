@@ -634,6 +634,76 @@ describe.each([false, true])('own-name decision routing (edit=%s)', edit => {
   });
 });
 
+describe.each([false, true])('claimant Name summary edits (edit URL=%s)', edit => {
+  const route = '/check-your-answers-name';
+  const savedPeople = {
+    aggregatedValues: [{
+      fields: [
+        { field: 'someone-else-new-given-name', value: 'Saved' },
+        { field: 'documents-someone-else-new-name', value: [{ id: 'existing-upload' }] }
+      ]
+    }]
+  };
+  const buildNameRequest = (selections, returnRoute) =>
+    buildRequest(selections, edit, {
+      steps: [config.entryPoint, '/reason-name-change', '/new-name', '/new-name-evidence'],
+      'do-you-need-to-change-your-name': 'yes',
+      'change-someone-elses-name': 'yes',
+      'documents-new-name': [],
+      someoneelsenewname: savedPeople,
+      'edit-return-path': returnRoute ? `${app.baseUrl}${returnRoute}` : undefined
+    });
+
+  test.each([
+    ['/confirm', true],
+    ['/confirm', false],
+    ['/information-given', true],
+    ['/information-given', false]
+  ])('completed claimant Name edits return to %s with saved people=%s', (returnRoute, hasPeople) => {
+    const req = buildNameRequest(['name'], returnRoute);
+    if (!hasPeople) {
+      req.sessionModel.unset('someoneelsenewname');
+      req.sessionModel.set('change-someone-elses-name', 'no');
+    }
+    completeSelectedSections(req);
+    const peopleBefore = req.sessionModel.get('someoneelsenewname');
+    post('/new-name', req, { 'given-name': 'Updated', 'family-name': 'Name' }, true);
+    post('/new-name-evidence', req, {}, true);
+
+    expect(post(route, req, {}, true).url).toBe(`${app.baseUrl}${returnRoute}`);
+    expect(req.sessionModel.get('given-name')).toBe('Updated');
+    expect(req.sessionModel.get('someoneelsenewname')).toEqual(peopleBefore);
+    expect(req.sessionModel.get('documents-new-name')).toEqual([]);
+    expect(req.sessionModel.get(config.stateKey).completedSections).toContain('name');
+  });
+
+  test.each(['/confirm', '/information-given'])(
+    'completed Name edits preserve saved people and still collect unfinished Phone before %s',
+    returnRoute => {
+      const req = buildNameRequest(['name', 'phone-number'], returnRoute);
+      const state = req.sessionModel.get(config.stateKey);
+      req.sessionModel.set(config.stateKey, { ...state, completedSections: ['name'] });
+
+      expect(post(route, req, {}, true).url)
+        .toBe(`${app.baseUrl}/your-phone-number${edit ? '/edit' : ''}`);
+      expect(req.sessionModel.get('someoneelsenewname')).toEqual(savedPeople);
+      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(['name']);
+    }
+  );
+
+  test.each([undefined, '/confirm', '/information-given'])(
+    'an incomplete Name section still asks about someone else (return=%s)',
+    returnRoute => {
+      const req = buildNameRequest(['name'], returnRoute);
+
+      expect(post(route, req, {}, true).url)
+        .toBe(`${app.baseUrl}/do-you-need-to-change-someone-elses-name${edit ? '/edit' : ''}`);
+      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([]);
+      expect(req.sessionModel.get('someoneelsenewname')).toEqual(savedPeople);
+    }
+  );
+});
+
 describe.each([false, true])('claimant DOB summary edits (edit URL=%s)', edit => {
   const route = '/check-your-answers-date-of-birth';
   const savedPeople = {
