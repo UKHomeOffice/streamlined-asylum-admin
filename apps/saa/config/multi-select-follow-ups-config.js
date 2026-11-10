@@ -62,6 +62,22 @@ module.exports = {
             '/someone-else-new-name',
             '/someone-else-new-name-evidence',
             '/check-your-answers-someone-else-name'
+          ],
+          fieldsToUnset: [
+            'do-you-need-to-change-your-name',
+            'reason-name-change',
+            'given-name',
+            'family-name',
+            'documents-new-name',
+            'change-someone-elses-name',
+            'relationship-name-change',
+            'reason-someone-else-name-change',
+            'someone-else-old-given-name',
+            'someone-else-old-family-name',
+            'someone-else-new-given-name',
+            'someone-else-new-family-name',
+            'documents-someone-else-new-name',
+            'someoneelsenewname'
           ]
         }
       ]

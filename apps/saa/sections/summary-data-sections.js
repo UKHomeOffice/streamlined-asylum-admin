@@ -195,6 +195,15 @@ module.exports = {
       }
     ]
   },
+  'someone-else-new-name': {
+    steps: [
+      {
+        step: '/do-you-need-to-change-someone-elses-name',
+        field: 'change-someone-elses-name'
+      },
+      aggregateSummaryRow('someoneelsenewname')
+    ]
+  },
   'date-of-birth': {
     steps: dateOfBirthRows
   },
