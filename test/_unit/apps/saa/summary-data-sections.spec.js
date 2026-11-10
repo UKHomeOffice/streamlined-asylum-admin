@@ -221,6 +221,117 @@ describe('summary data sections', () => {
   });
 });
 
+describe('name rows on the confirm page', () => {
+  const ConfirmPage = SummaryLabels(Summary(class {}));
+  const pages = require('../../../../apps/saa/translations/src/en/pages.json');
+  const uploadRow = sections.name.steps.find(
+    entry => entry.field === 'documents-new-name'
+  );
+  const createRequest = session => ({
+    baseUrl: '/changes',
+    sessionModel: { get: key => session[key] },
+    translate: keys => {
+      const list = [].concat(keys);
+      return list.map(key =>
+        key.split('.').reduce((value, part) => value?.[part], { pages })
+      ).find(value => value !== undefined) || list[list.length - 1];
+    },
+    form: { options: { fieldsConfig: {}, steps: {} } }
+  });
+
+  test('shows the decision, reason, new name and uploaded files in order', () => {
+    const req = createRequest({
+      'do-you-need-to-change-your-name': 'yes',
+      'reason-name-change': 'marriage',
+      'given-name': 'Alex',
+      'family-name': 'Smith',
+      'documents-new-name': [{ name: 'certificate.pdf' }]
+    });
+    const shown = new ConfirmPage().getFieldsForRow(sections.name.steps, req);
+
+    expect(shown.map(entry => entry.field)).toEqual([
+      'do-you-need-to-change-your-name',
+      'reason-name-change',
+      'given-name',
+      'documents-new-name'
+    ]);
+    expect(shown[1]).toMatchObject({
+      value: 'marriage',
+      changeLink: '/changes/check-your-answers-name'
+    });
+  });
+
+  test.each(['no', undefined])('hides the reason when the name change answer is %p', answer => {
+    const reasonRow = sections.name.steps.find(entry => entry.field === 'reason-name-change');
+    const req = createRequest({
+      'do-you-need-to-change-your-name': answer,
+      'reason-name-change': 'marriage'
+    });
+
+    expect(new ConfirmPage().getFieldsForRow([reasonRow], req)).toEqual([]);
+  });
+
+  test('keeps the someone else name decision only in its dedicated section', () => {
+    expect(sections.name.steps.some(entry => entry.field === 'change-someone-elses-name'))
+      .toBe(false);
+    expect(sections['someone-else-new-name'].steps).toEqual([
+      expect.objectContaining({
+        step: '/do-you-need-to-change-someone-elses-name',
+        field: 'change-someone-elses-name'
+      }),
+      expect.objectContaining({ field: 'someoneelsenewname' })
+    ]);
+  });
+
+  test('New name Change links go to the name check your answers page', () => {
+    const req = createRequest({
+      'given-name': 'Alex',
+      'family-name': 'Smith'
+    });
+    const nameRow = sections.name.steps.find(entry => entry.field === 'given-name');
+
+    expect(new ConfirmPage().getFieldsForRow([nameRow], req)).toEqual([
+      expect.objectContaining({
+        value: 'Alex Smith',
+        changeLink: '/changes/check-your-answers-name'
+      })
+    ]);
+  });
+
+  test('lists own-name evidence as Files uploaded with a link to the name check your answers page', () => {
+    const req = createRequest({
+      'do-you-need-to-change-your-name': 'yes',
+      'documents-new-name': [
+        { id: '1', name: 'deed-poll.pdf' },
+        { id: '2', name: 'certificate.pdf' }
+      ]
+    });
+
+    expect(new ConfirmPage().getFieldsForRow([uploadRow], req)).toEqual([
+      expect.objectContaining({
+        label: 'Files uploaded',
+        value: 'deed-poll.pdf\ncertificate.pdf',
+        changeLink: '/changes/check-your-answers-name'
+      })
+    ]);
+  });
+
+  test.each(['no', undefined])('hides own-name evidence when the answer is %p', answer => {
+    const req = createRequest({
+      'do-you-need-to-change-your-name': answer,
+      'documents-new-name': [{ name: 'old-evidence.pdf' }]
+    });
+
+    expect(new ConfirmPage().getFieldsForRow([uploadRow], req)).toEqual([]);
+  });
+
+  test('omits the Files uploaded row when no own-name evidence exists', () => {
+    const req = createRequest({ 'do-you-need-to-change-your-name': 'yes' });
+
+    expect(new ConfirmPage().getFieldsForRow([uploadRow], req)).toEqual([]);
+  });
+});
+
 describe('evidence rows on the confirm page', () => {
   const evidenceRows = sections.evidence.steps.filter(
     entry => entry.dependsOn === 'send-evidence-for-your-claim'

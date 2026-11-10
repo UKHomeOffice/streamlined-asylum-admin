@@ -7,10 +7,12 @@ module.exports = {
     mixin: 'select',
     className: ['typeahead'],
     validate: ['required'],
-    options: [{
-      value: '',
-      label: 'fields.claimant-main-language.options.none_selected'
-    }].concat(languages.map(language => ({ value: language, label: language }))),
+    options: [
+      {
+        value: '',
+        label: 'fields.claimant-main-language.options.none_selected'
+      }
+    ].concat(languages.map(language => ({ value: language, label: language }))),
     labelClassName: 'govuk-label--m'
   },
   'person-completing-form': {
@@ -75,11 +77,7 @@ module.exports = {
   },
   'reason-name-change': {
     mixin: 'radio-group',
-    options: [
-      'error',
-      'marriage-or-divorce',
-      'deed-poll'
-    ],
+    options: ['error', 'marriage-or-divorce', 'deed-poll'],
     validate: ['required'],
     isPageHeading: true
   },
@@ -192,10 +190,12 @@ module.exports = {
     mixin: 'select',
     className: ['typeahead'],
     validate: ['required'],
-    options: [{
-      value: '',
-      label: 'fields.child-partner-nationality.options.none_selected'
-    }].concat(countries)
+    options: [
+      {
+        value: '',
+        label: 'fields.child-partner-nationality.options.none_selected'
+      }
+    ].concat(countries)
   },
   'main-claimant-died': {
     mixin: 'radio-group',
@@ -224,24 +224,29 @@ module.exports = {
     validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
     labelClassName: 'govuk-label--s'
   },
-  'date-of-birth-person-who-died': dateComponent('date-of-birth-person-who-died', {
-    mixin: 'input-date',
-    validate: [
-      'required',
-      'date',
-      'before',
-      { type: 'after', arguments: '1900-01-01' }
-    ],
-    isPageHeading: true
-  }),
+  'date-of-birth-person-who-died': dateComponent(
+    'date-of-birth-person-who-died',
+    {
+      mixin: 'input-date',
+      validate: [
+        'required',
+        'date',
+        'before',
+        { type: 'after', arguments: '1900-01-01' }
+      ],
+      isPageHeading: true
+    }
+  ),
   'nationality-person-who-died': {
     mixin: 'select',
     className: ['typeahead'],
     validate: ['required'],
-    options: [{
-      value: '',
-      label: 'fields.nationality-person-who-died.options.none_selected'
-    }].concat(countries)
+    options: [
+      {
+        value: '',
+        label: 'fields.nationality-person-who-died.options.none_selected'
+      }
+    ].concat(countries)
   },
   'relationship-to-claimant': {
     mixin: 'radio-group',
@@ -322,16 +327,25 @@ module.exports = {
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
   },
-  'someone-else-correct-date-of-birth': dateComponent('someone-else-correct-date-of-birth', {
-    mixin: 'input-date',
-    validate: [
-      'required',
-      'date',
-      'before',
-      { type: 'after', arguments: '1900-01-01' }
-    ],
-    legend: { className: 'govuk-label--s' }
-  }),
+  'no-changes-made': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    isPageHeading: true
+  },
+  'someone-else-correct-date-of-birth': dateComponent(
+    'someone-else-correct-date-of-birth',
+    {
+      mixin: 'input-date',
+      validate: [
+        'required',
+        'date',
+        'before',
+        { type: 'after', arguments: '1900-01-01' }
+      ],
+      legend: { className: 'govuk-label--s' }
+    }
+  ),
   'someone-else-correct-date-of-birth-given-name': {
     mixin: 'input-text',
     validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],

@@ -24,7 +24,8 @@
     "captionHeading": "Update personal details"
   },
   "check-your-answers-name": {
-    "header": "Check your answers"
+    "header": "Check your answers",
+    "captionHeading": "Update your personal details"
   },
   "do-you-need-to-change-someone-elses-name": {
     "captionHeading": "Update personal details"
@@ -88,7 +89,7 @@
     "limit-exceeded": "You have changed the maximum number of {{maxItems}} names. You cannot add any more.",
     "add-another-name": "Change another name"
   },
-  "whose-nationality-to-change": {
+  "nationality-change": {
     "header": "Do you need to change your nationality?"
   },
   "correct-nationality": {
@@ -154,6 +155,14 @@
   },
   "change-contact-address": {
     "header": "Do you need to change the address we send your letters to?"
+  },
+  "no-changes-made": {
+    "headers": {
+      "name": "You have not changed any names, do you want to continue?",
+      "date-of-birth": "You have not changed any dates of birth, do you want to continue?",
+      "nationality": "You have not changed any nationalities, do you want to continue?",
+      "address": "You have not changed any address, do you want to continue?"
+    }
   },
   "reason-contact-address-change": {
     "header": "Why do you need us to send letters to a different address?"
@@ -284,6 +293,9 @@
       "name": {
         "header": "Name"
       },
+      "change-your-name": {
+        "header": "Change your name"
+      },
       "personal-details": {
         "header": "Personal details"
       },
@@ -321,6 +333,9 @@
       },
       "claimants-given-name": {
         "label": "Name"
+      },
+      "documents-new-name": {
+        "label": "Files uploaded"
       }
     }
   }

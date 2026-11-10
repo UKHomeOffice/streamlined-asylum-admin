@@ -119,7 +119,7 @@
     }
   },
   "reason-name-change": {
-    "legend": "Why do you need to change the name?",
+    "legend": "Why do you need to change your name?",
     "options": {
       "error": {
         "label": "An error"
@@ -400,6 +400,17 @@
       },
       "no": {
         "label": "No"
+      }
+    }
+  },
+  "no-changes-made": {
+    "legend": "{{noChangesHeader}}",
+    "options": {
+      "yes": {
+        "label": "Yes, continue"
+      },
+      "no": {
+        "label": "No, cancel and return to make a change"
       }
     }
   },

@@ -209,6 +209,9 @@
   "change-someone-else-date-of-birth": {
     "required": "Select if you want to change someone else's date of birth"
   },
+  "no-changes-made": {
+    "required": "Select if you want to continue without making a change"
+  },
   "someone-else-correct-date-of-birth-given-name": {
     "required": "Enter their given name",
     "noDigits": "Given name must not contain numbers",

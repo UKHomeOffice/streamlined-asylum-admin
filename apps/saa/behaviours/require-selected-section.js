@@ -1,22 +1,21 @@
 const { hasSelectedSection } = require('../../../utils');
 
-// For SECTION_FIELDS steps: stop edits that leave every section as "no" from returning to /confirm.
+// Revisit the final question when an edit leaves no main sections selected.
 module.exports = superclass =>
   class extends superclass {
     getNextStep(req, res) {
       const nextStep = super.getNextStep(req, res);
 
       if (
-        nextStep !== `${req.baseUrl}/confirm` ||
+        ![
+          `${req.baseUrl}/confirm`,
+          `${req.baseUrl}/information-given`
+        ].includes(nextStep) ||
         hasSelectedSection(req.sessionModel)
       ) {
         return nextStep;
       }
 
-      if (req.sessionModel.get('something-else') === 'yes') {
-        return `${req.baseUrl}/contact-us-by-email`;
-      }
-
-      return `${req.baseUrl}/no-options`;
+      return `${req.baseUrl}/something-else`;
     }
   };

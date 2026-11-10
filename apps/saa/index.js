@@ -4,7 +4,6 @@ const config = require('../../config');
 
 const CustomValidation = require('../common/behaviours/custom-validation');
 const somethingElseFork = require('../saa/behaviours/something-else-fork');
-const changeSomeoneElsesNameFork = require('./behaviours/change-someone-elses-name-fork');
 const ContactUsByEmail = require('./behaviours/contact-us-by-email');
 const CheckEmailToken = require('./behaviours/check-email-token');
 const RemoveDocument = require('./behaviours/remove-document');
@@ -40,48 +39,10 @@ const documentUploadStep = category => ({
   }
 });
 
-const MultiSelectFollowUps = require('./behaviours/multi-select-follow-ups');
+const configureMultiSelectFollowUps = require('./config/configure-multi-select-follow-ups');
 const multiSelectFollowUpsConfig = require('./config/multi-select-follow-ups-config');
-const multiSelectFollowUpsBehaviour = MultiSelectFollowUps(
-  multiSelectFollowUpsConfig
-);
 const { SAA_BASE_URL: baseUrl } = require('../../utils/constants');
 
-const getConfiguredSections = option => option.sections || [];
-
-const getCompletionRoutesForSection = section =>
-  MultiSelectFollowUps.asArray(section.completeOn).map(completion =>
-    MultiSelectFollowUps.getCompletionRoute(completion)
-  );
-
-const getCompletionRoutesForOption = option =>
-  getConfiguredSections(option).reduce(
-    (routes, section) => routes.concat(getCompletionRoutesForSection(section)),
-    []
-  );
-
-const getConfiguredCompletionRoutes = followUpsConfig =>
-  followUpsConfig.options.reduce(
-    (routes, option) => routes.concat(getCompletionRoutesForOption(option)),
-    []
-  );
-
-const getStartRoutesForOption = option =>
-  getConfiguredSections(option).map(section => section.start);
-
-const getConfiguredStartRoutes = followUpsConfig =>
-  followUpsConfig.options.reduce(
-    (routes, option) => routes.concat(getStartRoutesForOption(option)),
-    []
-  );
-
-/*
- * The multi-select follow-up behaviour is intentionally used as a thin wrapper
- * around normal HOF routes. It only decides which selected section starts next
- * after `/changes-to-contact-details`, and which section starts after a section
- * completion page posts. Individual pages below still use their existing `next`
- * and `forks` settings.
- */
 const steps = {
   '/continue-to-form': {
     behaviours: [CheckEmailToken],
@@ -143,22 +104,23 @@ const steps = {
   '/changes-to-contact-details': {
     fields: ['changes-to-contact-details'],
     // Entry point: calculate active follow-up sections from the checkbox field.
-    behaviours: [multiSelectFollowUpsBehaviour],
-    next: '/provide-photo-identity'
+    behaviours: [RequireSelectedSection],
+    next: '/do-you-need-add-remove-dependant'
   },
   '/do-you-need-to-change-your-name': {
+    continueOnEdit: true,
     fields: ['do-you-need-to-change-your-name'],
     forks: [
       {
         target: '/do-you-need-to-change-someone-elses-name',
+        continueOnEdit: true,
         condition: {
           field: 'do-you-need-to-change-your-name',
           value: 'no'
         }
       }
     ],
-    next: '/reason-name-change',
-    backLink: '/changes/changes-to-contact-details'
+    next: '/reason-name-change'
   },
   '/reason-name-change': {
     fields: ['reason-name-change'],
@@ -175,28 +137,34 @@ const steps = {
     next: '/check-your-answers-name'
   },
   '/check-your-answers-name': {
+    behaviours: [Summary, SummaryLabels, EditRouteReturn],
+    sections: require('./sections/summary-data-name'),
     next: '/do-you-need-to-change-someone-elses-name'
   },
   '/do-you-need-to-change-someone-elses-name': {
     behaviours: [
-      multiSelectFollowUpsBehaviour,
-      changeSomeoneElsesNameFork,
-      RequireSelectedSection,
       ResetSectionSummary(['someoneelsenewname'], 'change-someone-elses-name')
     ],
     fields: ['change-someone-elses-name'],
-    next: '/relationship-name-change',
-    continueOnEdit: true
+    forks: [
+      {
+        target: '/relationship-name-change',
+        continueOnEdit: true,
+        condition: {
+          field: 'change-someone-elses-name',
+          value: 'yes'
+        }
+      }
+    ],
+    next: '/do-you-need-add-remove-dependant'
   },
   '/relationship-name-change': {
     fields: ['relationship-name-change'],
-    next: '/reason-someone-else-name-change',
-    continueOnEdit: true
+    next: '/reason-someone-else-name-change'
   },
   '/reason-someone-else-name-change': {
     fields: ['reason-someone-else-name-change'],
-    next: '/someone-else-new-name',
-    continueOnEdit: true
+    next: '/someone-else-new-name'
   },
   '/someone-else-new-name': {
     behaviours: [CustomValidation],
@@ -206,14 +174,12 @@ const steps = {
       'someone-else-new-given-name',
       'someone-else-new-family-name'
     ],
-    next: '/someone-else-new-name-evidence',
-    continueOnEdit: true
+    next: '/someone-else-new-name-evidence'
   },
   '/someone-else-new-name-evidence': {
     ...documentUploadStep('documents-someone-else-new-name'),
     template: 'upload-new-name-evidence',
-    next: '/check-your-answers-someone-else-name',
-    continueOnEdit: true
+    next: '/check-your-answers-someone-else-name'
   },
   '/check-your-answers-someone-else-name': {
     backLink: false,
@@ -235,7 +201,7 @@ const steps = {
     ],
     aggregateLimit: config.aggregateLimits.someoneElsesName,
     addStep: 'relationship-name-change',
-    next: '/change-your-date-of-birth'
+    next: '/do-you-need-add-remove-dependant'
   },
   '/change-your-date-of-birth': {
     fields: ['change-your-date-of-birth'],
@@ -261,14 +227,18 @@ const steps = {
     next: '/check-your-answers-date-of-birth'
   },
   '/check-your-answers-date-of-birth': {
+    // Incomplete sections still need the someone-else question; completed edits use the configured boundary.
+    continueOnEdit: true,
     behaviours: [Summary, SummaryLabels, EditRouteReturn],
     sections: require('./sections/summary-data-date-of-birth'),
     next: '/change-someone-else-date-of-birth'
   },
   '/change-someone-else-date-of-birth': {
     behaviours: [
-      RequireSelectedSection,
-      ResetSectionSummary(['someoneelsenewdob'], 'change-someone-else-date-of-birth')
+      ResetSectionSummary(
+        ['someoneelsenewdob'],
+        'change-someone-else-date-of-birth'
+      )
     ],
     fields: ['change-someone-else-date-of-birth'],
     forks: [
@@ -281,7 +251,7 @@ const steps = {
         }
       }
     ],
-    next: '/nationality-change'
+    next: '/do-you-need-add-remove-dependant'
   },
   '/relationship-date-of-birth': {
     fields: ['relationship-date-of-birth'],
@@ -319,42 +289,101 @@ const steps = {
     ],
     addStep: 'relationship-date-of-birth',
     aggregateLimit: config.aggregateLimits.someoneElseNewDob,
-    next: '/nationality-change'
+    next: '/do-you-need-add-remove-dependant'
   },
   '/nationality-change': {
-    next: '/whose-nationality-to-change'
-  },
-  '/whose-nationality-to-change': {
+    // Page fields and validation belong to its Nationality story.
+    forks: [
+      {
+        target: '/change-someone-else-nationality',
+        continueOnEdit: true,
+        condition: {
+          field: 'change-your-nationality',
+          value: 'no'
+        }
+      }
+    ],
     next: '/correct-nationality'
   },
   '/correct-nationality': {
+    // Page fields to be added in its story.
     next: '/reason-nationality-change'
   },
   '/reason-nationality-change': {
+    // Page fields to be added in its story.
     next: '/upload-nationality-evidence'
   },
   '/upload-nationality-evidence': {
-    // provisional document category: documents-nationality
+    // Upload (documents-nationality) to be added in its story.
     next: '/check-your-answers-nationality'
   },
   '/check-your-answers-nationality': {
+    // Summary to be added in its story.
     next: '/change-someone-else-nationality'
   },
   '/change-someone-else-nationality': {
+    // Add ResetSectionSummary for the nationality loop when its add-another story is built.
+    // Page fields and validation belong to its Nationality story.
+    forks: [
+      {
+        target: '/relationship-nationality-change',
+        continueOnEdit: true,
+        condition: {
+          field: 'change-someone-else-nationality',
+          value: 'yes'
+        }
+      }
+    ],
+    // Keep unanswered placeholders inside the section until the decision field is implemented.
     next: '/relationship-nationality-change'
   },
   '/relationship-nationality-change': {
+    // Page fields to be added in its story.
     next: '/someone-else-correct-nationality'
   },
   '/someone-else-correct-nationality': {
-    // provisional document category: documents-someone-else-nationality
-    next: '/provide-photo-identity'
+    // Page fields to be added in its story.
+    next: '/reason-someone-else-nationality-change'
+  },
+  '/reason-someone-else-nationality-change': {
+    // Page fields to be added in its story.
+    next: '/upload-someone-else-nationality-evidence'
+  },
+  '/upload-someone-else-nationality-evidence': {
+    // Upload (documents-someone-else-nationality) to be added in its story.
+    next: '/check-your-answers-someone-else-nationality'
+  },
+  '/check-your-answers-someone-else-nationality': {
+    // Add-another loop to be added in its story; Continue completes the nationality section.
+    next: '/do-you-need-add-remove-dependant'
   },
   '/change-uk-address': {
+    // Page fields and validation belong to its Address story.
+    forks: [
+      {
+        target: '/change-contact-address',
+        continueOnEdit: true,
+        condition: {
+          field: 'change-uk-address',
+          value: 'no'
+        }
+      }
+    ],
     next: '/home-address'
   },
   '/home-address': {
-    next: '/new-email-address'
+    // Address, moved date and letter-delivery fields belong to its Address story.
+    forks: [
+      {
+        target: '/change-contact-address',
+        continueOnEdit: true,
+        condition: {
+          field: 'send-letters-to-home-address',
+          value: 'no'
+        }
+      }
+    ],
+    next: '/check-your-answers-address'
   },
   '/new-email-address': {
     behaviours: [CustomValidation],
@@ -368,7 +397,7 @@ const steps = {
   '/check-your-answers-email': {
     behaviours: [Summary, SummaryLabels, EditRouteReturn],
     sections: require('./sections/summary-data-email-address'),
-    next: '/your-phone-number'
+    next: '/do-you-need-add-remove-dependant'
   },
   '/your-phone-number': {
     fields: ['your-phone-number', 'whose-phone-number'],
@@ -386,10 +415,16 @@ const steps = {
   '/check-your-answers-phone-number': {
     behaviours: [Summary, SummaryLabels, EditRouteReturn],
     sections: require('./sections/summary-data-phone-number'),
-    next: '/provide-photo-identity'
+    next: '/do-you-need-add-remove-dependant'
   },
   '/provide-photo-identity': {
     // provisional document category: documents-update-contact
+    next: '/do-you-need-add-remove-dependant'
+  },
+  '/no-changes-made': {
+    // Shared by personal details sections; the multi-select behaviour handles routing, header and Back.
+    fields: ['no-changes-made'],
+    behaviours: [RequireSelectedSection],
     next: '/do-you-need-add-remove-dependant'
   },
   '/relationship-to-claimant': {
@@ -424,15 +459,29 @@ const steps = {
     next: '/personal-details'
   },
   '/change-contact-address': {
-    next: '/reason-contact-address-change'
+    // Page fields and validation belong to its Address story.
+    forks: [
+      {
+        target: '/reason-contact-address-change',
+        continueOnEdit: true,
+        condition: {
+          field: 'change-contact-address',
+          value: 'yes'
+        }
+      }
+    ],
+    next: '/check-your-answers-address'
   },
   '/reason-contact-address-change': {
+    // Page fields to be added in its story.
     next: '/contact-address'
   },
   '/contact-address': {
+    // Page fields to be added in its story.
     next: '/check-your-answers-address'
   },
   '/check-your-answers-address': {
+    // Summary to be added in its story.
     next: '/do-you-need-add-remove-dependant'
   },
   '/do-you-need-add-remove-dependant': {
@@ -675,56 +724,7 @@ const steps = {
   '/expired-link': {}
 };
 
-/*
- * Attach the behaviour only to configured section completion pages. This is the
- * key design choice: the behaviour should not run every page in a selected flow,
- * because section internals can include HOF forks, aggregate loops and local CYA
- * journeys. Completion pages are the hand-off points back to the common
- * orchestrator.
- */
-getConfiguredCompletionRoutes(multiSelectFollowUpsConfig)
-  .filter((route, index, routes) => routes.indexOf(route) === index)
-  .forEach(route => {
-    if (
-      !steps[route] ||
-      (steps[route].behaviours || []).includes(multiSelectFollowUpsBehaviour)
-    ) {
-      return;
-    }
-
-    steps[route].behaviours = [].concat(
-      steps[route].behaviours || [],
-      multiSelectFollowUpsBehaviour
-    );
-  });
-
-if (steps[multiSelectFollowUpsConfig.exitPoint]) {
-  steps[multiSelectFollowUpsConfig.exitPoint].behaviours = [].concat(
-    steps[multiSelectFollowUpsConfig.exitPoint].behaviours || [],
-    multiSelectFollowUpsBehaviour
-  );
-}
-
-getConfiguredStartRoutes(multiSelectFollowUpsConfig)
-  .filter((route, index, routes) => routes.indexOf(route) === index)
-  .forEach(route => {
-    if (!steps[route]) {
-      return;
-    }
-
-    steps[route].behaviours = [].concat(
-      steps[route].behaviours || [],
-      multiSelectFollowUpsBehaviour
-    );
-    steps[route].prereqs = [].concat(
-      steps[route].prereqs || [],
-      multiSelectFollowUpsConfig.entryPoint
-    );
-    steps[route].backLinks = [].concat(
-      steps[route].backLinks || [],
-      multiSelectFollowUpsConfig.entryPoint
-    );
-  });
+configureMultiSelectFollowUps(steps, multiSelectFollowUpsConfig);
 
 module.exports = {
   name: 'saa',
