@@ -109,7 +109,6 @@ module.exports = {
             '/someone-else-new-name-evidence',
             '/check-your-answers-someone-else-name'
           ],
-          // Add the someone-else name loop key when its add-another story is built.
           fieldsToUnset: [
             OWN_NAME_FIELD,
             'reason-name-change',
@@ -123,7 +122,8 @@ module.exports = {
             'someone-else-old-family-name',
             'someone-else-new-given-name',
             'someone-else-new-family-name',
-            'documents-someone-else-new-name'
+            'documents-someone-else-new-name',
+            'someoneelsenewname'
           ]
         }
       ]

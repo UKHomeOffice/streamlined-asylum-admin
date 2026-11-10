@@ -50,6 +50,7 @@ const buildController = (route, req) => {
   const options = {
     ...step,
     route,
+    fieldsConfig: fields,
     fields: Object.fromEntries(
       (step.fields || []).map(field => [field, fields[field]])
     )
@@ -144,6 +145,7 @@ describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
           section.fieldsToUnset.map(field => [field, 'stale'])
         ),
         someoneelsenewdob: { aggregatedValues: [] },
+        someoneelsenewname: { aggregatedValues: [] },
         'new-phone-number': '07700900001',
         steps: [section.start, section.noChanges.route, '/your-phone-number']
       });
@@ -363,6 +365,134 @@ describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
       const res = { redirect: jest.fn() };
       controller.configure(req, res, jest.fn());
       expect(res.redirect).toHaveBeenCalledWith(url);
+    }
+  );
+});
+
+describe('someone-else name summary integration', () => {
+  const route = '/check-your-answers-someone-else-name';
+  const nameFields = {
+    'relationship-name-change': 'child',
+    'reason-someone-else-name-change': 'spelling-error',
+    'someone-else-old-given-name': 'Old',
+    'someone-else-old-family-name': 'Name',
+    'someone-else-new-given-name': 'New',
+    'someone-else-new-family-name': 'Name',
+    'documents-someone-else-new-name': [{ id: 'existing-upload', name: 'evidence.pdf' }]
+  };
+  const visitSummary = req => {
+    const controller = buildController(route, req);
+    const res = { locals: {}, redirect: jest.fn() };
+    controller.getValues(req, res, jest.fn());
+    return { controller, res };
+  };
+
+  test.each([
+    [false, undefined],
+    [true, '/confirm'],
+    [false, '/information-given']
+  ])(
+    'aggregating names preserves selected follow-ups (edit=%s, return=%s)',
+    (edit, returnPath) => {
+      const req = buildRequest(['name', 'phone-number'], edit, {
+        ...nameFields,
+        steps: [config.entryPoint, '/someone-else-new-name-evidence'],
+        'do-you-need-to-change-your-name': 'no',
+        'change-someone-elses-name': 'yes',
+        'edit-return-path': returnPath ? `${app.baseUrl}${returnPath}` : undefined
+      });
+      req.translate = keys => [].concat(keys)[0];
+      expect(visitSummary(req).res.redirect).toHaveBeenCalledWith(
+        `${app.baseUrl}${route}`
+      );
+      expect(req.sessionModel.get('someoneelsenewname').aggregatedValues).toEqual([
+        expect.objectContaining({
+          fields: expect.arrayContaining([
+            expect.objectContaining({
+              field: 'documents-someone-else-new-name',
+              value: nameFields['documents-someone-else-new-name']
+            })
+          ])
+        })
+      ]);
+      Object.keys(nameFields).forEach(field => {
+        expect(req.sessionModel.get(field)).toBeUndefined();
+      });
+      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([]);
+
+      const summary = visitSummary(req);
+      expect(summary.res.redirect).not.toHaveBeenCalled();
+      expect(summary.controller.options.backLink).toBe(false);
+      expect(summary.controller.locals(req, summary.res)).toMatchObject({
+        hasItems: true,
+        addStep: 'relationship-name-change'
+      });
+      const suffix = edit ? '/edit' : '';
+      expect(post(route, req, {}, true).url)
+        .toBe(`${app.baseUrl}/your-phone-number${suffix}`);
+      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(['name']);
+      const phone = buildController('/your-phone-number', req);
+      expect(phone.locals(req, { locals: {} }).backLink)
+        .toBe(`${app.baseUrl}${route}${suffix}`);
+      post('/your-phone-number', req, { 'your-phone-number': 'yes' }, true);
+      post('/new-phone-number', req, {
+        'new-phone-number': '07700900001',
+        'confirm-new-phone-number': '07700900001'
+      }, true);
+      expect(post('/check-your-answers-phone-number', req, {}, true).url)
+        .toBe(`${app.baseUrl}/provide-photo-identity${suffix}`);
+      expect(post('/provide-photo-identity', req, {}, true).url)
+        .toBe(`${app.baseUrl}${returnPath || config.exitPoint}`);
+    }
+  );
+
+  test('adding and editing a saved name preserves the collection until Continue', () => {
+    const req = buildRequest(['name'], true, {
+      ...nameFields,
+      steps: [config.entryPoint, '/someone-else-new-name-evidence'],
+      'change-someone-elses-name': 'yes',
+      'edit-return-path': `${app.baseUrl}/confirm`
+    });
+    visitSummary(req);
+    expect(post('/relationship-name-change', req, {
+      'relationship-name-change': 'child'
+    }).url).toBe(`${app.baseUrl}/reason-someone-else-name-change/edit`);
+    req.sessionModel.set({ ...nameFields, 'someone-else-new-given-name': 'Another' });
+    visitSummary(req);
+    expect(req.sessionModel.get('someoneelsenewname').aggregatedValues).toHaveLength(2);
+
+    req.params = { action: 'edit', id: '0' };
+    expect(visitSummary(req).res.redirect).toHaveBeenCalledWith(
+      `${app.baseUrl}/relationship-name-change`
+    );
+    expect(req.sessionModel.get('someone-else-new-given-name')).toBe('New');
+    req.sessionModel.set('someone-else-new-given-name', 'Corrected');
+    req.params = {};
+    visitSummary(req);
+    const items = req.sessionModel.get('someoneelsenewname').aggregatedValues;
+    expect(items).toHaveLength(2);
+    expect(items.map(item => item.fields.find(
+      field => field.field === 'someone-else-new-given-name'
+    ).value)).toEqual(['Corrected', 'Another']);
+    expect(post(route, req, {}, true).url).toBe(`${app.baseUrl}/confirm`);
+  });
+
+  test.each(['checkboxes', 'no-changes'])(
+    'removing Name via %s clears saved names and session upload references',
+    removal => {
+      const req = buildRequest(['name', 'phone-number'], true, nameFields);
+      visitSummary(req);
+      expect(req.sessionModel.get('someoneelsenewname').aggregatedValues).toHaveLength(1);
+      if (removal === 'checkboxes') {
+        post(config.entryPoint, req, { [config.field]: ['phone-number'] });
+      } else {
+        const section = noChangesSections.find(item => item.id === 'name');
+        post(section.noChanges.route, req, answerNo(section));
+        post('/no-changes-made', req, { 'no-changes-made': 'yes' });
+      }
+      expect(req.sessionModel.get('someoneelsenewname')).toBeUndefined();
+      expect(req.sessionModel.get('documents-someone-else-new-name')).toBeUndefined();
+      expect(req.sessionModel.get(config.field)).toEqual(['phone-number']);
     }
   );
 });

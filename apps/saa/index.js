@@ -198,7 +198,7 @@ const steps = {
     ],
     aggregateLimit: config.aggregateLimits.someoneElsesName,
     addStep: 'relationship-name-change',
-      next: '/do-you-need-add-remove-dependant'
+    next: '/do-you-need-add-remove-dependant'
   },
   '/change-your-date-of-birth': {
     fields: ['change-your-date-of-birth'],
