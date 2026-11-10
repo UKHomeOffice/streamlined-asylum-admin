@@ -119,7 +119,7 @@
     }
   },
   "reason-name-change": {
-    "legend": "Why do you need to change the name?",
+    "legend": "Why do you need to change your name?",
     "options": {
       "error": {
         "label": "An error"

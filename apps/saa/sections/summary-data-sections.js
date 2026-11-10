@@ -8,6 +8,7 @@ const evidenceSummary = require('./summary-data-evidence-help-your-claim');
 const emailAddressSummary = require('./summary-data-email-address');
 const dateOfBirthSummary = require('./summary-data-date-of-birth');
 const phoneNumberSummary = require('./summary-data-phone-number');
+const nameSummary = require('./summary-data-name');
 const { formatDate, formatUanForDisplay } = require('../../../utils');
 
 // Same rows as /check-your-answers-evidence; Change goes back to that page.
@@ -137,8 +138,19 @@ module.exports = {
   name: {
     steps: [
       {
+        step: '/do-you-need-to-change-your-name',
+        field: 'do-you-need-to-change-your-name'
+      },
+      {
+        step: '/reason-name-change',
+        field: 'reason-name-change',
+        changeLink: `${SAA_BASE_URL}/check-your-answers-name`,
+        dependsOn: 'do-you-need-to-change-your-name'
+      },
+      {
         step: '/new-name',
         field: 'given-name',
+        changeLink: `${SAA_BASE_URL}/check-your-answers-name`,
         parse: (value, req) => {
           const newName = [
             req.sessionModel.get('given-name'),
@@ -148,12 +160,11 @@ module.exports = {
         }
       },
       {
-        step: '/do-you-need-to-change-your-name',
-        field: 'do-you-need-to-change-your-name'
-      },
-      {
-        step: '/do-you-need-to-change-someone-elses-name',
-        field: 'change-someone-elses-name'
+        ...nameSummary['change-your-name'].steps.find(
+          row => row.field === 'documents-new-name'
+        ),
+        changeLink: `${SAA_BASE_URL}/check-your-answers-name`,
+        dependsOn: 'do-you-need-to-change-your-name'
       },
       {
         step: '/relationship-name-change',
