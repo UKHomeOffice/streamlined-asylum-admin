@@ -136,6 +136,8 @@ const steps = {
     next: '/check-your-answers-name'
   },
   '/check-your-answers-name': {
+    behaviours: [Summary, SummaryLabels, EditRouteReturn],
+    sections: require('./sections/summary-data-name'),
     next: '/do-you-need-to-change-someone-elses-name'
   },
   '/do-you-need-to-change-someone-elses-name': {
