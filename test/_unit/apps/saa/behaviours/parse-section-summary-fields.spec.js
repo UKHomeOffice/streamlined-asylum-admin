@@ -7,6 +7,7 @@ const translations = {
   'fields.documents-child-partner.summary-label': 'Files uploaded',
   'fields.documents-death-certificate.summary-label': 'Files uploaded',
   'fields.documents-someone-else-new-dob.summary-label': 'Files uploaded',
+  'fields.documents-someone-else-new-name.summary-label': 'Files uploaded',
   'fields.add-remove-child-partner.options.add-child-partner.summary-label':
     'Add a child or partner as a dependant',
   'fields.add-remove-child-partner.options.remove-child-partner.summary-label':
@@ -241,7 +242,8 @@ describe('parse section summary fields behaviour', () => {
     describe.each([
       ['addremovechildpartner', 'documents-child-partner'],
       ['reportadeath', 'documents-death-certificate'],
-      ['someoneelsenewdob', 'documents-someone-else-new-dob']
+      ['someoneelsenewdob', 'documents-someone-else-new-dob'],
+      ['someoneelsenewname', 'documents-someone-else-new-name']
     ])('document rows for %s', (aggregateTo, field) => {
       const settings =
         require('../../../../../apps/saa/config/aggregator-summaries')[

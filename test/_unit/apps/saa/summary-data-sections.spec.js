@@ -224,6 +224,7 @@ describe('summary data sections', () => {
 describe('name rows on the confirm page', () => {
   const ConfirmPage = SummaryLabels(Summary(class {}));
   const pages = require('../../../../apps/saa/translations/src/en/pages.json');
+  const fields = require('../../../../apps/saa/translations/src/en/fields.json');
   const uploadRow = sections.name.steps.find(
     entry => entry.field === 'documents-new-name'
   );
@@ -233,7 +234,7 @@ describe('name rows on the confirm page', () => {
     translate: keys => {
       const list = [].concat(keys);
       return list.map(key =>
-        key.split('.').reduce((value, part) => value?.[part], { pages })
+        key.split('.').reduce((value, part) => value?.[part], { pages, fields })
       ).find(value => value !== undefined) || list[list.length - 1];
     },
     form: { options: { fieldsConfig: {}, steps: {} } }
@@ -325,11 +326,22 @@ describe('name rows on the confirm page', () => {
     expect(new ConfirmPage().getFieldsForRow([uploadRow], req)).toEqual([]);
   });
 
-  test('omits the Files uploaded row when no own-name evidence exists', () => {
-    const req = createRequest({ 'do-you-need-to-change-your-name': 'yes' });
+  test.each([undefined, null, []])(
+    'shows No files uploaded when own-name evidence is %p',
+    documents => {
+      const req = createRequest({
+        'do-you-need-to-change-your-name': 'yes',
+        'documents-new-name': documents
+      });
 
-    expect(new ConfirmPage().getFieldsForRow([uploadRow], req)).toEqual([]);
-  });
+      expect(new ConfirmPage().getFieldsForRow([uploadRow], req)).toEqual([
+        expect.objectContaining({
+          value: 'No files uploaded',
+          changeLink: '/changes/check-your-answers-name'
+        })
+      ]);
+    }
+  );
 });
 
 describe('evidence rows on the confirm page', () => {

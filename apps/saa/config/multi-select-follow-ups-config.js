@@ -88,6 +88,15 @@ module.exports = {
                 { field: OWN_NAME_FIELD, value: 'no' },
                 { field: SOMEONE_ELSE_NAME_FIELD, value: 'yes' }
               ]
+            },
+            {
+              route: '/check-your-answers-name',
+              condition: [
+                req => req.params?.action === 'edit' ||
+                  Boolean(req.sessionModel.get('edit-return-path')),
+                req => req.sessionModel.get(CONTACT_DETAIL_UPDATES_STATE_KEY)
+                  ?.completedSections?.includes(NAME_SECTION)
+              ]
             }
           ],
           noChanges: {

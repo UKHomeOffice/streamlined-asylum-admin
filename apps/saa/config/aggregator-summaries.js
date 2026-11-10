@@ -37,6 +37,7 @@ module.exports = {
   someoneelsenewname: {
     route: '/check-your-answers-someone-else-name',
     dependsOn: 'change-someone-elses-name',
+    documentFields: ['documents-someone-else-new-name'],
     combineFields: {
       'someone-else-old-given-name': ['someone-else-old-family-name'],
       'someone-else-new-given-name': ['someone-else-new-family-name']
