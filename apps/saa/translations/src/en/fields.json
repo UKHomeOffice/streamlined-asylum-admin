@@ -138,7 +138,7 @@
   },
   "someone-else-old-family-name": {
     "label": "Family name",
-    "summary-label": "Old family name"
+    "summary-label": "Old name"
   },
   "someone-else-new-given-name": {
     "label": "Given name",
@@ -146,7 +146,10 @@
   },
   "someone-else-new-family-name": {
     "label": "Family name",
-    "summary-label": "New family name"
+    "summary-label": "New name"
+  },
+  "documents-someone-else-new-name": {
+    "summary-label": "Files uploaded"
   },
   "given-name": {
     "label": "Given name",
