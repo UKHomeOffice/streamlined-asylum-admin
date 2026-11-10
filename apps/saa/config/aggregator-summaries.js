@@ -33,5 +33,15 @@ module.exports = {
     },
     itemTitle: 'pages.check-your-answers-someone-else-date-of-birth.item-title',
     addIncrement: true
+  },
+  someoneelsenewname: {
+    route: '/check-your-answers-someone-else-name',
+    dependsOn: 'change-someone-elses-name',
+    combineFields: {
+      'someone-else-old-given-name': ['someone-else-old-family-name'],
+      'someone-else-new-given-name': ['someone-else-new-family-name']
+    },
+    itemTitle: 'pages.check-your-answers-someone-else-name.item-title',
+    addIncrement: true
   }
 };
