@@ -176,7 +176,7 @@ describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
     '$id removal of the last selection revisits something-else in edit mode',
     section => {
       const req = buildRequest([section.value], edit, {
-        'edit-return-path': `${app.baseUrl}/confirm`,
+        'edit-return-path': edit ? `${app.baseUrl}/confirm` : undefined,
         'add-remove-dependant': 'no',
         'send-evidence-for-your-claim': 'no',
         'report-a-death': 'no',
@@ -330,7 +330,7 @@ describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
 
   test('email and phone CYA defer EditRouteReturn until the shared identity section completes', () => {
     const req = buildRequest(['email-address', 'phone-number'], edit, {
-      'edit-return-path': `${app.baseUrl}/confirm`
+      'edit-return-path': edit ? `${app.baseUrl}/confirm` : undefined
     });
     expect(post('/check-your-answers-email', req).url).toBe(
       `${app.baseUrl}/your-phone-number${suffix}`
@@ -475,6 +475,67 @@ describe.each([false, true])('own-name decision routing (edit=%s)', edit => {
 
 describe('contact-detail edit completion', () => {
   test.each([
+    ['/check-your-answers-email', '/confirm'],
+    ['/check-your-answers-phone-number', '/confirm'],
+    ['/check-your-answers-email', '/information-given'],
+    ['/check-your-answers-phone-number', '/information-given']
+  ])('%s honours the summary return path %s without an edit URL', (route, returnRoute) => {
+    const req = buildRequest(['email-address', 'phone-number'], false);
+    completeSelectedSections(req);
+    req.originalUrl = `${app.baseUrl}${returnRoute}`;
+    const summary = buildController(returnRoute, req);
+    const next = jest.fn();
+    summary.getValues(req, {}, next);
+    expect(next).toHaveBeenCalledWith(null, expect.any(Object));
+    expect(req.sessionModel.get('edit-return-path')).toBe(req.originalUrl);
+    expect(req.params.action).toBeUndefined();
+
+    expect(post(route, req).url).toBe(req.originalUrl);
+    expect(req.form.options.continueOnEdit).toBe(true);
+  });
+
+  test('a summary return path without an edit URL still collects incomplete selected follow-ups', () => {
+    const req = buildRequest(['email-address', 'phone-number'], false, {
+      'edit-return-path': `${app.baseUrl}/confirm`
+    });
+    expect(post('/check-your-answers-email', req).url)
+      .toBe(`${app.baseUrl}/your-phone-number`);
+    expect(post('/check-your-answers-phone-number', req).url)
+      .toBe(`${app.baseUrl}/provide-photo-identity`);
+    expect(post('/provide-photo-identity', req).url).toBe(`${app.baseUrl}/confirm`);
+  });
+
+  test('a newly added Name section cannot complete merely from an unanswered someone-else follow-up', () => {
+    const req = buildRequest(['email-address'], true, {
+      steps: ['/personal-details', config.entryPoint],
+      'edit-return-path': `${app.baseUrl}/confirm`
+    });
+    completeSelectedSections(req);
+    expect(post(config.entryPoint, req, {
+      [config.field]: ['name', 'email-address']
+    }, true).url).toBe(`${app.baseUrl}/do-you-need-to-change-your-name/edit`);
+    post('/do-you-need-to-change-your-name', req, {
+      'do-you-need-to-change-your-name': 'yes'
+    }, true);
+    expect(post('/do-you-need-to-change-someone-elses-name', req, {
+      'change-someone-elses-name': 'yes'
+    }).url).toBe(`${app.baseUrl}/relationship-name-change/edit`);
+
+    expect(post('/do-you-need-to-change-your-name', req, {
+      'do-you-need-to-change-your-name': 'no'
+    }, true).url).toBe(`${app.baseUrl}/do-you-need-to-change-someone-elses-name/edit`);
+    expect(req.sessionModel.get(config.stateKey).completedSections).not.toContain('name');
+    expect(req.sessionModel.get('someone-else-new-given-name')).toBeUndefined();
+    expect(req.sessionModel.get('documents-someone-else-new-name')).toBeUndefined();
+    expect(post('/do-you-need-to-change-someone-elses-name', req, {
+      'change-someone-elses-name': 'yes'
+    }, true).url).toBe(`${app.baseUrl}/relationship-name-change/edit`);
+    expect(post('/check-your-answers-someone-else-name', req).url)
+      .toBe(`${app.baseUrl}/confirm`);
+    expect(req.sessionModel.get(config.stateKey).completedSections).toContain('name');
+  });
+
+  test.each([
     [['name'], '/something-else'],
     [['name', 'phone-number'], '/confirm']
   ])(
@@ -562,7 +623,7 @@ describe('contact-detail edit completion', () => {
       const suffix = edit ? '/edit' : '';
       const req = buildRequest(['name'], edit, {
         steps: ['/personal-details', config.entryPoint, ...sections.find(section => section.id === 'name').routes],
-        'edit-return-path': `${app.baseUrl}/confirm`
+        'edit-return-path': edit ? `${app.baseUrl}/confirm` : undefined
       });
       completeSelectedSections(req);
       expect(post(config.entryPoint, req, {

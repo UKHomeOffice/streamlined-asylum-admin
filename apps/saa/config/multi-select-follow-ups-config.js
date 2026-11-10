@@ -80,6 +80,8 @@ module.exports = {
               route: OWN_NAME_ROUTE,
               condition: [
                 req => req.params?.action === 'edit',
+                req => req.sessionModel.get('contact-detail-updates')
+                  ?.completedSections?.includes('name'),
                 { field: OWN_NAME_FIELD, value: 'no' },
                 { field: SOMEONE_ELSE_NAME_FIELD, value: 'yes' }
               ]

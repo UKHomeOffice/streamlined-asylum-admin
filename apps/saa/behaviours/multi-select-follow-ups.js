@@ -693,7 +693,7 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
     }
 
     toNextUrl(req, config, nextRoute) {
-      if (nextRoute === config.exitPoint && isEdit(req)) {
+      if (nextRoute === config.exitPoint && (isEdit(req) || config.editReturnUrl?.(req))) {
         return this.getEditExitUrl(req, config);
       }
 
