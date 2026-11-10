@@ -31,6 +31,8 @@
  */
 const SAA_NO_CHANGES_HEADER = 'pages.no-changes-made.headers';
 const CONTACT_DETAIL_UPDATES_STATE_KEY = 'contact-detail-updates';
+const DATE_OF_BIRTH_SECTION = 'date-of-birth';
+const NAME_SECTION = 'name';
 const PHOTO_IDENTITY_ROUTE = '/provide-photo-identity';
 const OWN_NAME_ROUTE = '/do-you-need-to-change-your-name';
 const SOMEONE_ELSE_NAME_ROUTE = '/do-you-need-to-change-someone-elses-name';
@@ -65,11 +67,11 @@ module.exports = {
   editReturnUrl: req => req.sessionModel.get('edit-return-path'),
   options: [
     {
-      value: 'name',
+      value: NAME_SECTION,
       order: 10,
       sections: [
         {
-          id: 'name',
+          id: NAME_SECTION,
           start: OWN_NAME_ROUTE,
           completeOn: [
             {
@@ -82,7 +84,7 @@ module.exports = {
               condition: [
                 req => req.params?.action === 'edit',
                 req => req.sessionModel.get(CONTACT_DETAIL_UPDATES_STATE_KEY)
-                  ?.completedSections?.includes('name'),
+                  ?.completedSections?.includes(NAME_SECTION),
                 { field: OWN_NAME_FIELD, value: 'no' },
                 { field: SOMEONE_ELSE_NAME_FIELD, value: 'yes' }
               ]
@@ -130,11 +132,11 @@ module.exports = {
       ]
     },
     {
-      value: 'date-of-birth',
+      value: DATE_OF_BIRTH_SECTION,
       order: 20,
       sections: [
         {
-          id: 'date-of-birth',
+          id: DATE_OF_BIRTH_SECTION,
           start: '/change-your-date-of-birth',
           completeOn: [
             {
@@ -151,7 +153,7 @@ module.exports = {
                 req => req.params?.action === 'edit' ||
                   Boolean(req.sessionModel.get('edit-return-path')),
                 req => req.sessionModel.get(CONTACT_DETAIL_UPDATES_STATE_KEY)
-                  ?.completedSections?.includes('date-of-birth')
+                  ?.completedSections?.includes(DATE_OF_BIRTH_SECTION)
               ]
             }
           ],
