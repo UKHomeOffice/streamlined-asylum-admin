@@ -139,7 +139,9 @@ const steps = {
     next: '/do-you-need-to-change-someone-elses-name'
   },
   '/do-you-need-to-change-someone-elses-name': {
-    // Add ResetSectionSummary for the name loop when its add-another story is built.
+    behaviours: [
+      ResetSectionSummary(['someoneelsenewname'], 'change-someone-elses-name')
+    ],
     fields: ['change-someone-elses-name'],
     forks: [
       {
@@ -177,8 +179,26 @@ const steps = {
     next: '/check-your-answers-someone-else-name'
   },
   '/check-your-answers-someone-else-name': {
-    // Add-another loop to be added in its story; Continue completes the name section.
-    next: '/do-you-need-add-remove-dependant'
+    backLink: false,
+    behaviours: [
+      AggregateSaveUpdate,
+      LimitAggregateItems,
+      ParseSummaryFields(aggregatorSummaries.someoneelsenewname),
+      EditRouteReturn
+    ],
+    aggregateTo: 'someoneelsenewname',
+    aggregateFrom: [
+      'relationship-name-change',
+      'reason-someone-else-name-change',
+      'someone-else-old-given-name',
+      'someone-else-old-family-name',
+      'someone-else-new-given-name',
+      'someone-else-new-family-name',
+      'documents-someone-else-new-name'
+    ],
+    aggregateLimit: config.aggregateLimits.someoneElsesName,
+    addStep: 'relationship-name-change',
+      next: '/do-you-need-add-remove-dependant'
   },
   '/change-your-date-of-birth': {
     fields: ['change-your-date-of-birth'],
