@@ -30,6 +30,7 @@
  * - section `noChanges.editRoute` optionally reports the same rule from an edit-only page.
  */
 const SAA_NO_CHANGES_HEADER = 'pages.no-changes-made.headers';
+const CONTACT_DETAIL_UPDATES_STATE_KEY = 'contact-detail-updates';
 const PHOTO_IDENTITY_ROUTE = '/provide-photo-identity';
 const OWN_NAME_ROUTE = '/do-you-need-to-change-your-name';
 const SOMEONE_ELSE_NAME_ROUTE = '/do-you-need-to-change-someone-elses-name';
@@ -54,7 +55,7 @@ module.exports = {
   field: 'changes-to-contact-details',
   entryPoint: '/changes-to-contact-details',
   exitPoint: '/do-you-need-add-remove-dependant',
-  stateKey: 'contact-detail-updates',
+  stateKey: CONTACT_DETAIL_UPDATES_STATE_KEY,
   noChangesPoint: {
     route: '/no-changes-made',
     field: 'no-changes-made',
@@ -80,7 +81,7 @@ module.exports = {
               route: OWN_NAME_ROUTE,
               condition: [
                 req => req.params?.action === 'edit',
-                req => req.sessionModel.get('contact-detail-updates')
+                req => req.sessionModel.get(CONTACT_DETAIL_UPDATES_STATE_KEY)
                   ?.completedSections?.includes('name'),
                 { field: OWN_NAME_FIELD, value: 'no' },
                 { field: SOMEONE_ELSE_NAME_FIELD, value: 'yes' }
@@ -149,7 +150,7 @@ module.exports = {
               condition: [
                 req => req.params?.action === 'edit' ||
                   Boolean(req.sessionModel.get('edit-return-path')),
-                req => req.sessionModel.get('contact-detail-updates')
+                req => req.sessionModel.get(CONTACT_DETAIL_UPDATES_STATE_KEY)
                   ?.completedSections?.includes('date-of-birth')
               ]
             }
