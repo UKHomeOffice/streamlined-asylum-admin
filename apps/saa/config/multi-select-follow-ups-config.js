@@ -31,6 +31,7 @@
  */
 const SAA_NO_CHANGES_HEADER = 'pages.no-changes-made.headers';
 const CONTACT_DETAIL_UPDATES_STATE_KEY = 'contact-detail-updates';
+const EDIT_RETURN_PATH_KEY = 'edit-return-path';
 const DATE_OF_BIRTH_SECTION = 'date-of-birth';
 const NAME_SECTION = 'name';
 const PHOTO_IDENTITY_ROUTE = '/provide-photo-identity';
@@ -64,7 +65,7 @@ module.exports = {
     continueValue: 'yes'
   },
   onNoneSelected: req => req.sessionModel.set('change-personal-details', 'no'),
-  editReturnUrl: req => req.sessionModel.get('edit-return-path'),
+  editReturnUrl: req => req.sessionModel.get(EDIT_RETURN_PATH_KEY),
   options: [
     {
       value: NAME_SECTION,
@@ -93,7 +94,7 @@ module.exports = {
               route: '/check-your-answers-name',
               condition: [
                 req => req.params?.action === 'edit' ||
-                  Boolean(req.sessionModel.get('edit-return-path')),
+                  Boolean(req.sessionModel.get(EDIT_RETURN_PATH_KEY)),
                 req => req.sessionModel.get(CONTACT_DETAIL_UPDATES_STATE_KEY)
                   ?.completedSections?.includes(NAME_SECTION)
               ]
@@ -160,7 +161,7 @@ module.exports = {
               route: '/check-your-answers-date-of-birth',
               condition: [
                 req => req.params?.action === 'edit' ||
-                  Boolean(req.sessionModel.get('edit-return-path')),
+                  Boolean(req.sessionModel.get(EDIT_RETURN_PATH_KEY)),
                 req => req.sessionModel.get(CONTACT_DETAIL_UPDATES_STATE_KEY)
                   ?.completedSections?.includes(DATE_OF_BIRTH_SECTION)
               ]
