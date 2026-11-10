@@ -7,7 +7,10 @@ module.exports = superclass =>
       const nextStep = super.getNextStep(req, res);
 
       if (
-        nextStep !== `${req.baseUrl}/confirm` ||
+        ![
+          `${req.baseUrl}/confirm`,
+          `${req.baseUrl}/information-given`
+        ].includes(nextStep) ||
         hasSelectedSection(req.sessionModel)
       ) {
         return nextStep;

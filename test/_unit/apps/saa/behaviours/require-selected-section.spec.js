@@ -2,7 +2,7 @@
 
 const RequireSelectedSection = require('../../../../../apps/saa/behaviours/require-selected-section');
 
-describe('require-selected-section behaviour', () => {
+describe.each(['/confirm', '/information-given'])('require-selected-section returning to %s', summary => {
   const baseGetNextStep = jest.fn();
 
   class Base {
@@ -28,7 +28,7 @@ describe('require-selected-section behaviour', () => {
 
   beforeEach(() => {
     baseGetNextStep.mockReset();
-    baseGetNextStep.mockReturnValue('/changes/confirm');
+    baseGetNextStep.mockReturnValue(`/changes${summary}`);
   });
 
   it.each([
@@ -36,10 +36,10 @@ describe('require-selected-section behaviour', () => {
     'add-remove-dependant',
     'send-evidence-for-your-claim',
     'someone-on-claim-died'
-  ])('returns to confirm when %s is yes', field => {
+  ])('keeps the summary destination when %s is yes', field => {
     const req = buildReq({ ...allNo, [field]: 'yes' });
 
-    expect(instance.getNextStep(req, {})).toBe('/changes/confirm');
+    expect(instance.getNextStep(req, {})).toBe(`/changes${summary}`);
   });
 
   it.each(['no', 'yes', undefined])(
@@ -51,7 +51,7 @@ describe('require-selected-section behaviour', () => {
     }
   );
 
-  it('keeps the next step when it is not confirm', () => {
+  it('keeps the next step when it is not a summary', () => {
     baseGetNextStep.mockReturnValue('/changes/something-else/edit');
 
     expect(instance.getNextStep(buildReq(allNo), {})).toBe(

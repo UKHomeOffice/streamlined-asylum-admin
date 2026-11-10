@@ -677,6 +677,27 @@ describe('contact-detail edit completion', () => {
 });
 
 describe('contact-detail selection cleanup', () => {
+  test.each(noChangesSections.flatMap(section =>
+    ['/confirm', '/information-given'].flatMap(summary =>
+      ['no', 'yes'].map(dependants => ({ section, summary, dependants }))
+    )
+  ))(
+    '$section.id removal returning to $summary with dependants=$dependants respects remaining selections',
+    ({ section, summary, dependants }) => {
+      const req = buildRequest([section.value], true, {
+        'edit-return-path': `${app.baseUrl}${summary}`,
+        'add-remove-dependant': dependants
+      });
+      post(section.noChanges.route, req, answerNo(section));
+
+      expect(
+        post('/no-changes-made', req, { 'no-changes-made': 'yes' }).url
+      ).toBe(`${app.baseUrl}${dependants === 'yes' ? summary : '/something-else'}`);
+      expect(req.sessionModel.get('change-personal-details')).toBe('no');
+      expect(req.sessionModel.get(config.field)).toBeUndefined();
+    }
+  );
+
   test.each([
     ['yes', 'no', '/no-options'],
     ['no', 'yes', '/contact-us-by-email']
