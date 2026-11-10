@@ -206,6 +206,7 @@ const steps = {
     next: '/do-you-need-add-remove-dependant'
   },
   '/change-your-date-of-birth': {
+    continueOnEdit: true,
     fields: ['change-your-date-of-birth'],
     forks: [
       {

@@ -19,11 +19,13 @@ const evidenceRows = evidenceSummary.evidence.steps.map(row => ({
 }));
 
 // Same rows as /check-your-answers-email; Change goes back to that page.
-const emailAddressRows = emailAddressSummary['email-address'].steps.map(row => ({
-  ...row,
-  changeLink: `${SAA_BASE_URL}/check-your-answers-email`,
-  dependsOn: 'change-personal-details'
-}));
+const emailAddressRows = emailAddressSummary['email-address'].steps.map(
+  row => ({
+    ...row,
+    changeLink: `${SAA_BASE_URL}/check-your-answers-email`,
+    dependsOn: 'change-personal-details'
+  })
+);
 
 // Same rows as /check-your-answers-date-of-birth; Change goes back to that page.
 const dateOfBirthRows = dateOfBirthSummary['date-of-birth'].steps.map(row => ({
@@ -110,6 +112,14 @@ module.exports = {
         field: 'claimant-main-language'
       },
       {
+        step: '/person-completing-form',
+        field: 'person-completing-form'
+      },
+      {
+        step: '/who-are-you',
+        field: 'who-are-you'
+      },
+      {
         step: '/relationship-to-claimant',
         field: 'relationship-to-claimant'
       },
@@ -132,6 +142,19 @@ module.exports = {
       {
         step: '/helper-details',
         field: 'helper-email-address'
+      }
+    ]
+  },
+  'personal-details': {
+    steps: [
+      {
+        step: '/personal-details',
+        field: 'change-personal-details'
+      },
+      {
+        step: '/changes-to-contact-details',
+        field: 'changes-to-contact-details',
+        parse: list => (Array.isArray(list) ? list.join('\n') : list)
       }
     ]
   },
@@ -165,44 +188,6 @@ module.exports = {
         ),
         changeLink: `${SAA_BASE_URL}/check-your-answers-name`,
         dependsOn: 'do-you-need-to-change-your-name'
-      },
-      {
-        step: '/relationship-name-change',
-        field: 'relationship-name-change',
-        dependsOn: 'change-someone-elses-name'
-      },
-      {
-        step: '/reason-someone-else-name-change',
-        field: 'reason-someone-else-name-change',
-        dependsOn: 'change-someone-elses-name'
-      },
-      {
-        step: '/someone-else-new-name',
-        field: 'someone-else-old-given-name',
-        dependsOn: 'change-someone-elses-name'
-      },
-      {
-        step: '/someone-else-new-name',
-        field: 'someone-else-old-family-name',
-        dependsOn: 'change-someone-elses-name'
-      },
-      {
-        step: '/someone-else-new-name',
-        field: 'someone-else-new-given-name',
-        dependsOn: 'change-someone-elses-name'
-      },
-      {
-        step: '/someone-else-new-name',
-        field: 'someone-else-new-family-name',
-        dependsOn: 'change-someone-elses-name'
-      }
-    ]
-  },
-  'personal-details': {
-    steps: [
-      {
-        step: '/personal-details',
-        field: 'change-personal-details'
       }
     ]
   },
