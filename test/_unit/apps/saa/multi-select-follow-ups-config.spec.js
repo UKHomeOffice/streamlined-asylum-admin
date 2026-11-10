@@ -9,6 +9,7 @@ jest.mock(
 const app = require('../../../../apps/saa');
 const MultiSelectFollowUps = require('../../../../apps/saa/behaviours/multi-select-follow-ups');
 const multiSelectFollowUpsConfig = require('../../../../apps/saa/config/multi-select-follow-ups-config');
+const configureMultiSelectFollowUps = require('../../../../apps/saa/config/configure-multi-select-follow-ups');
 
 const uniqueSectionStartRoutes = multiSelectFollowUpsConfig.options
   .reduce(
@@ -18,15 +19,87 @@ const uniqueSectionStartRoutes = multiSelectFollowUpsConfig.options
   )
   .filter((route, index, routes) => routes.indexOf(route) === index);
 
+describe('configuring multi-select follow-up routes', () => {
+  test('wires shared boundaries once and preserves page-specific configuration', () => {
+    const existingBehaviour = superclass => superclass;
+    const forks = [{ target: '/middle', condition: () => true }];
+    const steps = {
+      '/entry': { behaviours: [existingBehaviour] },
+      '/start': {
+        behaviours: [existingBehaviour],
+        prereqs: ['/existing'],
+        backLinks: ['/existing'],
+        backLink: false,
+        next: '/middle',
+        forks
+      },
+      '/middle': { next: '/end' },
+      '/end': { behaviours: [existingBehaviour] },
+      '/question': {},
+      '/no-changes': { prereqs: ['/existing'] },
+      '/exit': {},
+      '/unrelated': {}
+    };
+    const section = {
+      start: '/start',
+      routes: ['/start', '/middle', '/end', '/question', '/missing'],
+      completeOn: ['/end', { route: '/question', condition: () => true }],
+      noChanges: { route: '/question', editRoute: '/start' }
+    };
+    configureMultiSelectFollowUps(steps, {
+      entryPoint: '/entry',
+      exitPoint: '/exit',
+      noChangesPoint: { route: '/no-changes' },
+      options: [{ sections: [section] }, { sections: [section] }, {}]
+    });
+
+    const behaviour = steps['/entry'].behaviours[0];
+    ['/entry', '/start', '/end'].forEach(route => {
+      expect(steps[route].behaviours).toEqual([behaviour, existingBehaviour]);
+    });
+    ['/question', '/no-changes', '/exit'].forEach(route => {
+      expect(steps[route].behaviours).toEqual([behaviour]);
+    });
+    expect(steps['/start']).toMatchObject({
+      prereqs: ['/existing', '/entry', '/no-changes'],
+      backLinks: ['/existing', '/entry'],
+      backLink: false,
+      next: '/middle',
+      forks,
+      continueOnEdit: true
+    });
+    expect(steps['/middle']).toEqual({ next: '/end', continueOnEdit: true });
+    expect(steps['/end'].continueOnEdit).toBeUndefined();
+    expect(steps['/question'].continueOnEdit).toBeUndefined();
+    expect(steps['/no-changes'].prereqs).toEqual(['/existing', '/question', '/start']);
+    expect(steps['/unrelated']).toEqual({});
+    expect(steps['/missing']).toBeUndefined();
+  });
+
+  test('does not create steps for missing configured routes', () => {
+    const steps = {};
+    configureMultiSelectFollowUps(steps, {
+      entryPoint: '/entry',
+      exitPoint: '/exit',
+      options: [
+        { sections: [{ start: '/start', routes: [], completeOn: '/end' }] }
+      ]
+    });
+    expect(steps).toEqual({});
+  });
+});
+
 describe('SAA multi-select follow-up route config', () => {
-  test('attaches the name-change navigation behaviour to the relevant page', () => {
+  test('uses normal HOF forks for the someone-else name question', () => {
     const step = app.steps['/do-you-need-to-change-someone-elses-name'];
 
-    expect(step.behaviours).toContain(
-      require('../../../../apps/saa/behaviours/change-someone-elses-name-fork')
-    );
-    expect(step.forks).toBeUndefined();
-    expect(step.next).toBe('/relationship-name-change');
+    expect(step.forks).toContainEqual({
+      target: '/relationship-name-change',
+      continueOnEdit: true,
+      condition: { field: 'change-someone-elses-name', value: 'yes' }
+    });
+    expect(step.next).toBe('/do-you-need-add-remove-dependant');
+    expect(app.steps['/whose-nationality-to-change']).toBeUndefined();
   });
 
   test('allows each dynamic section start to be reached from the multi-select entry point', () => {
@@ -66,12 +139,12 @@ describe('SAA multi-select follow-up route config', () => {
   test.each([
     ['name', '/changes/do-you-need-to-change-your-name'],
     ['date-of-birth', '/changes/change-your-date-of-birth'],
-    ['nationality', '/changes/whose-nationality-to-change'],
+    ['nationality', '/changes/nationality-change'],
     ['address', '/changes/change-uk-address'],
     ['email-address', '/changes/new-email-address'],
     ['phone-number', '/changes/your-phone-number'],
-    [['nationality', 'address'], '/changes/whose-nationality-to-change'],
-    [['address', 'nationality'], '/changes/whose-nationality-to-change']
+    [['nationality', 'address'], '/changes/nationality-change'],
+    [['address', 'nationality'], '/changes/nationality-change']
   ])(
     'routes selection %p to the expected first section',
     (selection, expectedRoute) => {
@@ -356,7 +429,7 @@ describe('SAA multi-select follow-up route config', () => {
 
   test.each([
     [['name', 'date-of-birth'], 'yes', 'no', '/change-your-date-of-birth'],
-    [['name', 'nationality'], 'yes', 'no', '/whose-nationality-to-change'],
+    [['name', 'nationality'], 'yes', 'no', '/nationality-change'],
     [['name', 'address'], 'yes', 'no', '/change-uk-address'],
     [['name', 'email-address'], 'yes', 'no', '/new-email-address'],
     [['name', 'phone-number'], 'yes', 'no', '/your-phone-number'],
@@ -368,28 +441,24 @@ describe('SAA multi-select follow-up route config', () => {
     ],
     [['name'], 'yes', 'no', '/do-you-need-add-remove-dependant'],
     [['name'], 'no', 'no', '/no-changes-made'],
-    [['name', 'date-of-birth'], 'no', 'no', '/change-your-date-of-birth'],
-    [['name', 'nationality'], 'no', 'no', '/whose-nationality-to-change'],
-    [['name', 'address'], 'no', 'no', '/change-uk-address'],
-    [['name', 'email-address'], 'no', 'no', '/new-email-address'],
-    [['name', 'phone-number'], 'no', 'no', '/your-phone-number'],
+    [['name', 'date-of-birth'], 'no', 'no', '/no-changes-made'],
+    [['name', 'nationality'], 'no', 'no', '/no-changes-made'],
+    [['name', 'address'], 'no', 'no', '/no-changes-made'],
+    [['name', 'email-address'], 'no', 'no', '/no-changes-made'],
+    [['name', 'phone-number'], 'no', 'no', '/no-changes-made'],
     [['name', 'nationality'], 'no', 'yes', '/relationship-name-change'],
     [['name', 'nationality'], 'yes', 'yes', '/relationship-name-change']
   ])(
     'routes selections %p with name answers %s/%s to %s',
     (selections, ownNameAnswer, someoneElsesNameAnswer, nextRoute) => {
-      class BaseController {
+      class BaseController extends require('hof/controller/controller') {
         constructor(options) {
-          this.options = options;
+          super(options);
         }
 
         saveValues(req, res, callback) {
           req.sessionModel.set(req.form.values);
           callback();
-        }
-
-        getNextStep(req) {
-          return req.baseUrl + this.options.next;
         }
       }
 
@@ -416,6 +485,7 @@ describe('SAA multi-select follow-up route config', () => {
         baseUrl: app.baseUrl,
         params: {},
         form: {
+          options: { ...step },
           values: {
             'change-someone-elses-name': someoneElsesNameAnswer
           }
@@ -442,7 +512,11 @@ describe('SAA multi-select follow-up route config', () => {
 
       expect(
         sessionValues[multiSelectFollowUpsConfig.stateKey].completedSections
-      ).toEqual(someoneElsesNameAnswer === 'no' ? ['name'] : []);
+      ).toEqual(
+        ownNameAnswer === 'yes' && someoneElsesNameAnswer === 'no'
+          ? ['name']
+          : []
+      );
       expect(controller.getNextStep(req, {})).toBe(app.baseUrl + nextRoute);
     }
   );

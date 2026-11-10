@@ -2,7 +2,7 @@
 
 const RequireSelectedSection = require('../../../../../apps/saa/behaviours/require-selected-section');
 
-describe('require-selected-section behaviour', () => {
+describe.each(['/confirm', '/information-given'])('require-selected-section returning to %s', summary => {
   const baseGetNextStep = jest.fn();
 
   class Base {
@@ -28,7 +28,7 @@ describe('require-selected-section behaviour', () => {
 
   beforeEach(() => {
     baseGetNextStep.mockReset();
-    baseGetNextStep.mockReturnValue('/changes/confirm');
+    baseGetNextStep.mockReturnValue(`/changes${summary}`);
   });
 
   it.each([
@@ -36,25 +36,22 @@ describe('require-selected-section behaviour', () => {
     'add-remove-dependant',
     'send-evidence-for-your-claim',
     'someone-on-claim-died'
-  ])('returns to confirm when %s is yes', field => {
+  ])('keeps the summary destination when %s is yes', field => {
     const req = buildReq({ ...allNo, [field]: 'yes' });
 
-    expect(instance.getNextStep(req, {})).toBe('/changes/confirm');
+    expect(instance.getNextStep(req, {})).toBe(`/changes${summary}`);
   });
 
-  it('goes to no-options instead of confirm when every section is no', () => {
-    const req = buildReq({ ...allNo, 'something-else': 'no' });
+  it.each(['no', 'yes', undefined])(
+    'revisits something-else when every section is no and its previous answer is %p',
+    answer => {
+      const req = buildReq({ ...allNo, 'something-else': answer });
 
-    expect(instance.getNextStep(req, {})).toBe('/changes/no-options');
-  });
+      expect(instance.getNextStep(req, {})).toBe('/changes/something-else');
+    }
+  );
 
-  it('goes to contact-us-by-email instead of confirm when every section is no and something else is yes', () => {
-    const req = buildReq({ ...allNo, 'something-else': 'yes' });
-
-    expect(instance.getNextStep(req, {})).toBe('/changes/contact-us-by-email');
-  });
-
-  it('keeps the next step when it is not confirm', () => {
+  it('keeps the next step when it is not a summary', () => {
     baseGetNextStep.mockReturnValue('/changes/something-else/edit');
 
     expect(instance.getNextStep(buildReq(allNo), {})).toBe(
