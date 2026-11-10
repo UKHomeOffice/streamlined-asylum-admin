@@ -338,6 +338,8 @@ const withBaseUrl = (req, route) => {
   return `${baseUrl.replace(/\/$/, '')}/${route.replace(/^\//, '')}`;
 };
 
+const isEdit = req => req.params?.action === 'edit';
+
 /*
  * Preserve HOF's edit-mode URL convention. If the user edits the multi-select
  * page and adds a new section, they should be sent into that section in edit
@@ -345,8 +347,9 @@ const withBaseUrl = (req, route) => {
  * the normal downstream route/summary behaviour.
  */
 const withEditSuffix = (req, config, route, nextRoute) => {
-  const isEdit = req.params?.action === 'edit';
-  return isEdit && nextRoute !== config.exitPoint ? `${route}/edit` : route;
+  return isEdit(req) && nextRoute !== config.exitPoint
+    ? `${route}/edit`
+    : route;
 };
 
 const getEntryPointNextRoute = (req, config, activeSections, state) => {
@@ -386,17 +389,8 @@ const getSectionStartBackLink = (state, route) =>
   state.sectionStartBackLinks?.[route] ||
   (state.sectionStartRoute === route ? state.sectionStartBackLink : undefined);
 
-const isEdit = req => req.params?.action === 'edit';
-
-const getCompletionNextRoute = (req, config, activeSections, state) => {
-  const completedSteps = asArray(req.sessionModel.get('steps'));
-  // Match HOF edit navigation: only unseen follow-up sections need continuing.
-  const remainingSections = isEdit(req)
-    ? activeSections.filter(section => !completedSteps.includes(section.start))
-    : activeSections;
-
-  return nextIncompleteSection(remainingSections, state)?.start || config.exitPoint;
-};
+const getCompletionNextRoute = (config, activeSections, state) =>
+  nextIncompleteSection(activeSections, state)?.start || config.exitPoint;
 
 const getAllSections = config =>
   getActiveSections(
@@ -444,9 +438,11 @@ const clearInactiveValues = (req, state) => {
 
 // Unticks the options behind a section, as if the user had deselected them on the entry page.
 const removeSectionSelection = (req, config, state, sectionId) => {
-  const removedValues = new Set(config.options
-    .filter(optionHasSection(sectionId))
-    .map(option => option.value));
+  const removedValues = new Set(
+    config.options
+      .filter(optionHasSection(sectionId))
+      .map(option => option.value)
+  );
   const selections = asArray(state.selections).filter(
     value => !removedValues.has(value)
   );
@@ -462,6 +458,104 @@ const removeSectionSelection = (req, config, state, sectionId) => {
   }
 
   return nextState;
+};
+
+const updateSectionState = (req, config, previousState, route) => {
+  const activeSections = getActiveSections(config, previousState.selections);
+  const noChangesSection = getNoChangesSection(activeSections, route, req);
+
+  if (noChangesSection) {
+    return markNoChanges(previousState, noChangesSection, route);
+  }
+
+  const completingSections = getCompletingSections(activeSections, route, req);
+  const resumedState = previousState.noChangesSection
+    ? {
+      ...previousState,
+      noChangesSection: undefined,
+      noChangesFrom: undefined
+    }
+    : previousState;
+  let state = invalidateReopenedSections(
+    resumedState,
+    activeSections,
+    route,
+    req
+  );
+
+  if (!completingSections.length) {
+    return state;
+  }
+
+  state = {
+    ...state,
+    completedSections: getCompletedSections(state, completingSections),
+    lastCompletionRoute: getLastCompletionRoute(
+      state,
+      route,
+      completingSections
+    )
+  };
+
+  const nextRoute = getCompletionNextRoute(config, activeSections, state);
+  return withSectionStartBackLink(state, config, nextRoute, route);
+};
+
+const resolveNoChanges = (req, config, state, continuing) => {
+  const point = config.noChangesPoint;
+  req.sessionModel.unset(point.field);
+
+  if (!state.noChangesSection || !continuing) {
+    return state;
+  }
+
+  const nextState = removeSectionSelection(
+    req,
+    config,
+    state,
+    state.noChangesSection
+  );
+  const nextRoute = getCompletionNextRoute(
+    config,
+    getActiveSections(config, nextState.selections),
+    nextState
+  );
+
+  return withSectionStartBackLink(
+    { ...nextState, noChangesNextRoute: nextRoute },
+    config,
+    nextRoute,
+    nextState.lastCompletionRoute || config.entryPoint
+  );
+};
+
+const getNoChangesLocals = (req, res, config, state) => {
+  const section = getSectionById(
+    getAllSections(config),
+    state.noChangesSection
+  );
+  const headerKey = section?.noChanges?.header;
+  const header =
+    headerKey && typeof req.translate === 'function'
+      ? req.translate(headerKey)
+      : headerKey;
+
+  // Set before HOF builds the page title and legend, which render from res.locals.
+  if (header && res.locals) {
+    res.locals.noChangesHeader = header;
+  }
+
+  return {
+    noChangesHeader: header,
+    backLink: state.noChangesFrom
+      ? withEditSuffix(
+        req,
+        config,
+        withBaseUrl(req, state.noChangesFrom),
+        state.noChangesFrom
+      )
+      : undefined
+  };
 };
 
 const multiSelectFollowUps = behaviourConfig => SuperClass =>
@@ -532,7 +626,11 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
           clearInactiveValues(req, state);
         } else if (this.options.route === config.noChangesPoint?.route) {
           if (!previousState.noChangesSection) {
-            callback(new Error('No follow-up section is awaiting a no-changes decision'));
+            callback(
+              new Error(
+                'No follow-up section is awaiting a no-changes decision'
+              )
+            );
             return;
           }
           state = this.resolveNoChanges(req, config, previousState);
@@ -569,81 +667,16 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
      * matches first, in which case the user is sent to the shared no-changes page.
      */
     updateSectionState(req, config, previousState) {
-      const route = this.options.route;
-      const activeSections = getActiveSections(
-        config,
-        previousState.selections
-      );
-      const noChangesSection = getNoChangesSection(activeSections, route, req);
-
-      if (noChangesSection) {
-        return markNoChanges(previousState, noChangesSection, route);
-      }
-
-      const completingSections = getCompletingSections(
-        activeSections,
-        route,
-        req
-      );
-      const resumedState = previousState.noChangesSection
-        ? {
-          ...previousState,
-          noChangesSection: undefined,
-          noChangesFrom: undefined
-        }
-        : previousState;
-      let state = invalidateReopenedSections(
-        resumedState,
-        activeSections,
-        route,
-        req
-      );
-
-      if (!completingSections.length) {
-        return state;
-      }
-
-      state = {
-        ...state,
-        completedSections: getCompletedSections(state, completingSections),
-        lastCompletionRoute: getLastCompletionRoute(
-          state,
-          route,
-          completingSections
-        )
-      };
-
-      const nextRoute = getCompletionNextRoute(req, config, activeSections, state);
-
-      return withSectionStartBackLink(state, config, nextRoute, route);
+      return updateSectionState(req, config, previousState, this.options.route);
     }
 
     // "Yes" unticks the section's option and moves on; "No" keeps state so getNextStep returns to the section start.
     resolveNoChanges(req, config, state) {
-      const point = config.noChangesPoint;
-      const continuing = this.isContinuingWithNoChanges(req, config);
-
-      req.sessionModel.unset(point.field);
-
-      if (!state.noChangesSection || !continuing) {
-        return state;
-      }
-
-      const nextState = removeSectionSelection(
-        req, config, state, state.noChangesSection
-      );
-      const nextRoute = getCompletionNextRoute(
+      return resolveNoChanges(
         req,
         config,
-        getActiveSections(config, nextState.selections),
-        nextState
-      );
-
-      return withSectionStartBackLink(
-        { ...nextState, noChangesNextRoute: nextRoute },
-        config,
-        nextRoute,
-        nextState.lastCompletionRoute || config.entryPoint
+        state,
+        this.isContinuingWithNoChanges(req, config)
       );
     }
 
@@ -679,7 +712,6 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
 
       if (this.isContinuingWithNoChanges(req, config)) {
         return getCompletionNextRoute(
-          req,
           config,
           getActiveSections(config, state.selections),
           state
@@ -691,32 +723,7 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
     }
 
     getNoChangesLocals(req, res, config, state) {
-      const section = getSectionById(
-        getAllSections(config),
-        state.noChangesSection
-      );
-      const headerKey = section?.noChanges?.header;
-      const header =
-        headerKey && typeof req.translate === 'function'
-          ? req.translate(headerKey)
-          : headerKey;
-
-      // Set before HOF builds the page title and legend, which render from res.locals.
-      if (header && res.locals) {
-        res.locals.noChangesHeader = header;
-      }
-
-      return {
-        noChangesHeader: header,
-        backLink: state.noChangesFrom
-          ? withEditSuffix(
-            req,
-            config,
-            withBaseUrl(req, state.noChangesFrom),
-            state.noChangesFrom
-          )
-          : undefined
-      };
+      return getNoChangesLocals(req, res, config, state);
     }
 
     locals(req, res) {
@@ -801,7 +808,7 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
          * incomplete section. If every selected section is complete, this behaviour
          * gets out of the way by sending the user to the configured exit point.
          */
-        nextRoute = getCompletionNextRoute(req, config, activeSections, state);
+        nextRoute = getCompletionNextRoute(config, activeSections, state);
       }
 
       if (!nextRoute) {

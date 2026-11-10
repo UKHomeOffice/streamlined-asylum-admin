@@ -30,14 +30,23 @@
  * - section `noChanges.editRoute` optionally reports the same rule from an edit-only page.
  */
 const SAA_NO_CHANGES_HEADER = 'pages.no-changes-made.headers';
+const PHOTO_IDENTITY_ROUTE = '/provide-photo-identity';
+const OWN_NAME_ROUTE = '/do-you-need-to-change-your-name';
+const SOMEONE_ELSE_NAME_ROUTE = '/do-you-need-to-change-someone-elses-name';
+const SOMEONE_ELSE_DOB_ROUTE = '/change-someone-else-date-of-birth';
+const SOMEONE_ELSE_NATIONALITY_ROUTE = '/change-someone-else-nationality';
+const OWN_NAME_FIELD = 'do-you-need-to-change-your-name';
+const SOMEONE_ELSE_NAME_FIELD = 'change-someone-elses-name';
+const SOMEONE_ELSE_DOB_FIELD = 'change-someone-else-date-of-birth';
+const SOMEONE_ELSE_NATIONALITY_FIELD = 'change-someone-else-nationality';
 
 // The photo identity page is shown once, last, when any contact detail is still selected.
 const photoIdentitySection = {
   id: 'photo-identity',
   order: 100,
-  start: '/provide-photo-identity',
-  completeOn: '/provide-photo-identity',
-  routes: ['/provide-photo-identity'],
+  start: PHOTO_IDENTITY_ROUTE,
+  completeOn: PHOTO_IDENTITY_ROUTE,
+  routes: [PHOTO_IDENTITY_ROUTE],
   fieldsToUnset: ['documents-update-contact']
 };
 
@@ -60,38 +69,38 @@ module.exports = {
       sections: [
         {
           id: 'name',
-          start: '/do-you-need-to-change-your-name',
+          start: OWN_NAME_ROUTE,
           completeOn: [
             {
-              route: '/do-you-need-to-change-someone-elses-name',
-              condition: { field: 'change-someone-elses-name', value: 'no' }
+              route: SOMEONE_ELSE_NAME_ROUTE,
+              condition: { field: SOMEONE_ELSE_NAME_FIELD, value: 'no' }
             },
             '/check-your-answers-someone-else-name',
             {
-              route: '/do-you-need-to-change-your-name',
+              route: OWN_NAME_ROUTE,
               condition: [
                 req => req.params?.action === 'edit',
-                { field: 'do-you-need-to-change-your-name', value: 'no' },
-                { field: 'change-someone-elses-name', value: 'yes' }
+                { field: OWN_NAME_FIELD, value: 'no' },
+                { field: SOMEONE_ELSE_NAME_FIELD, value: 'yes' }
               ]
             }
           ],
           noChanges: {
-            route: '/do-you-need-to-change-someone-elses-name',
-            editRoute: '/do-you-need-to-change-your-name',
+            route: SOMEONE_ELSE_NAME_ROUTE,
+            editRoute: OWN_NAME_ROUTE,
             when: [
-              { field: 'do-you-need-to-change-your-name', value: 'no' },
-              { field: 'change-someone-elses-name', value: 'no' }
+              { field: OWN_NAME_FIELD, value: 'no' },
+              { field: SOMEONE_ELSE_NAME_FIELD, value: 'no' }
             ],
             header: `${SAA_NO_CHANGES_HEADER}.name`
           },
           routes: [
-            '/do-you-need-to-change-your-name',
+            OWN_NAME_ROUTE,
             '/reason-name-change',
             '/new-name',
             '/new-name-evidence',
             '/check-your-answers-name',
-            '/do-you-need-to-change-someone-elses-name',
+            SOMEONE_ELSE_NAME_ROUTE,
             '/relationship-name-change',
             '/reason-someone-else-name-change',
             '/someone-else-new-name',
@@ -100,12 +109,12 @@ module.exports = {
           ],
           // Add the someone-else name loop key when its add-another story is built.
           fieldsToUnset: [
-            'do-you-need-to-change-your-name',
+            OWN_NAME_FIELD,
             'reason-name-change',
             'given-name',
             'family-name',
             'documents-new-name',
-            'change-someone-elses-name',
+            SOMEONE_ELSE_NAME_FIELD,
             'relationship-name-change',
             'reason-someone-else-name-change',
             'someone-else-old-given-name',
@@ -126,19 +135,19 @@ module.exports = {
           start: '/change-your-date-of-birth',
           completeOn: [
             {
-              route: '/change-someone-else-date-of-birth',
+              route: SOMEONE_ELSE_DOB_ROUTE,
               condition: {
-                field: 'change-someone-else-date-of-birth',
+                field: SOMEONE_ELSE_DOB_FIELD,
                 value: 'no'
               }
             },
             '/check-your-answers-someone-else-date-of-birth'
           ],
           noChanges: {
-            route: '/change-someone-else-date-of-birth',
+            route: SOMEONE_ELSE_DOB_ROUTE,
             when: [
               { field: 'change-your-date-of-birth', value: 'no' },
-              { field: 'change-someone-else-date-of-birth', value: 'no' }
+              { field: SOMEONE_ELSE_DOB_FIELD, value: 'no' }
             ],
             header: `${SAA_NO_CHANGES_HEADER}.date-of-birth`
           },
@@ -147,7 +156,7 @@ module.exports = {
             '/correct-date-of-birth',
             '/new-date-of-birth-evidence',
             '/check-your-answers-date-of-birth',
-            '/change-someone-else-date-of-birth',
+            SOMEONE_ELSE_DOB_ROUTE,
             '/relationship-date-of-birth',
             '/someone-else-correct-date-of-birth',
             '/someone-else-new-date-of-birth-evidence',
@@ -157,7 +166,7 @@ module.exports = {
             'change-your-date-of-birth',
             'correct-date-of-birth',
             'documents-new-dob',
-            'change-someone-else-date-of-birth',
+            SOMEONE_ELSE_DOB_FIELD,
             'someoneelsenewdob',
             'relationship-date-of-birth',
             'someone-else-correct-date-of-birth-given-name',
@@ -177,19 +186,19 @@ module.exports = {
           start: '/nationality-change',
           completeOn: [
             {
-              route: '/change-someone-else-nationality',
+              route: SOMEONE_ELSE_NATIONALITY_ROUTE,
               condition: {
-                field: 'change-someone-else-nationality',
+                field: SOMEONE_ELSE_NATIONALITY_FIELD,
                 value: 'no'
               }
             },
             '/check-your-answers-someone-else-nationality'
           ],
           noChanges: {
-            route: '/change-someone-else-nationality',
+            route: SOMEONE_ELSE_NATIONALITY_ROUTE,
             when: [
               { field: 'change-your-nationality', value: 'no' },
-              { field: 'change-someone-else-nationality', value: 'no' }
+              { field: SOMEONE_ELSE_NATIONALITY_FIELD, value: 'no' }
             ],
             header: `${SAA_NO_CHANGES_HEADER}.nationality`
           },
@@ -199,7 +208,7 @@ module.exports = {
             '/reason-nationality-change',
             '/upload-nationality-evidence',
             '/check-your-answers-nationality',
-            '/change-someone-else-nationality',
+            SOMEONE_ELSE_NATIONALITY_ROUTE,
             '/relationship-nationality-change',
             '/someone-else-correct-nationality',
             '/reason-someone-else-nationality-change',
@@ -209,7 +218,7 @@ module.exports = {
           // Add the page fields and loop key as the nationality page stories are built.
           fieldsToUnset: [
             'change-your-nationality',
-            'change-someone-else-nationality'
+            SOMEONE_ELSE_NATIONALITY_FIELD
           ]
         }
       ]

@@ -340,32 +340,34 @@ describe('multi-select follow-ups behaviour', () => {
   });
 
   test.each([
-    [{}, ['/second-start'], '/changes/second-start'],
-    [{ action: 'edit' }, ['/second-start'], '/changes/confirm'],
-    [{ action: 'edit' }, [], '/changes/second-start/edit']
-  ])('completion honours HOF edit history with params %p and steps %p', (params, steps, nextRoute) => {
-    const controller = buildController('/first-end');
-    const req = {
-      baseUrl: '/changes',
-      params,
-      form: { options: {}, values: {} },
-      sessionModel: buildSessionModel({
-        steps,
-        'changes-follow-ups': {
-          selections: ['first', 'second'],
-          activeSections: ['first', 'second'],
-          completedSections: []
-        }
-      })
-    };
+    [{}, ['/second-start'], [], '/changes/second-start'],
+    [{ action: 'edit' }, ['/second-start'], [], '/changes/second-start/edit'],
+    [{ action: 'edit' }, ['/second-start'], ['second'], '/changes/confirm'],
+    [{ action: 'edit' }, [], [], '/changes/second-start/edit']
+  ])('completion uses section state with params %p, steps %p and completed sections %p',
+    (params, steps, completedSections, nextRoute) => {
+      const controller = buildController('/first-end');
+      const req = {
+        baseUrl: '/changes',
+        params,
+        form: { options: {}, values: {} },
+        sessionModel: buildSessionModel({
+          steps,
+          'changes-follow-ups': {
+            selections: ['first', 'second'],
+            activeSections: ['first', 'second'],
+            completedSections
+          }
+        })
+      };
 
-    controller.saveValues(req, {}, err => expect(err).toBeUndefined());
-    expect(controller.getNextStep(req, {})).toBe(nextRoute);
-    expect(req.sessionModel.get('changes-follow-ups').completedSections).toEqual(['first']);
-    if (nextRoute === '/changes/confirm') {
-      expect(req.sessionModel.get('changes-follow-ups').sectionStartRoute).toBeUndefined();
-    }
-  });
+      controller.saveValues(req, {}, err => expect(err).toBeUndefined());
+      expect(controller.getNextStep(req, {})).toBe(nextRoute);
+      expect(req.sessionModel.get('changes-follow-ups').completedSections).toEqual([...completedSections, 'first']);
+      if (nextRoute === '/changes/confirm') {
+        expect(req.sessionModel.get('changes-follow-ups').sectionStartRoute).toBeUndefined();
+      }
+    });
 
   test('exit page back link returns to the last completed section route', () => {
     const controller = buildController('/exit');

@@ -89,6 +89,14 @@ const answerNo = section =>
     section.noChanges.when.map(condition => [condition.field, condition.value])
   );
 
+const completeSelectedSections = req => {
+  const state = req.sessionModel.get(config.stateKey);
+  req.sessionModel.set(config.stateKey, {
+    ...state,
+    completedSections: state.activeSections.slice()
+  });
+};
+
 describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
   const suffix = edit ? '/edit' : '';
 
@@ -144,7 +152,7 @@ describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
         'no-changes-made': 'yes'
       });
 
-      const nextRoute = edit ? '/provide-photo-identity' : '/your-phone-number';
+      const nextRoute = '/your-phone-number';
       expect(continued.url).toBe(`${app.baseUrl}${nextRoute}${suffix}`);
       expect(req.sessionModel.get(config.field)).toEqual(['phone-number']);
       section.fieldsToUnset.forEach(field => {
@@ -482,6 +490,7 @@ describe('contact-detail edit completion', () => {
         'change-someone-elses-name': 'no',
         'something-else': 'no'
       });
+      completeSelectedSections(req);
       expect(
         post(
           '/do-you-need-to-change-your-name',
@@ -509,13 +518,14 @@ describe('contact-detail edit completion', () => {
     ['email-address', '/check-your-answers-email'],
     ['phone-number', '/check-your-answers-phone-number']
   ])(
-    '%s returns to confirm without repeating previously visited sections',
+    '%s returns to confirm without repeating previously completed sections',
     (selection, route) => {
       const selections = [...new Set([selection, 'phone-number'])];
       const req = buildRequest(selections, true, {
         steps: sections.flatMap(section => section.routes),
         'edit-return-path': `${app.baseUrl}/confirm`
       });
+      completeSelectedSections(req);
       expect(post(route, req).url).toBe(`${app.baseUrl}/confirm`);
       expect(req.sessionModel.get(config.field)).toEqual(selections);
     }
@@ -546,11 +556,54 @@ describe('contact-detail edit completion', () => {
     );
   });
 
-  test('confirming no Name changes returns to confirm when the remaining sections were visited', () => {
+  test.each([false, true])(
+    'returning to Email CYA after starting Phone does not skip the unfinished update (edit=%s)',
+    edit => {
+      const suffix = edit ? '/edit' : '';
+      const req = buildRequest(['name'], edit, {
+        steps: ['/personal-details', config.entryPoint, ...sections.find(section => section.id === 'name').routes],
+        'edit-return-path': `${app.baseUrl}/confirm`
+      });
+      completeSelectedSections(req);
+      expect(post(config.entryPoint, req, {
+        [config.field]: ['name', 'email-address', 'phone-number']
+      }, true).url).toBe(`${app.baseUrl}/new-email-address${suffix}`);
+      post('/new-email-address', req, {
+        'new-email-address': 'updated@example.com',
+        'confirm-new-email-address': 'updated@example.com'
+      }, true);
+      expect(post('/check-your-answers-email', req, {}, true).url)
+        .toBe(`${app.baseUrl}/your-phone-number${suffix}`);
+      expect(post('/your-phone-number', req, {
+        'your-phone-number': 'yes',
+        'whose-phone-number': 'mine'
+      }, true).url).toBe(`${app.baseUrl}/new-phone-number${suffix}`);
+      expect(req.sessionModel.get('steps')).toContain('/your-phone-number');
+      expect(req.sessionModel.get(config.stateKey).completedSections).not.toContain('phone-number');
+
+      expect(post('/check-your-answers-email', req, {}, true).url)
+        .toBe(`${app.baseUrl}/your-phone-number${suffix}`);
+      expect(req.sessionModel.get('new-phone-number')).toBeUndefined();
+      expect(req.sessionModel.get(config.stateKey).completedSections).not.toContain('phone-number');
+
+      post('/new-phone-number', req, {
+        'new-phone-number': '07700900001',
+        'confirm-new-phone-number': '07700900001'
+      }, true);
+      expect(post('/check-your-answers-phone-number', req, {}, true).url)
+        .toBe(`${app.baseUrl}/provide-photo-identity${suffix}`);
+      expect(req.sessionModel.get(config.stateKey).completedSections).toContain('phone-number');
+      expect(post('/provide-photo-identity', req, {}, true).url)
+        .toBe(`${app.baseUrl}${edit ? '/confirm' : config.exitPoint}`);
+    }
+  );
+
+  test('confirming no Name changes returns to confirm when the remaining sections were completed', () => {
     const req = buildRequest(['name', 'phone-number'], true, {
       steps: sections.flatMap(section => section.routes),
       'edit-return-path': `${app.baseUrl}/confirm`
     });
+    completeSelectedSections(req);
     const name = noChangesSections.find(section => section.id === 'name');
     expect(post(name.noChanges.route, req, answerNo(name)).url).toBe(
       `${app.baseUrl}/no-changes-made/edit`
