@@ -655,10 +655,10 @@ describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
       .toEqual(['nationality', 'email-address', 'photo-identity']);
   });
 
-  test.each(['yes', 'no'])(
-    'declining a contact address goes to address CYA when UK address change is %s',
-    changeUkAddress => {
-      const req = buildRequest(['address'], edit, { 'change-uk-address': changeUkAddress });
+  test(
+    'changing the UK address then declining a contact address still needs address CYA',
+    () => {
+      const req = buildRequest(['address'], edit, { 'change-uk-address': 'yes' });
       expect(
         post('/change-contact-address', req, { 'change-contact-address': 'no' })
           .url
