@@ -208,6 +208,33 @@
     "maxlength": "Reason must be between 1 and 500 characters",
     "notUrl": "Reason must not contain a URL"
   },
+  "contact-address-full-name": {
+    "required": "Enter the full name of the person you want to receive your letters"
+  },
+  "contact-address-line-1": {
+    "required": "Enter the first line of your contact address",
+    "regex": "First line of address cannot include special characters such as (), ./ & -",
+    "notUrl": "First line of address cannot contain a URL",
+    "maxlength": "First line of address should be no more than 60 characters, including spaces"
+  },
+  "contact-address-line-2": {
+    "notUrl": "Second line of address cannot contain a URL",
+    "maxlength": "Second line of address should be no more than 60 characters, including spaces"
+  },
+  "contact-address-town-or-city": {
+    "required": "Enter the town or city of your contact address",
+    "regex": "Town or city cannot include special characters such as (), ./ & -",
+    "notUrl": "Town or city cannot contain a URL",
+    "maxlength": "Town or city should be no more than 60 characters, including spaces"
+  },
+  "contact-address-county": {
+    "maxlength": "County should be no more than 60 characters, including spaces",
+    "notUrl": "County cannot contain a URL"
+  },
+  "contact-address-postcode": {
+    "required": "Enter the postcode of your contact address",
+    "postcode": "Enter a real UK postcode"
+  },
   "home-address-line-1": {
     "required": "Enter address line 1"
   },

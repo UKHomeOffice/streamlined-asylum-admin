@@ -170,7 +170,8 @@
     "captionHeading": "Update personal details"
   },
   "contact-address": {
-    "header": "Where should we send letters?"
+    "header": "Where should we send letters?",
+    "captionHeading": "Update personal details"
   },
   "check-your-answers-address": {
     "header": "Check your answers"

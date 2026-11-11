@@ -487,7 +487,14 @@ const steps = {
     next: '/contact-address'
   },
   '/contact-address': {
-    // Page fields to be added in its story.
+    fields: [
+      'contact-address-full-name',
+      'contact-address-line-1',
+      'contact-address-line-2',
+      'contact-address-town-or-city',
+      'contact-address-county',
+      'contact-address-postcode'
+    ],
     next: '/check-your-answers-address'
   },
   '/check-your-answers-address': {

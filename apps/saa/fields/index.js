@@ -324,6 +324,49 @@ module.exports = {
     attributes: [{ attribute: 'rows', value: 5 }],
     isPageHeading: true
   },
+  'contact-address-full-name': {
+    mixin: 'input-text',
+    validate: ['required'],
+    labelClassName: 'govuk-label--s'
+  },
+  'contact-address-line-1': {
+    mixin: 'input-text',
+    validate: [
+      'required',
+      'notUrl',
+      { type: 'regex', arguments: /^[^(),./&-]*$/ },
+      { type: 'maxlength', arguments: 60 }
+    ],
+    labelClassName: 'govuk-label--s'
+  },
+  'contact-address-line-2': {
+    mixin: 'input-text',
+    validate: ['notUrl', { type: 'maxlength', arguments: 60 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'contact-address-town-or-city': {
+    mixin: 'input-text',
+    validate: [
+      'required',
+      'notUrl',
+      { type: 'regex', arguments: /^[^(),./&-]*$/ },
+      { type: 'maxlength', arguments: 60 }
+    ],
+    labelClassName: 'govuk-label--s',
+    className: ['govuk-input', 'govuk-!-width-two-thirds']
+  },
+  'contact-address-county': {
+    mixin: 'input-text',
+    validate: ['notUrl', { type: 'maxlength', arguments: 60 }],
+    labelClassName: 'govuk-label--s',
+    className: ['govuk-input', 'govuk-!-width-two-thirds']
+  },
+  'contact-address-postcode': {
+    mixin: 'input-text',
+    validate: ['required', 'postcode'],
+    labelClassName: 'govuk-label--s',
+    className: ['govuk-input', 'govuk-input--width-10']
+  },
   'home-address-line-1': {
     mixin: 'input-text',
     validate: ['required'],
@@ -336,17 +379,20 @@ module.exports = {
   'home-address-town-or-city': {
     mixin: 'input-text',
     validate: ['required', 'notUrl', { type: 'maxlength', arguments: 60 }],
-    labelClassName: 'govuk-label--s'
+    labelClassName: 'govuk-label--s',
+    className: ['govuk-input', 'govuk-!-width-two-thirds']
   },
   'home-address-county': {
     mixin: 'input-text',
     validate: ['notUrl', { type: 'maxlength', arguments: 60 }],
-    labelClassName: 'govuk-label--s'
+    labelClassName: 'govuk-label--s',
+    className: ['govuk-input', 'govuk-!-width-two-thirds']
   },
   'home-address-postcode': {
     mixin: 'input-text',
     validate: ['required', 'postcode'],
-    labelClassName: 'govuk-label--s'
+    labelClassName: 'govuk-label--s',
+    className: ['govuk-input', 'govuk-input--width-10']
   },
   'home-address-moved-date': dateComponent('home-address-moved-date', {
     mixin: 'input-date',

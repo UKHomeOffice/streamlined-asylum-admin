@@ -194,6 +194,98 @@ describe('contact address change reason', () => {
   });
 });
 
+describe('contact address fields', () => {
+  test('includes the recipient and address fields in order with the requested caption and hint', () => {
+    expect(app.steps['/contact-address'].fields).toEqual([
+      'contact-address-full-name',
+      'contact-address-line-1',
+      'contact-address-line-2',
+      'contact-address-town-or-city',
+      'contact-address-county',
+      'contact-address-postcode'
+    ]);
+    expect(pages['contact-address'].captionHeading).toBe('Update personal details');
+    expect(fieldTranslations['contact-address-full-name']).toEqual({
+      label: 'Full name',
+      hint: 'The name of the person you want to receive your letters'
+    });
+    expect(app.steps['/contact-address'].fields.map(field => fieldTranslations[field].label))
+      .toEqual([
+        'Full name', 'Address line 1', 'Address line 2 (optional)',
+        'Town or city', 'County (optional)', 'Postcode'
+      ]);
+  });
+
+  test.each([
+    ['contact-address-full-name', '', 'required'],
+    ['contact-address-full-name', 'Alex Smith', undefined],
+    ['contact-address-line-1', '', 'required'],
+    ['contact-address-line-1', '1 High Street', undefined],
+    ['contact-address-line-1', 'a'.repeat(60), undefined],
+    ['contact-address-line-1', 'a'.repeat(61), 'maxlength'],
+    ['contact-address-line-1', 'https://example.com', 'notUrl'],
+    ['contact-address-line-2', '', undefined],
+    ['contact-address-line-2', 'a'.repeat(60), undefined],
+    ['contact-address-line-2', 'a'.repeat(61), 'maxlength'],
+    ['contact-address-line-2', 'https://example.com', 'notUrl'],
+    ['contact-address-town-or-city', '', 'required'],
+    ['contact-address-town-or-city', 'a'.repeat(60), undefined],
+    ['contact-address-town-or-city', 'a'.repeat(61), 'maxlength'],
+    ['contact-address-town-or-city', 'https://example.com', 'notUrl'],
+    ['contact-address-county', '', undefined],
+    ['contact-address-county', 'a'.repeat(60), undefined],
+    ['contact-address-county', 'a'.repeat(61), 'maxlength'],
+    ['contact-address-county', 'https://example.com', 'notUrl'],
+    ['contact-address-postcode', '', 'required'],
+    ['contact-address-postcode', 'SW1A 1AA', undefined],
+    ['contact-address-postcode', 'invalid', 'postcode']
+  ])('validates %s value "%s" with error %s', (field, value, errorType) => {
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: value };
+    const controller = buildController('/contact-address', req);
+
+    const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeFalsy();
+    }
+  });
+
+  test.each(
+    ['contact-address-line-1', 'contact-address-town-or-city'].flatMap(field =>
+      ['(', ')', ',', '.', '/', '&', '-'].map(character => [field, character])
+    )
+  )('rejects %s containing "%s"', (field, character) => {
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: `Some ${character} place` };
+    const controller = buildController('/contact-address', req);
+
+    expect(controller.validateField(field, req)).toMatchObject({
+      key: field,
+      type: 'regex'
+    });
+  });
+
+  test.each(['contact-address-line-1', 'contact-address-town-or-city'])(
+    'allows unlisted characters and counts spaces towards the limit in %s',
+    field => {
+      const req = buildRequest(['address']);
+      const controller = buildController('/contact-address', req);
+      for (const value of ["St John's", 'Caf\u00e9', `${'a'.repeat(29)} ${'b'.repeat(30)}`]) {
+        req.form.values = { [field]: value };
+        expect(controller.validateField(field, req)).toBeFalsy();
+      }
+      req.form.values = { [field]: `${'a'.repeat(30)} ${'b'.repeat(30)}` };
+      expect(controller.validateField(field, req)).toMatchObject({
+        key: field,
+        type: 'maxlength'
+      });
+    }
+  );
+});
+
 describe.each([
   ['home-address-town-or-city', 'required'],
   ['home-address-county', undefined]

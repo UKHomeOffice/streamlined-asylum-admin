@@ -401,6 +401,25 @@
   "reason-contact-address-change": {
     "label": "Why do you need us to send letters to a different address?"
   },
+  "contact-address-full-name": {
+    "label": "Full name",
+    "hint": "The name of the person you want to receive your letters"
+  },
+  "contact-address-line-1": {
+    "label": "Address line 1"
+  },
+  "contact-address-line-2": {
+    "label": "Address line 2 (optional)"
+  },
+  "contact-address-town-or-city": {
+    "label": "Town or city"
+  },
+  "contact-address-county": {
+    "label": "County (optional)"
+  },
+  "contact-address-postcode": {
+    "label": "Postcode"
+  },
   "home-address-line-1": {
     "label": "Address line 1"
   },
