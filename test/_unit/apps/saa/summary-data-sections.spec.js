@@ -278,14 +278,35 @@ describe('name rows on the confirm page', () => {
     });
   });
 
-  test.each(['no', undefined])('hides the reason when the name change answer is %p', answer => {
-    const reasonRow = sections.name.steps.find(entry => entry.field === 'reason-name-change');
+  test.each(['no', undefined])('hides own-name details when the name change answer is %p', answer => {
+    const detailRows = sections.name.steps.filter(entry => entry.field !== 'do-you-need-to-change-your-name');
     const req = createRequest({
       'do-you-need-to-change-your-name': answer,
-      'reason-name-change': 'marriage'
+      'reason-name-change': 'marriage',
+      'given-name': 'Old',
+      'family-name': 'Name'
     });
 
-    expect(new ConfirmPage().getFieldsForRow([reasonRow], req)).toEqual([]);
+    expect(new ConfirmPage().getFieldsForRow(detailRows, req)).toEqual([]);
+  });
+
+  describe('personal-details selection summary', () => {
+    test.each(['yes', 'no'])('only lists selected changes when personal details is Yes (answer=%s)', answer => {
+      const req = {
+        baseUrl: '/changes',
+        sessionModel: {
+          get: key => ({
+            'change-personal-details': answer,
+            'changes-to-contact-details': ['name', 'date-of-birth']
+          })[key]
+        },
+        translate: keys => [].concat(keys)[0],
+        form: { options: { fieldsConfig: {}, steps: {} } }
+      };
+      const Page = SummaryLabels(Summary(class {}));
+      const rows = new Page().getFieldsForRow(sections['personal-details'].steps, req);
+      expect(rows.some(row => row.field === 'changes-to-contact-details')).toBe(answer === 'yes');
+    });
   });
 
   test('keeps the someone else name decision only in its dedicated section', () => {
@@ -325,6 +346,7 @@ describe('name rows on the confirm page', () => {
 
   test('New name Change links go to the name check your answers page', () => {
     const req = createRequest({
+      'do-you-need-to-change-your-name': 'yes',
       'given-name': 'Alex',
       'family-name': 'Smith'
     });
@@ -485,14 +507,14 @@ describe('evidence rows on the confirm page', () => {
 });
 
 describe('non-aggregate DOB evidence on the confirm page', () => {
-  const rows = sections['date-of-birth'].steps;
+  const rows = sections['date-of-birth'].steps.filter(row => row.field === 'documents-new-dob');
   const ConfirmPage = SummaryLabels(Summary(class {}));
-  const createRequest = (selection, documents) => ({
+  const createRequest = (ownDecision, documents) => ({
     baseUrl: '/changes',
     sessionModel: {
       get: key =>
         ({
-          'change-personal-details': selection,
+          'change-your-date-of-birth': ownDecision,
           'documents-new-dob': documents
         })[key]
     },
@@ -527,12 +549,12 @@ describe('non-aggregate DOB evidence on the confirm page', () => {
   );
 
   test.each([undefined, 'no'])(
-    'does not display fallback text when the section selection is %p',
-    selection => {
+    'does not display fallback text when the own DOB decision is %p',
+    ownDecision => {
       expect(
         new ConfirmPage().getFieldsForRow(
           rows,
-          createRequest(selection, undefined)
+          createRequest(ownDecision, undefined)
         )
       ).toEqual([]);
     }

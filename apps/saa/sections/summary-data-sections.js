@@ -31,7 +31,7 @@ const emailAddressRows = emailAddressSummary['email-address'].steps.map(
 const dateOfBirthRows = dateOfBirthSummary['date-of-birth'].steps.map(row => ({
   ...row,
   changeLink: `${SAA_BASE_URL}/check-your-answers-date-of-birth`,
-  dependsOn: 'change-personal-details'
+  dependsOn: 'change-your-date-of-birth'
 }));
 
 // Same rows as /check-your-answers-phone-number; Change goes back to that page.
@@ -154,6 +154,7 @@ module.exports = {
       {
         step: '/changes-to-contact-details',
         field: 'changes-to-contact-details',
+        dependsOn: 'change-personal-details',
         parse: list => (Array.isArray(list) ? list.join('\n') : list)
       }
     ]
@@ -173,6 +174,7 @@ module.exports = {
       {
         step: '/new-name',
         field: 'given-name',
+        dependsOn: 'do-you-need-to-change-your-name',
         changeLink: `${SAA_BASE_URL}/check-your-answers-name`,
         parse: (value, req) => {
           const newName = [
