@@ -374,7 +374,15 @@ const steps = {
     next: '/home-address'
   },
   '/home-address': {
-    // Address, moved date and letter-delivery fields belong to its Address story.
+    fields: [
+      'home-address-line-1',
+      'home-address-line-2',
+      'home-address-town-or-city',
+      'home-address-county',
+      'home-address-postcode',
+      'home-address-moved-date',
+      'send-letters-to-home-address'
+    ],
     forks: [
       {
         target: '/change-contact-address',

@@ -123,7 +123,8 @@
     "header": "Have you moved to a new address in the UK?"
   },
   "home-address": {
-    "header": "UK address where you live now"
+    "header": "UK address where you live now",
+    "captionHeading": "Update personal details"
   },
   "new-email-address": {
     "header": "Change your email address",

@@ -304,6 +304,46 @@ module.exports = {
     matchField: 'new-email-address',
     labelClassName: 'govuk-label--s'
   },
+  'home-address-line-1': {
+    mixin: 'input-text',
+    validate: ['required'],
+    labelClassName: 'govuk-label--s'
+  },
+  'home-address-line-2': {
+    mixin: 'input-text',
+    labelClassName: 'govuk-label--s'
+  },
+  'home-address-town-or-city': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 60 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'home-address-county': {
+    mixin: 'input-text',
+    validate: ['notUrl', { type: 'maxlength', arguments: 60 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'home-address-postcode': {
+    mixin: 'input-text',
+    validate: ['required', 'postcode'],
+    labelClassName: 'govuk-label--s'
+  },
+  'home-address-moved-date': dateComponent('home-address-moved-date', {
+    mixin: 'input-date',
+    validate: [
+      'required',
+      'date',
+      { type: 'after', arguments: '1900-01-01' }
+    ],
+    legend: { className: 'govuk-label--s' }
+  }),
+  'send-letters-to-home-address': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    legend: { className: 'govuk-label--s' }
+  },
   'change-your-date-of-birth': {
     mixin: 'radio-group',
     options: ['yes', 'no'],

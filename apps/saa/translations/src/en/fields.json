@@ -376,6 +376,36 @@
   "confirm-new-email-address": {
     "label": "Confirm new email address"
   },
+  "home-address-line-1": {
+    "label": "Address line 1"
+  },
+  "home-address-line-2": {
+    "label": "Address line 2 (optional)"
+  },
+  "home-address-town-or-city": {
+    "label": "Town or city"
+  },
+  "home-address-county": {
+    "label": "County (optional)"
+  },
+  "home-address-postcode": {
+    "label": "Postcode"
+  },
+  "home-address-moved-date": {
+    "legend": "When did you move to this address?",
+    "hint": "For example, 27 3 2020"
+  },
+  "send-letters-to-home-address": {
+    "legend": "Can we send letters to this address?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
   "change-your-date-of-birth": {
     "legend": "Do you need to change your date of birth?",
     "options": {

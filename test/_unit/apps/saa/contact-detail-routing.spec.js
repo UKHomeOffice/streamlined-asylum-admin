@@ -25,6 +25,23 @@ const sections = followUps.getActiveSections(
 );
 const noChangesSections = sections.filter(section => section.noChanges);
 
+test('home address includes the required letter-delivery radio question', () => {
+  const field = 'send-letters-to-home-address';
+  expect(app.steps['/home-address'].fields).toContain(field);
+  expect(fields[field]).toMatchObject({
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required']
+  });
+  expect(fieldTranslations[field]).toEqual({
+    legend: 'Can we send letters to this address?',
+    options: {
+      yes: { label: 'Yes' },
+      no: { label: 'No' }
+    }
+  });
+});
+
 const buildRequest = (selections, edit = false, values = {}) => ({
   baseUrl: app.baseUrl,
   params: edit ? { action: 'edit' } : {},
@@ -62,6 +79,83 @@ const buildController = (route, req) => {
   );
   return new Composed(options);
 };
+
+describe.each([
+  ['home-address-town-or-city', 'required'],
+  ['home-address-county', undefined]
+])('home address %s validation', (field, emptyError) => {
+  test.each([
+    ['London', undefined],
+    ['Newcastle upon Tyne', undefined],
+    [`${'a'.repeat(29)} ${'b'.repeat(30)}`, undefined],
+    [`${'a'.repeat(30)} ${'b'.repeat(30)}`, 'maxlength'],
+    ['https://example.com', 'notUrl'],
+    ['London www.example.com', 'notUrl'],
+    ['', emptyError]
+  ])('validates "%s" with error %s', (value, errorType) => {
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: value };
+    const controller = buildController('/home-address', req);
+
+    const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeUndefined();
+    }
+  });
+});
+
+describe('home address postcode validation', () => {
+  test.each([
+    ['SW1A 1AA', undefined],
+    ['sw1a 1aa', undefined],
+    ['SW1A1AA', undefined],
+    ['M1 1AE', undefined],
+    ['not a postcode', 'postcode'],
+    ['12345', 'postcode'],
+    ['SW1A', 'postcode'],
+    ['', 'required']
+  ])('validates "%s" with error %s', (value, errorType) => {
+    const field = 'home-address-postcode';
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: value };
+    const controller = buildController('/home-address', req);
+
+    const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeUndefined();
+    }
+  });
+});
+
+describe('home address moved date validation', () => {
+  test.each([
+    ['1899-12-31', 'after'],
+    ['1900-01-01', 'after'],
+    ['1900-01-02', undefined],
+    ['2020-03-27', undefined],
+    ['2020-02-30', 'date'],
+    ['', 'required']
+  ])('validates "%s" with error %s', (value, errorType) => {
+    const field = 'home-address-moved-date';
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: value };
+    const controller = buildController('/home-address', req);
+
+    const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeUndefined();
+    }
+  });
+});
 
 const post = (route, req, values = {}, complete = false) => {
   req.form.values = values;

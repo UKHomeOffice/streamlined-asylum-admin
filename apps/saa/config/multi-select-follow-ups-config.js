@@ -271,11 +271,16 @@ module.exports = {
             '/contact-address',
             '/check-your-answers-address'
           ],
-          // Add the page fields as the address page stories are built.
           fieldsToUnset: [
             'change-uk-address',
             'send-letters-to-home-address',
-            'change-contact-address'
+            'change-contact-address',
+            'home-address-line-1',
+            'home-address-line-2',
+            'home-address-town-or-city',
+            'home-address-county',
+            'home-address-postcode',
+            'home-address-moved-date'
           ]
         },
         photoIdentitySection
