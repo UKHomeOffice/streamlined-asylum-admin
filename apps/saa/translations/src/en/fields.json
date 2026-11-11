@@ -376,6 +376,17 @@
   "confirm-new-email-address": {
     "label": "Confirm new email address"
   },
+  "change-uk-address": {
+    "legend": "Have you moved to a new address in the UK?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
   "home-address-line-1": {
     "label": "Address line 1"
   },

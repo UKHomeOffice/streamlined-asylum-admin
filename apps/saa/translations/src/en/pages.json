@@ -120,7 +120,7 @@
     "header": "Provide a photo identity document to update your contact details"
   },
   "change-uk-address": {
-    "header": "Have you moved to a new address in the UK?"
+    "captionHeading": "Update personal details"
   },
   "home-address": {
     "header": "UK address where you live now",

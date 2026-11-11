@@ -80,6 +80,45 @@ const buildController = (route, req) => {
   return new Composed(options);
 };
 
+describe('change UK address question', () => {
+  test('includes a Yes/No radio question and personal details caption', () => {
+    expect(app.steps['/change-uk-address'].fields).toEqual(['change-uk-address']);
+    expect(fields['change-uk-address']).toMatchObject({
+      mixin: 'radio-group',
+      options: ['yes', 'no'],
+      validate: ['required'],
+      isPageHeading: true
+    });
+    expect(pages['change-uk-address'].captionHeading).toBe('Update personal details');
+    expect(fieldTranslations['change-uk-address']).toEqual({
+      legend: 'Have you moved to a new address in the UK?',
+      options: {
+        yes: { label: 'Yes' },
+        no: { label: 'No' }
+      }
+    });
+  });
+
+  test.each([
+    ['yes', undefined],
+    ['no', undefined],
+    ['', 'required']
+  ])('validates "%s" with error %s', (value, errorType) => {
+    const field = 'change-uk-address';
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: value };
+    const controller = buildController('/change-uk-address', req);
+
+    const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeUndefined();
+    }
+  });
+});
+
 describe.each([
   ['home-address-town-or-city', 'required'],
   ['home-address-county', undefined]

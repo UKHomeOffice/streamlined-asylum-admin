@@ -360,7 +360,7 @@ const steps = {
     next: '/do-you-need-add-remove-dependant'
   },
   '/change-uk-address': {
-    // Page fields and validation belong to its Address story.
+    fields: ['change-uk-address'],
     forks: [
       {
         target: '/change-contact-address',

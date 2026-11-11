@@ -197,6 +197,9 @@
     "email": "Enter a real new email address",
     "matchField": "Email address must be the same"
   },
+  "change-uk-address": {
+    "required": "Select if you have a new UK  address"
+  },
   "home-address-line-1": {
     "required": "Enter address line 1"
   },
