@@ -564,7 +564,7 @@ steps:
       failure: ignore
       icon.url: https://readme.drone.io/logo.svg
       template: >
-            *✘ {{ uppercasefirst build.status }}*: CRON Job `tear_down_pr_envs` for *Streamlined Asylum Admin* has failed.
+            *✘ {{ uppercasefirst build.status }}*: CRON Job `tear_down_pr_envs` for *Send information for your asylum claim* has failed.
 
             Branch <https://github.com/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.branch }}|{{build.branch}}> | Commit <https://github.com/{{ repo.owner }}/{{ repo.name }}/commit/{{ build.commit }}|{{ truncate build.commit 8 }}>
 
@@ -588,7 +588,7 @@ steps:
       failure: ignore
       icon.url: https://readme.drone.io/logo.svg
       template: >
-            *✘ {{ uppercasefirst build.status }}*: CRON Job `security_scans` for *Streamlined Asylum Admin* has failed.
+            *✘ {{ uppercasefirst build.status }}*: CRON Job `security_scans` for *Send information for your asylum claim* has failed.
 
             Branch <https://github.com/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.branch }}|{{build.branch}}> | Commit <https://github.com/{{ repo.owner }}/{{ repo.name }}/commit/{{ build.commit }}|{{ truncate build.commit 8 }}>
 
