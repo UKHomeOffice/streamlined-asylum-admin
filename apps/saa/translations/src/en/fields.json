@@ -398,6 +398,9 @@
       }
     }
   },
+  "reason-contact-address-change": {
+    "label": "Why do you need us to send letters to a different address?"
+  },
   "home-address-line-1": {
     "label": "Address line 1"
   },

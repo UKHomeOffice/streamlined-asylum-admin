@@ -318,6 +318,12 @@ module.exports = {
     className: ['govuk-radios', 'govuk-radios--inline'],
     legend: { className: 'visuallyhidden' }
   },
+  'reason-contact-address-change': {
+    mixin: 'textarea',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 500 }],
+    attributes: [{ attribute: 'rows', value: 5 }],
+    isPageHeading: true
+  },
   'home-address-line-1': {
     mixin: 'input-text',
     validate: ['required'],

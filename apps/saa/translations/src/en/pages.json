@@ -167,7 +167,7 @@
     }
   },
   "reason-contact-address-change": {
-    "header": "Why do you need us to send letters to a different address?"
+    "captionHeading": "Update personal details"
   },
   "contact-address": {
     "header": "Where should we send letters?"

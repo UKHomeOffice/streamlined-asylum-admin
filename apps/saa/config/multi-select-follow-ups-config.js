@@ -267,6 +267,7 @@ module.exports = {
             'change-uk-address',
             'send-letters-to-home-address',
             'change-contact-address',
+            'reason-contact-address-change',
             'home-address-line-1',
             'home-address-line-2',
             'home-address-town-or-city',

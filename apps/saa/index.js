@@ -483,7 +483,7 @@ const steps = {
     next: '/check-your-answers-address'
   },
   '/reason-contact-address-change': {
-    // Page fields to be added in its story.
+    fields: ['reason-contact-address-change'],
     next: '/contact-address'
   },
   '/contact-address': {

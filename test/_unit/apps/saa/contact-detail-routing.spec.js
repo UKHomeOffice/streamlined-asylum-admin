@@ -157,6 +157,43 @@ describe('change contact address question', () => {
   });
 });
 
+describe('contact address change reason', () => {
+  const field = 'reason-contact-address-change';
+
+  test('includes a textarea heading and personal details caption', () => {
+    expect(app.steps['/reason-contact-address-change'].fields).toEqual([field]);
+    expect(fields[field]).toMatchObject({
+      mixin: 'textarea',
+      isPageHeading: true
+    });
+    expect(pages[field].captionHeading).toBe('Update personal details');
+    expect(fieldTranslations[field].label)
+      .toBe('Why do you need us to send letters to a different address?');
+  });
+
+  test.each([
+    ['a', undefined],
+    ['Please send letters to my family.', undefined],
+    ['a'.repeat(500), undefined],
+    ['a'.repeat(501), 'maxlength'],
+    ['https://example.com', 'notUrl'],
+    ['Please use www.example.com', 'notUrl'],
+    ['', 'required']
+  ])('validates "%s" with error %s', (value, errorType) => {
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: value };
+    const controller = buildController('/reason-contact-address-change', req);
+
+    const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeUndefined();
+    }
+  });
+});
+
 describe.each([
   ['home-address-town-or-city', 'required'],
   ['home-address-county', undefined]

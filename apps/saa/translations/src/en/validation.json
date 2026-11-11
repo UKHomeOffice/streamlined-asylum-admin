@@ -203,6 +203,11 @@
   "change-contact-address": {
     "required": "Select if you need to change the address we send your letters to"
   },
+  "reason-contact-address-change": {
+    "required": "Enter why you need letters sent to a different address",
+    "maxlength": "Reason must be between 1 and 500 characters",
+    "notUrl": "Reason must not contain a URL"
+  },
   "home-address-line-1": {
     "required": "Enter address line 1"
   },
