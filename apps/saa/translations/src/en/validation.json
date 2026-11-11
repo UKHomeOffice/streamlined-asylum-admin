@@ -213,7 +213,6 @@
   },
   "contact-address-line-1": {
     "required": "Enter the first line of your contact address",
-    "regex": "First line of address cannot include special characters such as (), ./ & -",
     "notUrl": "First line of address cannot contain a URL",
     "maxlength": "First line of address should be no more than 60 characters, including spaces"
   },
@@ -223,7 +222,6 @@
   },
   "contact-address-town-or-city": {
     "required": "Enter the town or city of your contact address",
-    "regex": "Town or city cannot include special characters such as (), ./ & -",
     "notUrl": "Town or city cannot contain a URL",
     "maxlength": "Town or city should be no more than 60 characters, including spaces"
   },
@@ -254,6 +252,7 @@
   "home-address-moved-date": {
     "required": "Enter the date you moved to this address",
     "date": "Enter a real date",
+    "before": "Date must be in the past",
     "after": "Enter a date after 01 01 1900"
   },
   "send-letters-to-home-address": {

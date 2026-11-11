@@ -257,19 +257,16 @@ describe('contact address fields', () => {
     ['contact-address-line-1', 'contact-address-town-or-city'].flatMap(field =>
       ['(', ')', ',', '.', '/', '&', '-'].map(character => [field, character])
     )
-  )('rejects %s containing "%s"', (field, character) => {
+  )('accepts %s containing "%s"', (field, character) => {
     const req = buildRequest(['address']);
     req.form.values = { [field]: `Some ${character} place` };
     const controller = buildController('/contact-address', req);
 
-    expect(controller.validateField(field, req)).toMatchObject({
-      key: field,
-      type: 'regex'
-    });
+    expect(controller.validateField(field, req)).toBeFalsy();
   });
 
   test.each(['contact-address-line-1', 'contact-address-town-or-city'])(
-    'allows unlisted characters and counts spaces towards the limit in %s',
+    'allows apostrophes and accented letters and counts spaces towards the limit in %s',
     field => {
       const req = buildRequest(['address']);
       const controller = buildController('/contact-address', req);
@@ -340,11 +337,23 @@ describe('home address postcode validation', () => {
 });
 
 describe('home address moved date validation', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date(2026, 10, 11, 15, 30));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   test.each([
     ['1899-12-31', 'after'],
     ['1900-01-01', 'after'],
     ['1900-01-02', undefined],
     ['2020-03-27', undefined],
+    ['2026-11-10', undefined],
+    ['2026-11-11', undefined],
+    ['2026-11-12', 'before'],
     ['2020-02-30', 'date'],
     ['', 'required']
   ])('validates "%s" with error %s', (value, errorType) => {

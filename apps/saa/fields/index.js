@@ -334,7 +334,6 @@ module.exports = {
     validate: [
       'required',
       'notUrl',
-      { type: 'regex', arguments: /^[^(),./&-]*$/ },
       { type: 'maxlength', arguments: 60 }
     ],
     labelClassName: 'govuk-label--s'
@@ -349,7 +348,6 @@ module.exports = {
     validate: [
       'required',
       'notUrl',
-      { type: 'regex', arguments: /^[^(),./&-]*$/ },
       { type: 'maxlength', arguments: 60 }
     ],
     labelClassName: 'govuk-label--s',
@@ -399,6 +397,7 @@ module.exports = {
     validate: [
       'required',
       'date',
+      { type: 'before', arguments: ['0', 'days'] },
       { type: 'after', arguments: '1900-01-01' }
     ],
     legend: { className: 'govuk-label--s' }
