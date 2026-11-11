@@ -28,6 +28,7 @@
  * - `onNoneSelected` runs when unticking leaves no options selected.
  * - `editReturnUrl` is where edit journeys go once no selected section is left.
  * - section `noChanges.editRoute` optionally reports the same rule from an edit-only page.
+ * - completion `reopenOnChange` limits reopening at that boundary to changes in the named field.
  */
 const SAA_NO_CHANGES_HEADER = 'pages.no-changes-made.headers';
 const CONTACT_DETAIL_UPDATES_STATE_KEY = 'contact-detail-updates';
@@ -161,6 +162,7 @@ module.exports = {
             '/check-your-answers-someone-else-date-of-birth',
             {
               route: OWN_DOB_ROUTE,
+              reopenOnChange: OWN_DOB_FIELD,
               condition: [
                 req => req.params?.action === 'edit',
                 req => req.sessionModel.get(CONTACT_DETAIL_UPDATES_STATE_KEY)

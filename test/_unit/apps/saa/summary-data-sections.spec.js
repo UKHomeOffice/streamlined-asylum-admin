@@ -165,10 +165,14 @@ describe('summary data sections', () => {
     }
   );
 
-  test('DOB Change links on /confirm return to its check-your-answers page', () => {
+  test('DOB decision can be edited directly while detail Change links return to its mini-CYA', () => {
     const rows = sections['date-of-birth'].steps;
 
-    expect(rows.map(dobRow => dobRow.changeLink)).toEqual([
+    expect(rows[0]).toEqual({
+      step: '/change-your-date-of-birth',
+      field: 'change-your-date-of-birth'
+    });
+    expect(rows.slice(1).map(dobRow => dobRow.changeLink)).toEqual([
       '/changes/check-your-answers-date-of-birth',
       '/changes/check-your-answers-date-of-birth'
     ]);

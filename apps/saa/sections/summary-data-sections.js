@@ -201,7 +201,13 @@ module.exports = {
     ]
   },
   'date-of-birth': {
-    steps: dateOfBirthRows
+    steps: [
+      {
+        step: '/change-your-date-of-birth',
+        field: 'change-your-date-of-birth'
+      },
+      ...dateOfBirthRows
+    ]
   },
   'someone-else-date-of-birth': {
     steps: [

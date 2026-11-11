@@ -797,14 +797,30 @@ describe.each(['/confirm', '/information-given'])('DOB decision edits returning 
       .toBe(`${app.baseUrl}/correct-date-of-birth/edit`);
     expect(req.sessionModel.get(config.stateKey).completedSections).not.toContain('date-of-birth');
     expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
+    post('/correct-date-of-birth', req, { 'correct-date-of-birth': '1991-02-03' }, true);
+    post('/new-date-of-birth-evidence', req, {}, true);
+    expect(post('/check-your-answers-date-of-birth', req, {}, true).url)
+      .toBe(`${app.baseUrl}${otherRoute}/edit`);
   });
 
-  test('continuing with an unchanged own Yes retains the uploaded evidence', () => {
-    const req = buildDobRequest({});
-    expect(post(ownRoute, req, { 'change-your-date-of-birth': 'yes' }, true).url)
-      .toBe(`${app.baseUrl}/correct-date-of-birth/edit`);
-    expect(req.sessionModel.get('documents-new-dob')).toEqual([{ id: 'own-upload' }]);
-  });
+  test.each(['yes', 'no'])(
+    'unchanged own Yes with someone else=%s returns from mini-CYA without repeating the question',
+    someoneElse => {
+      const req = buildDobRequest({ 'change-someone-else-date-of-birth': someoneElse });
+      expect(post(ownRoute, req, { 'change-your-date-of-birth': 'yes' }, true).url)
+        .toBe(`${app.baseUrl}/correct-date-of-birth/edit`);
+      expect(req.sessionModel.get(config.stateKey).completedSections).toContain('date-of-birth');
+      expect(req.sessionModel.get('documents-new-dob')).toEqual([{ id: 'own-upload' }]);
+      expect(post('/correct-date-of-birth', req, { 'correct-date-of-birth': '1991-02-03' }, true).url)
+        .toBe(`${app.baseUrl}/new-date-of-birth-evidence/edit`);
+      expect(post('/new-date-of-birth-evidence', req, {}, true).url)
+        .toBe(`${app.baseUrl}/check-your-answers-date-of-birth/edit`);
+      expect(post('/check-your-answers-date-of-birth', req, {}, true).url)
+        .toBe(`${app.baseUrl}${returnRoute}`);
+      expect(req.sessionModel.get('correct-date-of-birth')).toBe('1991-02-03');
+      expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
+    }
+  );
 
   test('the own-No completion still visits another unfinished selected section', () => {
     const req = buildDobRequest({});
