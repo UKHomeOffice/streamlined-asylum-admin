@@ -563,6 +563,28 @@ const getNoChangesLocals = (req, res, config, state) => {
   };
 };
 
+const updateEntryState = (req, config, previousState) => {
+  // Only the entry page recalculates selections from posted checkbox values.
+  const state = createState(
+    config,
+    previousState,
+    req.form.values[config.field]
+  );
+  const nextState = withSectionStartBackLink(
+    state,
+    config,
+    getEntryPointNextRoute(
+      req,
+      config,
+      getActiveSections(config, state.selections),
+      state
+    ),
+    config.entryPoint
+  );
+  clearInactiveValues(req, nextState);
+  return nextState;
+};
+
 const multiSelectFollowUps = behaviourConfig => SuperClass =>
   class MultiSelectFollowUps extends SuperClass {
     getMultiSelectFollowUpsConfig() {
@@ -607,31 +629,7 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
         let state;
 
         if (this.options.route === config.entryPoint) {
-          /*
-           * The entry page is the only place where selected options are
-           * recalculated from form values. This keeps the behaviour predictable:
-           * internal section pages do not silently change which sections are
-           * active unless a page-specific controller explicitly does so.
-           */
-          state = createState(
-            config,
-            previousState,
-            req.form.values[config.field]
-          );
-
-          state = withSectionStartBackLink(
-            state,
-            config,
-            getEntryPointNextRoute(
-              req,
-              config,
-              getActiveSections(config, state.selections),
-              state
-            ),
-            config.entryPoint
-          );
-
-          clearInactiveValues(req, state);
+          state = updateEntryState(req, config, previousState);
         } else if (this.options.route === config.noChangesPoint?.route) {
           if (!previousState.noChangesSection) {
             callback(
