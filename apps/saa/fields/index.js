@@ -311,6 +311,13 @@ module.exports = {
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
   },
+  'change-contact-address': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    legend: { className: 'visuallyhidden' }
+  },
   'home-address-line-1': {
     mixin: 'input-text',
     validate: ['required'],

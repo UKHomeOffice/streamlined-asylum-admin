@@ -119,6 +119,44 @@ describe('change UK address question', () => {
   });
 });
 
+describe('change contact address question', () => {
+  test('includes a Yes/No radio question and personal details caption', () => {
+    expect(app.steps['/change-contact-address'].fields).toEqual(['change-contact-address']);
+    expect(fields['change-contact-address']).toMatchObject({
+      mixin: 'radio-group',
+      options: ['yes', 'no'],
+      validate: ['required']
+    });
+    expect(pages['change-contact-address'].captionHeading).toBe('Update personal details');
+    expect(fieldTranslations['change-contact-address']).toEqual({
+      legend: 'Do you need to change the address we send your letters to?',
+      options: {
+        yes: { label: 'Yes' },
+        no: { label: 'No' }
+      }
+    });
+  });
+
+  test.each([
+    ['yes', undefined],
+    ['no', undefined],
+    ['', 'required']
+  ])('validates "%s" with error %s', (value, errorType) => {
+    const field = 'change-contact-address';
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: value };
+    const controller = buildController('/change-contact-address', req);
+
+    const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeUndefined();
+    }
+  });
+});
+
 describe.each([
   ['home-address-town-or-city', 'required'],
   ['home-address-county', undefined]
@@ -479,20 +517,23 @@ describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
       .toEqual(['nationality', 'email-address', 'photo-identity']);
   });
 
-  test('changing the UK address then declining a contact address still needs address CYA', () => {
-    const req = buildRequest(['address'], edit, { 'change-uk-address': 'yes' });
-    expect(
-      post('/change-contact-address', req, { 'change-contact-address': 'no' })
-        .url
-    ).toBe(`${app.baseUrl}/check-your-answers-address${suffix}`);
-    expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([]);
-    expect(post('/check-your-answers-address', req).url).toBe(
-      `${app.baseUrl}/provide-photo-identity${suffix}`
-    );
-    expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([
-      'address'
-    ]);
-  });
+  test.each(['yes', 'no'])(
+    'declining a contact address goes to address CYA when UK address change is %s',
+    changeUkAddress => {
+      const req = buildRequest(['address'], edit, { 'change-uk-address': changeUkAddress });
+      expect(
+        post('/change-contact-address', req, { 'change-contact-address': 'no' })
+          .url
+      ).toBe(`${app.baseUrl}/check-your-answers-address${suffix}`);
+      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([]);
+      expect(post('/check-your-answers-address', req).url).toBe(
+        `${app.baseUrl}/provide-photo-identity${suffix}`
+      );
+      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([
+        'address'
+      ]);
+    }
+  );
 
   test('email and phone CYA defer EditRouteReturn until the shared identity section completes', () => {
     const req = buildRequest(['email-address', 'phone-number'], edit, {

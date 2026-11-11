@@ -387,6 +387,17 @@
       }
     }
   },
+  "change-contact-address": {
+    "legend": "Do you need to change the address we send your letters to?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
   "home-address-line-1": {
     "label": "Address line 1"
   },

@@ -155,7 +155,8 @@
     "header": "Completing the form for someone else"
   },
   "change-contact-address": {
-    "header": "Do you need to change the address we send your letters to?"
+    "header": "Do you need to change the address we send your letters to?",
+    "captionHeading": "Update personal details"
   },
   "no-changes-made": {
     "headers": {

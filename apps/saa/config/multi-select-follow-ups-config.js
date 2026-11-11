@@ -255,14 +255,6 @@ module.exports = {
           id: 'address',
           start: '/change-uk-address',
           completeOn: '/check-your-answers-address',
-          noChanges: {
-            route: '/change-contact-address',
-            when: [
-              { field: 'change-uk-address', value: 'no' },
-              { field: 'change-contact-address', value: 'no' }
-            ],
-            header: `${SAA_NO_CHANGES_HEADER}.address`
-          },
           routes: [
             '/change-uk-address',
             '/home-address',

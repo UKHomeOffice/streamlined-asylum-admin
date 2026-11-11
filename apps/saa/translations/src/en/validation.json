@@ -200,6 +200,9 @@
   "change-uk-address": {
     "required": "Select if you have a new UK  address"
   },
+  "change-contact-address": {
+    "required": "Select if you need to change the address we send your letters to"
+  },
   "home-address-line-1": {
     "required": "Enter address line 1"
   },

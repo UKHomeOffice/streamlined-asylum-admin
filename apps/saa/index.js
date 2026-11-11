@@ -469,7 +469,7 @@ const steps = {
     next: '/personal-details'
   },
   '/change-contact-address': {
-    // Page fields and validation belong to its Address story.
+    fields: ['change-contact-address'],
     forks: [
       {
         target: '/reason-contact-address-change',
