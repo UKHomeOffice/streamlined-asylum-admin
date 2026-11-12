@@ -1,10 +1,9 @@
 import { expect, type Page } from '@playwright/test';
 import { BasePage } from './saa-base-page';
-import { EVIDENCE_PAGES } from '../utility-helper/constants-lib';
 
 export class PrepareYourEvidencePage extends BasePage {
   constructor(page: Page) {
-    super(page, EVIDENCE_PAGES['Prepare your evidence']);
+    super(page, { path: '/changes/prepare-your-evidence', heading: 'Prepare your evidence' });
   }
 
   async assertContentAndLayout() {

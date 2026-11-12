@@ -1,10 +1,10 @@
 import { test as base } from 'playwright-bdd';
 import { BasePage } from '../pages/saa-base-page';
-import { SendEvidencePage } from '../pages/saa-send-evidence-page';
-import { PrepareYourEvidencePage } from '../pages/saa-prepare-your-evidence-page';
-import { UploadSupportingEvidencePage } from '../pages/saa-upload-supporting-evidence-page';
-import { ViolentUpsettingImagesPage } from '../pages/saa-violent-upsetting-images-page';
-import { EvidenceCheckYourAnswersPage } from '../pages/saa-evidence-check-your-answers-page';
+import { SendEvidencePage } from '../pages/saa-EVI-send-evidence-page';
+import { PrepareYourEvidencePage } from '../pages/saa-EVI-prepare-your-evidence-page';
+import { UploadSupportingEvidencePage } from '../pages/saa-EVI-upload-supporting-evidence-page';
+import { ViolentUpsettingImagesPage } from '../pages/saa-EVI-violent-upsetting-images-page';
+import { EvidenceCheckYourAnswersPage } from '../pages/saa-EVI-evidence-check-your-answers-page';
 import { CheckYourAnswersPage } from '../pages/saa-check-your-answers-page';
 import { BeforeYouStartPage } from '../pages/saa-before-you-start-page';
 import { ClaimantDetailsPage } from '../pages/saa-claimant-details-page';
@@ -23,8 +23,24 @@ import { PersonalDetailsPage } from '../pages/saa-personal-details-page';
 import { DependantsPage } from '../pages/saa-dependants-page';
 import { SomeoneOnClaimDiedPage } from '../pages/saa-someone-on-claim-died-page';
 import { SomethingElsePage } from '../pages/saa-something-else-page';
+import { RADSomeoneOnClaimDiedPage } from '../pages/saa-RAD-someone-on-claim-died-page';
+import { RADAboutWhoHasDiedPage } from '../pages/saa-RAD-about-who-has-died-page';
+import { RADMainClaimantDiedPage } from '../pages/saa-RAD-main-claimant-died-page';
+import { RADNamePersonWhoDiedPage } from '../pages/saa-RAD-name-person-who-died-page';
+import { RADDateOfBirthPersonWhoDiedPage } from '../pages/saa-RAD-date-of-birth-person-who-died-page';
+import { RADNationalityPersonWhoDiedPage } from '../pages/saa-RAD-nationality-person-who-died-page';
+import { RADUploadDeathCertificatePage } from '../pages/saa-RAD-upload-death-certificate-page';
+import { RADCheckYourAnswersDeathPage } from '../pages/saa-RAD-check-your-answers-death-page';
 
 export type Pages = {
+  radSomeoneOnClaimDiedPage: RADSomeoneOnClaimDiedPage;
+  radAboutWhoHasDiedPage: RADAboutWhoHasDiedPage;
+  radMainClaimantDiedPage: RADMainClaimantDiedPage;
+  radNamePersonWhoDiedPage: RADNamePersonWhoDiedPage;
+  radDateOfBirthPersonWhoDiedPage: RADDateOfBirthPersonWhoDiedPage;
+  radNationalityPersonWhoDiedPage: RADNationalityPersonWhoDiedPage;
+  radUploadDeathCertificatePage: RADUploadDeathCertificatePage;
+  radCheckYourAnswersDeathPage: RADCheckYourAnswersDeathPage;
   basePage: BasePage;
   sendEvidencePage: SendEvidencePage;
   prepareYourEvidencePage: PrepareYourEvidencePage;
@@ -54,6 +70,14 @@ export type Pages = {
 export const test = base.extend<{ pages: Pages }>({
   pages: async ({ page }, use) => {
     await use({
+      radSomeoneOnClaimDiedPage: new RADSomeoneOnClaimDiedPage(page),
+      radAboutWhoHasDiedPage: new RADAboutWhoHasDiedPage(page),
+      radMainClaimantDiedPage: new RADMainClaimantDiedPage(page),
+      radNamePersonWhoDiedPage: new RADNamePersonWhoDiedPage(page),
+      radDateOfBirthPersonWhoDiedPage: new RADDateOfBirthPersonWhoDiedPage(page),
+      radNationalityPersonWhoDiedPage: new RADNationalityPersonWhoDiedPage(page),
+      radUploadDeathCertificatePage: new RADUploadDeathCertificatePage(page),
+      radCheckYourAnswersDeathPage: new RADCheckYourAnswersDeathPage(page),
       basePage: new BasePage(page),
       sendEvidencePage: new SendEvidencePage(page),
       prepareYourEvidencePage: new PrepareYourEvidencePage(page),

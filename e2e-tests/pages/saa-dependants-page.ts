@@ -1,13 +1,15 @@
 import { type Page } from '@playwright/test';
 import { BasePage } from './saa-base-page';
-import { EVI_JOURNEY_PAGES } from '../utility-helper/constants-lib';
 
 export class DependantsPage extends BasePage {
   constructor(page: Page) {
-    super(page, EVI_JOURNEY_PAGES.Dependants);
+    super(page, {
+      path: '/changes/do-you-need-add-remove-dependant',
+      heading: 'Do you need to add or remove a child or partner as a dependant?',
+    });
   }
 
   async answer(answer: string) {
-    await this.answerQuestion(answer, EVI_JOURNEY_PAGES.Dependants.heading);
+    await this.answerQuestion(answer, this.details!.heading);
   }
 }

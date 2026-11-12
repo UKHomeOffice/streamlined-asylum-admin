@@ -79,7 +79,10 @@ navigation, radio questions, errors, back links, feedback and header/footer chec
 
 `EvidenceJourney` follows the start page, before-you-start page, claimant
 details, and claim-decision question before submitting `SAA_TEST_EMAIL` (falling
-back to `SKIP_EMAIL` or the shared test address). It follows the configured
+back to `SAS_HOF_EMAIL`, then `SKIP_EMAIL`). Drone supplies `SAS_HOF_EMAIL` from
+the secret with the same name when the E2E pipeline steps are enabled. There is
+no hardcoded email fallback; authentication fails with a configuration error if
+none of these variables is set. It follows the configured
 `token=skip` test link and enters the form before completing preceding steps in
 order. It keeps the original setup answers: Yes to sending evidence, No to
 adding/removing a dependant, and No to violent or upsetting images when

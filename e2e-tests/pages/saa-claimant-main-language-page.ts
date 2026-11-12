@@ -1,10 +1,9 @@
 import { type Page } from '@playwright/test';
 import { BasePage } from './saa-base-page';
-import { EVI_JOURNEY_PAGES } from '../utility-helper/constants-lib';
 
 export class ClaimantMainLanguagePage extends BasePage {
   constructor(page: Page) {
-    super(page, EVI_JOURNEY_PAGES['Claimant main language']);
+    super(page, { path: '/changes/claimant-main-language', heading: "Claimant's main language" });
   }
 
   async selectLanguage(languageName: string) {

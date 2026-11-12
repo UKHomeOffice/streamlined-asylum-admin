@@ -1,10 +1,10 @@
 import { expect, type Page } from '@playwright/test';
 import { BasePage } from './saa-base-page';
-import { EVIDENCE_PAGES, VIOLENT_IMAGES_QUESTION, VIOLENT_IMAGES_REQUIRED_ERROR } from '../utility-helper/constants-lib';
+import { ConstantsLib as c } from '../utility-helper/constants-lib';
 
 export class ViolentUpsettingImagesPage extends BasePage {
   constructor(page: Page) {
-    super(page, EVIDENCE_PAGES['Violent or upsetting images']);
+    super(page, { path: '/changes/violent-upsetting-images', heading: 'Violent or upsetting images' });
   }
 
   async assertContentAndLayout() {
@@ -18,11 +18,11 @@ export class ViolentUpsettingImagesPage extends BasePage {
     ]) {
       await expect(this.page.getByText(text, { exact: true })).toBeVisible();
     }
-    await this.assertUnansweredQuestion(VIOLENT_IMAGES_QUESTION);
+    await this.assertUnansweredQuestion(c.VIOLENT_IMAGES_QUESTION);
   }
 
   async answer(answer: string) {
-    await this.answerQuestion(answer, VIOLENT_IMAGES_QUESTION);
+    await this.answerQuestion(answer, c.VIOLENT_IMAGES_QUESTION);
   }
 
   async continueWithoutSelectingAnswer() {
@@ -31,6 +31,6 @@ export class ViolentUpsettingImagesPage extends BasePage {
   }
 
   async assertRequiredError() {
-    await this.assertError(VIOLENT_IMAGES_REQUIRED_ERROR);
+    await this.assertError(c.VIOLENT_IMAGES_REQUIRED_ERROR);
   }
 }

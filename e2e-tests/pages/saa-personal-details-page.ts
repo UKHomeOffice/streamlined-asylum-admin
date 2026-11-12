@@ -1,13 +1,12 @@
 import { type Page } from '@playwright/test';
 import { BasePage } from './saa-base-page';
-import { EVI_JOURNEY_PAGES } from '../utility-helper/constants-lib';
 
 export class PersonalDetailsPage extends BasePage {
   constructor(page: Page) {
-    super(page, EVI_JOURNEY_PAGES['Personal details']);
+    super(page, { path: '/changes/personal-details', heading: 'Do you need to update personal details?' });
   }
 
   async answer(answer: string) {
-    await this.answerQuestion(answer, EVI_JOURNEY_PAGES['Personal details'].heading);
+    await this.answerQuestion(answer, this.details!.heading);
   }
 }

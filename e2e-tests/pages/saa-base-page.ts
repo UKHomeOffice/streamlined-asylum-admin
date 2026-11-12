@@ -39,7 +39,9 @@ export class BasePage {
     if (!this.details) {
       throw new Error('Page details are required to assert the current page');
     }
-    await expect(this.page).toHaveURL(url => url.pathname === this.details.path);
+    await expect(this.page).toHaveURL(url =>
+      url.pathname === this.details!.path || url.pathname === `${this.details!.path}/edit`
+    );
     await expect(this.page.getByRole('heading', { level: 1, name: this.details.heading })).toBeVisible();
   }
 

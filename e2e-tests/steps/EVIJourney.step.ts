@@ -2,94 +2,129 @@ import { expect } from '@playwright/test';
 import { createBdd } from 'playwright-bdd';
 import { BasePage } from '../pages/saa-base-page';
 import { test, type Pages } from '../fixtures/fixtures';
-import { E2E_EMAIL, EVIDENCE_PAGES, MAX_JOURNEY_STEPS, NO_OPTIONS_PAGE, VIOLENT_IMAGES_QUESTION } from '../utility-helper/constants-lib';
+import { ConstantsLib as c } from '../utility-helper/constants-lib';
 
 const { Given, When, Then } = createBdd(test);
 
-const journeyPages = (pages: Pages): Record<string, BasePage> => ({
-  Start: pages.startPage,
-  'Before you start': pages.beforeYouStartPage,
-  'Claimant details': pages.claimantDetailsPage,
-  'Claim decision': pages.claimDecisionPage,
-  'Email address': pages.emailAddressPage,
-  'Form entry': pages.continueToFormPage,
-  'Which form': pages.whichFormPage,
-  'Information given': pages.informationGivenPage,
-  'Claimant name': pages.claimantsNamePage,
-  'Claimant main language': pages.claimantMainLanguagePage,
-  'Person completing form': pages.personCompletingFormPage,
-  'Who are you': pages.whoAreYouPage,
-  'Personal details': pages.personalDetailsPage,
-  Dependants: pages.dependantsPage,
-  'Send evidence for your claim': pages.sendEvidencePage,
-  'Prepare your evidence': pages.prepareYourEvidencePage,
-  'Upload evidence to help your claim': pages.uploadSupportingEvidencePage,
-  'Violent or upsetting images': pages.violentUpsettingImagesPage,
-  'Evidence check your answers': pages.evidenceCheckYourAnswersPage,
-  'Someone on my claim has died': pages.someoneOnClaimDiedPage,
-  'Something else': pages.somethingElsePage,
-  'Check your answers': pages.checkYourAnswersPage,
-  'No options': pages.noOptionsPage,
-});
-
-const pageFor = (pages: Pages, name: string) => {
-  const target = journeyPages(pages)[name];
-  if (!target?.details) {
-    throw new Error(`No page mapping defined for "${name}"`);
+export const pagePath = (page: BasePage) => {
+  if (!page.details) {
+    throw new Error('Page details are required to navigate the journey');
   }
-  return target;
+  return page.details.path;
 };
 
-const continueUntil = async (pages: Pages, path: string) => {
-  const mappedPages = journeyPages(pages);
-  for (let step = 0; step < MAX_JOURNEY_STEPS; step++) {
+const pageFor = (pages: Pages, name: string): BasePage => {
+  switch (name) {
+    case 'Start': return pages.startPage;
+    case 'Before you start': return pages.beforeYouStartPage;
+    case 'Claimant details': return pages.claimantDetailsPage;
+    case 'Claim decision': return pages.claimDecisionPage;
+    case 'Email address': return pages.emailAddressPage;
+    case 'Form entry': return pages.continueToFormPage;
+    case 'Which form': return pages.whichFormPage;
+    case 'Information given': return pages.informationGivenPage;
+    case 'Claimant name': return pages.claimantsNamePage;
+    case 'Claimant main language': return pages.claimantMainLanguagePage;
+    case 'Person completing form': return pages.personCompletingFormPage;
+    case 'Who are you': return pages.whoAreYouPage;
+    case 'Personal details': return pages.personalDetailsPage;
+    case 'Dependants': return pages.dependantsPage;
+    case 'Send evidence for your claim': return pages.sendEvidencePage;
+    case 'Prepare your evidence': return pages.prepareYourEvidencePage;
+    case 'Upload evidence to help your claim': return pages.uploadSupportingEvidencePage;
+    case 'Violent or upsetting images': return pages.violentUpsettingImagesPage;
+    case 'Evidence check your answers': return pages.evidenceCheckYourAnswersPage;
+    case 'Someone on my claim has died': return pages.someoneOnClaimDiedPage;
+    case 'Something else': return pages.somethingElsePage;
+    case 'About who has died': return pages.radAboutWhoHasDiedPage;
+    case 'Check your answers': return pages.checkYourAnswersPage;
+    case 'No options': return pages.noOptionsPage;
+    default: throw new Error(`No page mapping defined for "${name}"`);
+  }
+};
+
+const pageForPath = (pages: Pages, path: string): BasePage | undefined => {
+  switch (path) {
+    case pagePath(pages.startPage): return pages.startPage;
+    case pagePath(pages.beforeYouStartPage): return pages.beforeYouStartPage;
+    case pagePath(pages.claimantDetailsPage): return pages.claimantDetailsPage;
+    case pagePath(pages.claimDecisionPage): return pages.claimDecisionPage;
+    case pagePath(pages.emailAddressPage): return pages.emailAddressPage;
+    case pagePath(pages.continueToFormPage): return pages.continueToFormPage;
+    case pagePath(pages.whichFormPage): return pages.whichFormPage;
+    case pagePath(pages.informationGivenPage): return pages.informationGivenPage;
+    case pagePath(pages.claimantsNamePage): return pages.claimantsNamePage;
+    case pagePath(pages.claimantMainLanguagePage): return pages.claimantMainLanguagePage;
+    case pagePath(pages.personCompletingFormPage): return pages.personCompletingFormPage;
+    case pagePath(pages.whoAreYouPage): return pages.whoAreYouPage;
+    case pagePath(pages.personalDetailsPage): return pages.personalDetailsPage;
+    case pagePath(pages.dependantsPage): return pages.dependantsPage;
+    case pagePath(pages.sendEvidencePage): return pages.sendEvidencePage;
+    case pagePath(pages.prepareYourEvidencePage): return pages.prepareYourEvidencePage;
+    case pagePath(pages.uploadSupportingEvidencePage): return pages.uploadSupportingEvidencePage;
+    case pagePath(pages.violentUpsettingImagesPage): return pages.violentUpsettingImagesPage;
+    case pagePath(pages.evidenceCheckYourAnswersPage): return pages.evidenceCheckYourAnswersPage;
+    case pagePath(pages.someoneOnClaimDiedPage): return pages.someoneOnClaimDiedPage;
+    case pagePath(pages.somethingElsePage): return pages.somethingElsePage;
+    case pagePath(pages.radAboutWhoHasDiedPage): return pages.radAboutWhoHasDiedPage;
+    case pagePath(pages.checkYourAnswersPage): return pages.checkYourAnswersPage;
+    case pagePath(pages.noOptionsPage): return pages.noOptionsPage;
+    default: return undefined;
+  }
+};
+
+export const continueUntil = async (pages: Pages, path: string, applicationDateOfBirth = '01 January 2020') => {
+  for (let step = 0; step < c.MAX_JOURNEY_STEPS; step++) {
     const currentPath = pages.basePage.currentPath;
-    const currentPage = Object.values(mappedPages).find(page => page.details?.path === currentPath);
-    if (currentPage) {
-      await currentPage.assertOnPage();
-    }
-    if (currentPath === path || currentPath === NO_OPTIONS_PAGE.path) {
+    const currentPage = pageForPath(pages, currentPath);
+    if (currentPage) await currentPage.assertOnPage();
+    if (currentPath === path || currentPath === pagePath(pages.noOptionsPage)) {
       return;
     }
-    if (currentPath === EVIDENCE_PAGES['Send evidence for your claim'].path) {
-      await pages.sendEvidencePage.answer('Yes');
-    }
-    if (currentPath === '/changes/personal-details') {
-      await pages.personalDetailsPage.answer('No');
-    }
-    if (currentPath === '/changes/claimants-name') {
-      await pages.claimantsNamePage.enterName('Test', 'User');
-    }
-    if (currentPath === '/changes/claimant-main-language') {
-      await pages.claimantMainLanguagePage.selectLanguage('English');
-    }
-    if (currentPath === '/changes/person-completing-form') {
-      await pages.personCompletingFormPage.answer('For me');
-    }
-    if (currentPath === '/changes/who-are-you') {
-      await pages.whoAreYouPage.answerQuestion('I am the person claiming asylum', 'Who are you?');
-    }
-    if (currentPath === EVIDENCE_PAGES['Upload evidence to help your claim'].path) {
-      await pages.uploadSupportingEvidencePage.uploadEvidenceForJourney();
-    }
-    if (currentPath === '/changes/do-you-need-add-remove-dependant') {
-      await pages.dependantsPage.answer('No');
-    }
-    if (currentPath === EVIDENCE_PAGES['Violent or upsetting images'].path) {
-      await pages.violentUpsettingImagesPage.answer('No');
-    }
-    if (currentPath === EVIDENCE_PAGES['Someone on my claim has died'].path) {
-      await pages.someoneOnClaimDiedPage.answer('No');
-    }
-    if (currentPath === '/changes/something-else') {
-      await pages.somethingElsePage.answer('No');
+    switch (currentPath) {
+      case pagePath(pages.sendEvidencePage):
+        await pages.sendEvidencePage.answer('Yes');
+        break;
+      case pagePath(pages.whichFormPage):
+        await pages.whichFormPage.selectApplication(applicationDateOfBirth, '1234-5678-9101-1121');
+        break;
+      case pagePath(pages.personalDetailsPage):
+        await pages.personalDetailsPage.answer('No');
+        break;
+      case pagePath(pages.claimantsNamePage):
+        await pages.claimantsNamePage.enterName('Test', 'User');
+        break;
+      case pagePath(pages.claimantMainLanguagePage):
+        await pages.claimantMainLanguagePage.selectLanguage('English');
+        break;
+      case pagePath(pages.personCompletingFormPage):
+        await pages.personCompletingFormPage.answer('For me');
+        break;
+      case pagePath(pages.whoAreYouPage):
+        await pages.whoAreYouPage.answerQuestion('I am the person claiming asylum', 'Who are you?');
+        break;
+      case pagePath(pages.uploadSupportingEvidencePage):
+        await pages.uploadSupportingEvidencePage.uploadEvidenceForJourney();
+        break;
+      case pagePath(pages.dependantsPage):
+        await pages.dependantsPage.answer('No');
+        break;
+      case pagePath(pages.violentUpsettingImagesPage):
+        await pages.violentUpsettingImagesPage.answer('No');
+        break;
+      case pagePath(pages.someoneOnClaimDiedPage):
+        await pages.someoneOnClaimDiedPage.answer(path === pagePath(pages.radAboutWhoHasDiedPage) ? 'Yes' : 'No');
+        break;
+      case pagePath(pages.somethingElsePage):
+        await pages.somethingElsePage.answer('No');
+        break;
     }
     await pages.basePage.continueToNextPage();
   }
-  throw new Error(`Did not reach ${path} within ${MAX_JOURNEY_STEPS} steps`);
+  throw new Error(`Did not reach ${path} within ${c.MAX_JOURNEY_STEPS} steps`);
 };
 
-const navigateTo = async (pages: Pages, name: string, emailAddress: string) => {
+export const navigateTo = async (pages: Pages, name: string, emailAddress: string) => {
   const target = pageFor(pages, name);
   await pages.startPage.startJourney();
   await pages.beforeYouStartPage.continueToClaimantDetails();
@@ -98,13 +133,13 @@ const navigateTo = async (pages: Pages, name: string, emailAddress: string) => {
   await pages.claimDecisionPage.continueToNextPage();
   await pages.emailAddressPage.authenticate(emailAddress);
   await pages.continueToFormPage.enterForm();
-  await continueUntil(pages, target.details!.path);
+  await continueUntil(pages, pagePath(target));
   await target.assertOnPage();
 };
 
 const continueToCheckYourAnswers = async (pages: Pages) => {
   await pages.basePage.continueToNextPage();
-  await continueUntil(pages, EVIDENCE_PAGES['Check your answers'].path);
+  await continueUntil(pages, pagePath(pages.checkYourAnswersPage));
 };
 
 Given('I start the application journey', async ({ pages }) => {
@@ -123,7 +158,7 @@ When('I complete the supporting evidence journey pertaining to {string}', async 
       await pages.violentUpsettingImagesPage.answer('No');
       await pages.violentUpsettingImagesPage.continueToNextPage();
       await pages.evidenceCheckYourAnswersPage.assertAnswer('Files uploaded', 'test-evidence.txt');
-      await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', 'No', VIOLENT_IMAGES_QUESTION);
+      await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', 'No', c.VIOLENT_IMAGES_QUESTION);
       await continueToCheckYourAnswers(pages);
       await pages.checkYourAnswersPage.assertAnswer('Do you need to send evidence to help your claim?', 'Yes');
       break;
@@ -153,7 +188,7 @@ When('I complete claimant details and continue', async ({ pages }) => {
 });
 
 When('I request a secure link using the test email', async ({ pages }) => {
-  await pages.emailAddressPage.authenticate(E2E_EMAIL);
+  await pages.emailAddressPage.authenticate(c.E2E_EMAIL);
 });
 
 When('I click Enter form', async ({ pages }) => {
@@ -176,7 +211,7 @@ When('I select {string} and continue', async ({ pages }, answer: string) => {
 });
 
 Given('I am on the {string} page', async ({ pages }, name: string) => {
-  await navigateTo(pages, name, E2E_EMAIL);
+  await navigateTo(pages, name, c.E2E_EMAIL);
 });
 
 Then('I am on the {string} page', async ({ pages }, name: string) => {
@@ -189,18 +224,27 @@ Then('I remain on the {string} page', async ({ pages }, name: string) => {
 
 Then('the page content and layout match the design', async ({ pages }) => {
   const currentPath = pages.basePage.currentPath;
-  if (currentPath === EVIDENCE_PAGES['Send evidence for your claim'].path) {
-    await pages.sendEvidencePage.assertContentAndLayout();
-  } else if (currentPath === EVIDENCE_PAGES['Prepare your evidence'].path) {
-    await pages.prepareYourEvidencePage.assertContentAndLayout();
-  } else if (currentPath === EVIDENCE_PAGES['Upload evidence to help your claim'].path) {
-    await pages.uploadSupportingEvidencePage.assertContentAndLayout();
-  } else if (currentPath === EVIDENCE_PAGES['Violent or upsetting images'].path) {
-    await pages.violentUpsettingImagesPage.assertContentAndLayout();
-  } else if (currentPath === EVIDENCE_PAGES['Evidence check your answers'].path) {
-    await pages.evidenceCheckYourAnswersPage.assertContentAndLayout();
-  } else {
-    throw new Error(`No content and layout check is defined for ${currentPath}`);
+  switch (currentPath) {
+    case pagePath(pages.sendEvidencePage):
+      await pages.sendEvidencePage.assertContentAndLayout();
+      break;
+    case pagePath(pages.prepareYourEvidencePage):
+      await pages.prepareYourEvidencePage.assertContentAndLayout();
+      break;
+    case pagePath(pages.uploadSupportingEvidencePage):
+      await pages.uploadSupportingEvidencePage.assertContentAndLayout();
+      break;
+    case pagePath(pages.violentUpsettingImagesPage):
+      await pages.violentUpsettingImagesPage.assertContentAndLayout();
+      break;
+    case pagePath(pages.evidenceCheckYourAnswersPage):
+      await pages.evidenceCheckYourAnswersPage.assertContentAndLayout();
+      break;
+    case pagePath(pages.someoneOnClaimDiedPage):
+      await pages.someoneOnClaimDiedPage.assertContentAndLayout();
+      break;
+    default:
+      throw new Error(`No content and layout check is defined for ${currentPath}`);
   }
 });
 
@@ -330,7 +374,7 @@ Then('my updated answer is shown on the "Check your answers" page', async ({ $te
 });
 
 Given('I am on the evidence check your answers page', async ({ pages }) => {
-  await navigateTo(pages, 'Evidence check your answers', E2E_EMAIL);
+  await navigateTo(pages, 'Evidence check your answers', c.E2E_EMAIL);
 });
 
 Then('the evidence check your answers page content and layout match the design', async ({ pages }) => {
@@ -347,17 +391,17 @@ Then('no Remove links are shown', async ({ pages }) => {
 });
 
 Given('I am on the evidence check your answers page with completed evidence answers', async ({ pages }) => {
-  await navigateTo(pages, 'Evidence check your answers', E2E_EMAIL);
+  await navigateTo(pages, 'Evidence check your answers', c.E2E_EMAIL);
 });
 
 Then('my answers from the evidence journey are shown correctly', async ({ pages }) => {
   await pages.evidenceCheckYourAnswersPage.assertAnswer('Files uploaded', 'test-evidence.txt');
-  await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', 'No', VIOLENT_IMAGES_QUESTION);
+  await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', 'No', c.VIOLENT_IMAGES_QUESTION);
 });
 
 Given('I have changed answers in the evidence journey', async ({ pages }) => {
-  await navigateTo(pages, 'Evidence check your answers', E2E_EMAIL);
-  await pages.evidenceCheckYourAnswersPage.editAnswer(VIOLENT_IMAGES_QUESTION, 'No');
+  await navigateTo(pages, 'Evidence check your answers', c.E2E_EMAIL);
+  await pages.evidenceCheckYourAnswersPage.editAnswer(c.VIOLENT_IMAGES_QUESTION, 'No');
 });
 
 When('I review the evidence check your answers page', async ({ pages }) => {
@@ -366,7 +410,7 @@ When('I review the evidence check your answers page', async ({ pages }) => {
 });
 
 Then('my updated answers are shown', async ({ pages }) => {
-  await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', 'Yes', VIOLENT_IMAGES_QUESTION);
+  await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', 'Yes', c.VIOLENT_IMAGES_QUESTION);
 });
 
 Then('my original answers are not shown', async ({ pages }) => {
@@ -431,11 +475,11 @@ Then('I remain on the violent or upsetting images page', async ({ pages }) => {
 });
 
 Given('I am editing my answer about violent or upsetting images', async ({ pages }) => {
-  await navigateTo(pages, 'Evidence check your answers', E2E_EMAIL);
-  await pages.evidenceCheckYourAnswersPage.editAnswer(VIOLENT_IMAGES_QUESTION, 'No');
+  await navigateTo(pages, 'Evidence check your answers', c.E2E_EMAIL);
+  await pages.evidenceCheckYourAnswersPage.editAnswer(c.VIOLENT_IMAGES_QUESTION, 'No');
 });
 
 Then('the evidence check your answers page shows the violent images answer {string}', async ({ pages }, answer: string) => {
   await pages.evidenceCheckYourAnswersPage.assertOnPage();
-  await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', answer, VIOLENT_IMAGES_QUESTION);
+  await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', answer, c.VIOLENT_IMAGES_QUESTION);
 });

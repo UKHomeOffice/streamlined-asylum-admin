@@ -1,13 +1,15 @@
 import { expect, type Page } from '@playwright/test';
 import { BasePage } from './saa-base-page';
-import { AUTH_PAGES } from '../utility-helper/constants-lib';
 
 export class EmailAddressPage extends BasePage {
   constructor(page: Page) {
-    super(page, AUTH_PAGES['Email address']);
+    super(page, { path: '/email-address', heading: 'What is your email address?' });
   }
 
   async authenticate(emailAddress: string) {
+    if (!emailAddress) {
+      throw new Error('Set SAA_TEST_EMAIL, SAS_HOF_EMAIL (Drone secret), or SKIP_EMAIL before running end-to-end tests.');
+    }
     await this.assertOnPage();
     await this.page.getByRole('textbox', { name: 'What is your email address?' }).fill(emailAddress);
     await this.page.getByRole('button', { name: 'Send secure link' }).click();

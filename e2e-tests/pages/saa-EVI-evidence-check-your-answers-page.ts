@@ -1,10 +1,9 @@
 import { expect, type Page } from '@playwright/test';
 import { BasePage } from './saa-base-page';
-import { EVIDENCE_PAGES } from '../utility-helper/constants-lib';
 
 export class EvidenceCheckYourAnswersPage extends BasePage {
   constructor(page: Page) {
-    super(page, EVIDENCE_PAGES['Evidence check your answers']);
+    super(page, { path: '/changes/check-your-answers-evidence', heading: 'Check your answers' });
   }
 
   async assertContentAndLayout() {
@@ -35,15 +34,15 @@ export class EvidenceCheckYourAnswersPage extends BasePage {
   async editAnswer(question: string, answer: string) {
     await this.page.getByRole('link', { name: `Change ${question} from ${answer}`, exact: true }).click();
     const expectedPath = question === 'Files uploaded'
-      ? EVIDENCE_PAGES['Upload evidence to help your claim'].path
-      : EVIDENCE_PAGES['Violent or upsetting images'].path;
+      ? '/changes/upload-supporting-evidence'
+      : '/changes/violent-upsetting-images';
     await expect(this.page).toHaveURL(url => url.pathname === expectedPath);
   }
 
   async addMoreEvidence() {
     await this.page.getByRole('link', { name: 'Add more evidence' }).click();
     await expect(this.page).toHaveURL(url =>
-      url.pathname === EVIDENCE_PAGES['Upload evidence to help your claim'].path
+      url.pathname === '/changes/upload-supporting-evidence'
     );
   }
 
