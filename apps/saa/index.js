@@ -325,8 +325,8 @@ const steps = {
     next: '/change-someone-else-nationality'
   },
   '/change-someone-else-nationality': {
+    fields: ['change-someone-else-nationality'],
     // Add ResetSectionSummary for the nationality loop when its add-another story is built.
-    // Page fields and validation belong to its Nationality story.
     forks: [
       {
         target: '/relationship-nationality-change',
@@ -337,8 +337,7 @@ const steps = {
         }
       }
     ],
-    // Keep unanswered placeholders inside the section until the decision field is implemented.
-    next: '/relationship-nationality-change'
+    next: '/do-you-need-add-remove-dependant'
   },
   '/relationship-nationality-change': {
     // Page fields to be added in its story.
