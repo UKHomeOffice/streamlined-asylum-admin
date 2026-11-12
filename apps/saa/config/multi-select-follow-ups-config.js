@@ -28,6 +28,7 @@
  * - `onNoneSelected` runs when unticking leaves no options selected.
  * - `editReturnUrl` is where edit journeys go once no selected section is left.
  * - section `noChanges.editRoute` optionally reports the same rule from an edit-only page.
+ * - completion `reopenOnChange` limits reopening at that boundary to changes in the named field.
  */
 const SAA_NO_CHANGES_HEADER = 'pages.no-changes-made.headers';
 const CONTACT_DETAIL_UPDATES_STATE_KEY = 'contact-detail-updates';
@@ -37,10 +38,12 @@ const NAME_SECTION = 'name';
 const PHOTO_IDENTITY_ROUTE = '/provide-photo-identity';
 const OWN_NAME_ROUTE = '/do-you-need-to-change-your-name';
 const SOMEONE_ELSE_NAME_ROUTE = '/do-you-need-to-change-someone-elses-name';
+const OWN_DOB_ROUTE = '/change-your-date-of-birth';
 const SOMEONE_ELSE_DOB_ROUTE = '/change-someone-else-date-of-birth';
 const SOMEONE_ELSE_NATIONALITY_ROUTE = '/change-someone-else-nationality';
 const OWN_NAME_FIELD = 'do-you-need-to-change-your-name';
 const SOMEONE_ELSE_NAME_FIELD = 'change-someone-elses-name';
+const OWN_DOB_FIELD = 'change-your-date-of-birth';
 const SOMEONE_ELSE_DOB_FIELD = 'change-someone-else-date-of-birth';
 const SOMEONE_ELSE_NATIONALITY_FIELD = 'change-someone-else-nationality';
 
@@ -147,7 +150,7 @@ module.exports = {
       sections: [
         {
           id: DATE_OF_BIRTH_SECTION,
-          start: '/change-your-date-of-birth',
+          start: OWN_DOB_ROUTE,
           completeOn: [
             {
               route: SOMEONE_ELSE_DOB_ROUTE,
@@ -157,6 +160,17 @@ module.exports = {
               }
             },
             '/check-your-answers-someone-else-date-of-birth',
+            {
+              route: OWN_DOB_ROUTE,
+              reopenOnChange: OWN_DOB_FIELD,
+              condition: [
+                req => req.params?.action === 'edit',
+                req => req.sessionModel.get(CONTACT_DETAIL_UPDATES_STATE_KEY)
+                  ?.completedSections?.includes(DATE_OF_BIRTH_SECTION),
+                { field: OWN_DOB_FIELD, value: 'no' },
+                { field: SOMEONE_ELSE_DOB_FIELD, value: 'yes' }
+              ]
+            },
             {
               route: '/check-your-answers-date-of-birth',
               condition: [
@@ -169,14 +183,15 @@ module.exports = {
           ],
           noChanges: {
             route: SOMEONE_ELSE_DOB_ROUTE,
+            editRoute: OWN_DOB_ROUTE,
             when: [
-              { field: 'change-your-date-of-birth', value: 'no' },
+              { field: OWN_DOB_FIELD, value: 'no' },
               { field: SOMEONE_ELSE_DOB_FIELD, value: 'no' }
             ],
             header: `${SAA_NO_CHANGES_HEADER}.date-of-birth`
           },
           routes: [
-            '/change-your-date-of-birth',
+            OWN_DOB_ROUTE,
             '/correct-date-of-birth',
             '/new-date-of-birth-evidence',
             '/check-your-answers-date-of-birth',
@@ -187,7 +202,7 @@ module.exports = {
             '/check-your-answers-someone-else-date-of-birth'
           ],
           fieldsToUnset: [
-            'change-your-date-of-birth',
+            OWN_DOB_FIELD,
             'correct-date-of-birth',
             'documents-new-dob',
             SOMEONE_ELSE_DOB_FIELD,

@@ -412,6 +412,7 @@ module.exports = {
   'change-your-date-of-birth': {
     mixin: 'radio-group',
     options: ['yes', 'no'],
+    invalidates: ['documents-new-dob'],
     validate: ['required'],
     isPageHeading: true
   },
@@ -428,6 +429,7 @@ module.exports = {
   'change-someone-else-date-of-birth': {
     mixin: 'radio-group',
     options: ['yes', 'no'],
+    invalidates: ['documents-someone-else-new-dob'],
     validate: ['required'],
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
