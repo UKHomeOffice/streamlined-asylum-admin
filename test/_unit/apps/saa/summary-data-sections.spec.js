@@ -1,5 +1,7 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const Summary = require('hof').components.summary;
 const SummaryLabels = require('../../../../apps/saa/behaviours/summary-labels');
 const sections = require('../../../../apps/saa/sections/summary-data-sections');
@@ -357,8 +359,6 @@ describe('address rows on the check-your-answers page', () => {
   });
 
   test('renders address answers and their change links in the page template', () => {
-    const fs = require('fs');
-    const path = require('path');
     const hogan = require('hogan.js');
     const views = path.resolve(__dirname, '../../../../apps/saa/views');
     const template = hogan.compile(
