@@ -56,7 +56,6 @@ module.exports = {
       '/reason-someone-else-name-change',
       '/someone-else-new-name',
       '/someone-else-new-name-evidence',
-      '/check-your-answers-date-of-birth',
       '/change-someone-else-date-of-birth',
       '/relationship-date-of-birth',
       '/someone-else-correct-date-of-birth',

@@ -284,14 +284,18 @@ const getSectionIds = sections => sections.map(section => section.id);
 const completionIsOnRoute = route => completion =>
   getCompletionRoute(completion) === route;
 
-const sectionReopensOnRoute = (state, route, req) => section =>
+const sectionReopensOnRoute = (state, route, req, previousValues) => section =>
   asArray(state.completedSections).includes(section.id) &&
-  asArray(section.completeOn).some(completionIsOnRoute(route)) &&
+  asArray(section.completeOn).some(completion =>
+    completionIsOnRoute(route)(completion) &&
+    (!completion.reopenOnChange ||
+      previousValues[completion.reopenOnChange] !== req.sessionModel.get(completion.reopenOnChange))
+  ) &&
   !sectionCompletesOnRoute(section, route, req);
 
-const invalidateReopenedSections = (state, sections, route, req) => {
+const invalidateReopenedSections = (state, sections, route, req, previousValues) => {
   const reopenedIds = getSectionIds(
-    sections.filter(sectionReopensOnRoute(state, route, req))
+    sections.filter(sectionReopensOnRoute(state, route, req, previousValues))
   );
 
   if (!reopenedIds.length) {
@@ -460,7 +464,7 @@ const removeSectionSelection = (req, config, state, sectionId) => {
   return nextState;
 };
 
-const updateSectionState = (req, config, previousState, route) => {
+const updateSectionState = (req, config, previousState, route, previousValues = {}) => {
   const activeSections = getActiveSections(config, previousState.selections);
   const noChangesSection = getNoChangesSection(activeSections, route, req);
 
@@ -480,7 +484,8 @@ const updateSectionState = (req, config, previousState, route) => {
     resumedState,
     activeSections,
     route,
-    req
+    req,
+    previousValues
   );
 
   if (!completingSections.length) {
@@ -558,6 +563,28 @@ const getNoChangesLocals = (req, res, config, state) => {
   };
 };
 
+const updateEntryState = (req, config, previousState) => {
+  // Only the entry page recalculates selections from posted checkbox values.
+  const state = createState(
+    config,
+    previousState,
+    req.form.values[config.field]
+  );
+  const nextState = withSectionStartBackLink(
+    state,
+    config,
+    getEntryPointNextRoute(
+      req,
+      config,
+      getActiveSections(config, state.selections),
+      state
+    ),
+    config.entryPoint
+  );
+  clearInactiveValues(req, nextState);
+  return nextState;
+};
+
 const multiSelectFollowUps = behaviourConfig => SuperClass =>
   class MultiSelectFollowUps extends SuperClass {
     getMultiSelectFollowUpsConfig() {
@@ -577,6 +604,9 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
     }
 
     saveValues(req, res, callback) {
+      const previousValues = Object.fromEntries(
+        Object.keys(req.form.values || {}).map(field => [field, req.sessionModel.get(field)])
+      );
       /*
        * Let HOF save and validate the page in the normal way first. This behaviour
        * only updates its derived section state after the current page values have
@@ -599,31 +629,7 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
         let state;
 
         if (this.options.route === config.entryPoint) {
-          /*
-           * The entry page is the only place where selected options are
-           * recalculated from form values. This keeps the behaviour predictable:
-           * internal section pages do not silently change which sections are
-           * active unless a page-specific controller explicitly does so.
-           */
-          state = createState(
-            config,
-            previousState,
-            req.form.values[config.field]
-          );
-
-          state = withSectionStartBackLink(
-            state,
-            config,
-            getEntryPointNextRoute(
-              req,
-              config,
-              getActiveSections(config, state.selections),
-              state
-            ),
-            config.entryPoint
-          );
-
-          clearInactiveValues(req, state);
+          state = updateEntryState(req, config, previousState);
         } else if (this.options.route === config.noChangesPoint?.route) {
           if (!previousState.noChangesSection) {
             callback(
@@ -635,7 +641,7 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
           }
           state = this.resolveNoChanges(req, config, previousState);
         } else {
-          state = this.updateSectionState(req, config, previousState);
+          state = this.updateSectionState(req, config, previousState, previousValues);
         }
 
         req.sessionModel.set(config.stateKey, state);
@@ -666,8 +672,8 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
      * route marks that section complete, unless the section's `noChanges` rule
      * matches first, in which case the user is sent to the shared no-changes page.
      */
-    updateSectionState(req, config, previousState) {
-      return updateSectionState(req, config, previousState, this.options.route);
+    updateSectionState(req, config, previousState, previousValues) {
+      return updateSectionState(req, config, previousState, this.options.route, previousValues);
     }
 
     // "Yes" unticks the section's option and moves on; "No" keeps state so getNextStep returns to the section start.
