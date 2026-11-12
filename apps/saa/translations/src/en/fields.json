@@ -406,7 +406,8 @@
     "hint": "The name of the person you want to receive your letters"
   },
   "contact-address-line-1": {
-    "label": "Address line 1"
+    "label": "Address line 1",
+    "summary-label": "Where should we send the letters?"
   },
   "contact-address-line-2": {
     "label": "Address line 2 (optional)"
@@ -421,7 +422,8 @@
     "label": "Postcode"
   },
   "home-address-line-1": {
-    "label": "Address line 1"
+    "label": "Address line 1",
+    "summary-label": "UK address where you live now"
   },
   "home-address-line-2": {
     "label": "Address line 2 (optional)"

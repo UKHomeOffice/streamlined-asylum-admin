@@ -221,6 +221,181 @@ describe('summary data sections', () => {
   });
 });
 
+describe('address rows on the check-your-answers page', () => {
+  const addressSection =
+    require('../../../../apps/saa/sections/summary-data-address').address;
+  const ConfirmPage = SummaryLabels(Summary(class {}));
+  const pages = require('../../../../apps/saa/translations/src/en/pages.json');
+  const fieldTranslations =
+    require('../../../../apps/saa/translations/src/en/fields.json');
+  const createRequest = session => ({
+    baseUrl: '/changes',
+    sessionModel: { get: key => session[key] },
+    translate: keys => {
+      const list = [].concat(keys);
+      return list.map(key =>
+        key.split('.').reduce((value, part) => value?.[part], {
+          pages,
+          fields: fieldTranslations
+        })
+      ).find(value => typeof value === 'string') || list[list.length - 1];
+    },
+    form: {
+      options: {
+        fieldsConfig: {
+          'change-uk-address': { mixin: 'radio-group' },
+          'send-letters-to-home-address': { mixin: 'radio-group' },
+          'change-contact-address': { mixin: 'radio-group' }
+        },
+        steps: {}
+      }
+    }
+  });
+
+  test('includes the pages in the address flow and links each answer to its page', () => {
+    expect(addressSection.steps.map(row => row.field)).toEqual([
+      'change-uk-address',
+      'home-address-line-1',
+      'home-address-moved-date',
+      'send-letters-to-home-address',
+      'change-contact-address',
+      'reason-contact-address-change',
+      'contact-address-full-name',
+      'contact-address-line-1'
+    ]);
+    expect(addressSection.steps[0]).toMatchObject({
+      step: '/change-uk-address',
+      changeLink: '/changes/change-uk-address'
+    });
+    expect(addressSection.steps.find(row => row.field === 'reason-contact-address-change'))
+      .toMatchObject({
+        step: '/reason-contact-address-change',
+        changeLink: '/changes/reason-contact-address-change',
+        dependsOn: 'change-contact-address'
+      });
+  });
+
+  test('shows home-address answers only when a UK address change was selected', () => {
+    const homeAddressRow = addressSection.steps.find(
+      row => row.field === 'home-address-line-1'
+    );
+    const rowFields = session =>
+      new ConfirmPage()
+        .getFieldsForRow([homeAddressRow], createRequest(session))
+        .map(field => field.field);
+
+    expect(rowFields({ 'change-uk-address': 'yes', 'home-address-line-1': '1 High Street' }))
+      .toEqual(['home-address-line-1']);
+    expect(rowFields({ 'change-uk-address': 'no', 'home-address-line-1': '1 High Street' }))
+      .toEqual([]);
+  });
+
+  test('shows correspondence-address answers only when a separate address was selected', () => {
+    const contactAddressRow = addressSection.steps.find(
+      row => row.field === 'contact-address-line-1'
+    );
+    const rowFields = session =>
+      new ConfirmPage()
+        .getFieldsForRow([contactAddressRow], createRequest(session))
+        .map(field => field.field);
+
+    expect(
+      rowFields({
+        'change-contact-address': 'yes',
+        'contact-address-line-1': '2 High Street'
+      })
+    ).toEqual(['contact-address-line-1']);
+    expect(
+      rowFields({
+        'change-contact-address': 'no',
+        'contact-address-line-1': '2 High Street'
+      })
+    ).toEqual([]);
+  });
+
+  test.each([
+    ['home', 'change-uk-address', 'UK address where you live now', '/changes/home-address'],
+    [
+      'contact',
+      'change-contact-address',
+      'Where should we send the letters?',
+      '/changes/contact-address'
+    ]
+  ])('combines the %s address in order with one change link', (type, decision, label, link) => {
+    const prefix = `${type}-address`;
+    const req = createRequest({
+      [decision]: 'yes',
+      [`${prefix}-line-1`]: '21 Elmhurst Lane',
+      [`${prefix}-line-2`]: 'South Norwood',
+      [`${prefix}-town-or-city`]: 'London',
+      [`${prefix}-postcode`]: 'SE25 6RJ'
+    });
+    const fields = new ConfirmPage().getFieldsForRow(addressSection.steps, req);
+    const address = fields.find(row => row.field === `${prefix}-line-1`);
+
+    expect(address).toMatchObject({
+      label,
+      value: '21 Elmhurst Lane\nSouth Norwood\nLondon\nSE25 6RJ',
+      changeLink: link
+    });
+    expect(fields.some(row => row.field === `${prefix}-town-or-city`)).toBe(false);
+  });
+
+  test('omits empty optional address lines and includes the county when provided', () => {
+    const req = createRequest({
+      'change-uk-address': 'yes',
+      'home-address-line-1': '1 High Street',
+      'home-address-line-2': ' ',
+      'home-address-town-or-city': 'Town',
+      'home-address-county': 'County',
+      'home-address-postcode': 'AA1 1AA'
+    });
+    const fields = new ConfirmPage().getFieldsForRow(addressSection.steps, req);
+
+    expect(fields.find(row => row.field === 'home-address-line-1').value)
+      .toBe('1 High Street\nTown\nCounty\nAA1 1AA');
+  });
+
+  test('renders address answers and their change links in the page template', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const hogan = require('hogan.js');
+    const views = path.resolve(__dirname, '../../../../apps/saa/views');
+    const template = hogan.compile(
+      fs.readFileSync(path.join(views, 'check-your-answers-address.html'), 'utf8')
+    );
+    const summaryTable = fs.readFileSync(
+      path.join(views, 'partials/summary-table.html'),
+      'utf8'
+    );
+    const req = createRequest({
+      'change-uk-address': 'yes',
+      'home-address-line-1': '1 High Street',
+      'home-address-town-or-city': 'Town',
+      'home-address-postcode': 'AA1 1AA',
+      'home-address-moved-date': '2020-03-27'
+    });
+    const fields = new ConfirmPage().getFieldsForRow(addressSection.steps, req);
+    const html = template.render(
+      {
+        rows: [{ section: pages.confirm.sections.address.header, fields }],
+        t: () => 'Change',
+        'input-submit': () => 'Continue'
+      },
+      {
+        'partials-page': '{{$page-content}}{{/page-content}}',
+        'partials-summary-table': summaryTable
+      }
+    );
+
+    expect(html).toContain('Change your address');
+    expect(html).toContain('>1 High Street\nTown\nAA1 1AA</dd>');
+    expect(html).toContain('27 March 2020');
+    expect(html).toContain('href="/changes/home-address"');
+    expect(html).toContain('continue');
+  });
+});
+
 describe('name rows on the confirm page', () => {
   const ConfirmPage = SummaryLabels(Summary(class {}));
   const pages = require('../../../../apps/saa/translations/src/en/pages.json');

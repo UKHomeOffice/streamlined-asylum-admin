@@ -317,6 +317,9 @@
       "email-address": {
         "header": "Change your email address"
       },
+      "address": {
+        "header": "Change your address"
+      },
       "phone-number": {
         "header": "Change your phone number"
       },

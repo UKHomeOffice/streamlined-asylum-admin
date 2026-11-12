@@ -498,7 +498,8 @@ const steps = {
     next: '/check-your-answers-address'
   },
   '/check-your-answers-address': {
-    // Summary to be added in its story.
+    behaviours: [Summary, SummaryLabels, EditRouteReturn],
+    sections: require('./sections/summary-data-address'),
     next: '/do-you-need-add-remove-dependant'
   },
   '/do-you-need-add-remove-dependant': {
