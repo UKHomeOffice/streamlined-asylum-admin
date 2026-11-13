@@ -20,6 +20,8 @@
  * selected section starts next after the user enters or completes a section.
  */
 
+const { CHANGE_EDIT_DELETE_REGEX } = require('../../../utils/constants');
+
 const asArray = value => {
   if (Array.isArray(value)) {
     return value.filter(Boolean);
@@ -435,7 +437,9 @@ const clearInactiveValues = (req, state) => {
   if (Array.isArray(steps) && state.inactiveRoutes.length) {
     req.sessionModel.set(
       'steps',
-      steps.filter(route => !state.inactiveRoutes.includes(route))
+      steps.filter(route =>
+        !state.inactiveRoutes.includes(route.split(CHANGE_EDIT_DELETE_REGEX)[0])
+      )
     );
   }
 };

@@ -96,6 +96,61 @@ const completeSelectedSections = req => {
   });
 };
 
+describe('someone-else Nationality decision validation', () => {
+  const route = '/change-someone-else-nationality';
+  const field = 'change-someone-else-nationality';
+
+  test('an unanswered decision reports the translated required error without saving or advancing', done => {
+    const req = buildRequest(['nationality'], false, {
+      steps: [config.entryPoint, '/check-your-answers-nationality'],
+      'change-your-nationality': 'yes'
+    });
+    req.method = 'POST';
+    req.url = '/';
+    req.path = route;
+    const controller = buildController(route, req);
+    const res = { locals: {}, redirect: jest.fn() };
+    const validation = require('../../../../apps/saa/translations/src/en/validation.json');
+    req.translate = key => {
+      const translations = { validation, fields: fieldTranslations };
+      return key.split('.').reduce((value, part) => value?.[part], translations) || key;
+    };
+    checkProgress(route, controller, app.steps)(req, res, err => expect(err).toBeUndefined());
+    const previousState = req.sessionModel.get(config.stateKey);
+    const previousSteps = req.sessionModel.get('steps').slice();
+    const save = jest.spyOn(controller, 'saveValues');
+    const success = jest.spyOn(controller, 'successHandler');
+
+    controller.post(req, res, errors => {
+      try {
+        expect(errors[field]).toMatchObject({ key: field, type: 'required' });
+        expect(controller.getErrorMessage(errors[field], req, res))
+          .toBe('Select if you need to change their nationality');
+        expect(save).not.toHaveBeenCalled();
+        expect(success).not.toHaveBeenCalled();
+        expect(res.redirect).not.toHaveBeenCalled();
+        expect(req.sessionModel.get(field)).toBeUndefined();
+        expect(req.sessionModel.get(config.stateKey)).toEqual(previousState);
+        expect(req.sessionModel.get('steps')).toEqual(previousSteps);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test.each(['yes', 'no'])('answer %s passes validation', answer => {
+    const req = buildRequest(['nationality']);
+    req.form.values = { [field]: answer };
+    const controller = buildController(route, req);
+    const next = jest.fn();
+
+    controller._validate(req, { locals: {} }, next);
+
+    expect(next).toHaveBeenCalledWith();
+  });
+});
+
 describe('declining personal details', () => {
   const selections = config.options.map(option => option.value);
   const staleValues = Object.fromEntries(
@@ -163,6 +218,31 @@ describe('declining personal details', () => {
     req.sessionModel.unset(config.stateKey);
     post('/personal-details', req, { 'change-personal-details': 'no' }, true);
     Object.keys(staleValues).forEach(field => expect(req.sessionModel.get(field)).toBeUndefined());
+  });
+
+  test('parent No removes inactive action history while preserving unrelated and similarly named routes', () => {
+    const removed = [
+      '/new-name',
+      '/new-name/change',
+      '/new-name/edit/0',
+      '/check-your-answers-someone-else-name/delete/1'
+    ];
+    const preserved = [
+      '/who-are-you',
+      '/new-name-extra/edit/0',
+      '/dependants/delete/1',
+      '/something-else/edit',
+      '/new-name/editor'
+    ];
+    const req = buildRequest(selections, true, {
+      'add-remove-dependant': 'yes',
+      steps: [...removed, ...preserved]
+    });
+
+    post('/personal-details', req, { 'change-personal-details': 'no' }, true);
+
+    removed.forEach(route => expect(req.sessionModel.get('steps')).not.toContain(route));
+    preserved.forEach(route => expect(req.sessionModel.get('steps')).toContain(route));
   });
 
   test('parent Yes preserves existing selected sections and their saved data', () => {
