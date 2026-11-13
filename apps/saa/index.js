@@ -295,6 +295,7 @@ const steps = {
     next: '/do-you-need-add-remove-dependant'
   },
   '/nationality-change': {
+    continueOnEdit: true,
     // Page fields and validation belong to its Nationality story.
     forks: [
       {
@@ -321,6 +322,7 @@ const steps = {
     next: '/check-your-answers-nationality'
   },
   '/check-your-answers-nationality': {
+    continueOnEdit: true,
     // Summary to be added in its story.
     next: '/change-someone-else-nationality'
   },

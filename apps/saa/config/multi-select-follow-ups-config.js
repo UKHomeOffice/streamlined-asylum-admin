@@ -36,17 +36,26 @@ const CONTACT_DETAIL_UPDATES_STATE_KEY = 'contact-detail-updates';
 const EDIT_RETURN_PATH_KEY = 'edit-return-path';
 const DATE_OF_BIRTH_SECTION = 'date-of-birth';
 const NAME_SECTION = 'name';
+const NATIONALITY_SECTION = 'nationality';
 const PHOTO_IDENTITY_ROUTE = '/provide-photo-identity';
 const OWN_NAME_ROUTE = '/do-you-need-to-change-your-name';
 const SOMEONE_ELSE_NAME_ROUTE = '/do-you-need-to-change-someone-elses-name';
 const OWN_DOB_ROUTE = '/change-your-date-of-birth';
+const OWN_NATIONALITY_ROUTE = '/nationality-change';
 const SOMEONE_ELSE_DOB_ROUTE = '/change-someone-else-date-of-birth';
 const SOMEONE_ELSE_NATIONALITY_ROUTE = '/change-someone-else-nationality';
 const OWN_NAME_FIELD = 'do-you-need-to-change-your-name';
 const SOMEONE_ELSE_NAME_FIELD = 'change-someone-elses-name';
 const OWN_DOB_FIELD = 'change-your-date-of-birth';
+const OWN_NATIONALITY_FIELD = 'change-your-nationality';
 const SOMEONE_ELSE_DOB_FIELD = 'change-someone-else-date-of-birth';
 const SOMEONE_ELSE_NATIONALITY_FIELD = 'change-someone-else-nationality';
+
+const hasCompletedOwnEdit = (req, section, ownRoute) => {
+  const state = req.sessionModel.get(CONTACT_DETAIL_UPDATES_STATE_KEY);
+  return state?.completedSections?.includes(section) ||
+    state?.reopenedSections?.[section] === ownRoute;
+};
 
 // The photo identity page is shown once, last, when any contact detail is still selected.
 const photoIdentitySection = {
@@ -104,8 +113,7 @@ module.exports = {
               condition: [
                 req => req.params?.action === 'edit' ||
                   Boolean(req.sessionModel.get(EDIT_RETURN_PATH_KEY)),
-                req => req.sessionModel.get(CONTACT_DETAIL_UPDATES_STATE_KEY)
-                  ?.completedSections?.includes(NAME_SECTION)
+                req => hasCompletedOwnEdit(req, NAME_SECTION, OWN_NAME_ROUTE)
               ]
             }
           ],
@@ -182,8 +190,7 @@ module.exports = {
               condition: [
                 req => req.params?.action === 'edit' ||
                   Boolean(req.sessionModel.get(EDIT_RETURN_PATH_KEY)),
-                req => req.sessionModel.get(CONTACT_DETAIL_UPDATES_STATE_KEY)
-                  ?.completedSections?.includes(DATE_OF_BIRTH_SECTION)
+                req => hasCompletedOwnEdit(req, DATE_OF_BIRTH_SECTION, OWN_DOB_ROUTE)
               ]
             }
           ],
@@ -223,12 +230,12 @@ module.exports = {
       ]
     },
     {
-      value: 'nationality',
+      value: NATIONALITY_SECTION,
       order: 30,
       sections: [
         {
-          id: 'nationality',
-          start: '/nationality-change',
+          id: NATIONALITY_SECTION,
+          start: OWN_NATIONALITY_ROUTE,
           completeOn: [
             {
               route: SOMEONE_ELSE_NATIONALITY_ROUTE,
@@ -237,18 +244,38 @@ module.exports = {
                 value: 'no'
               }
             },
-            '/check-your-answers-someone-else-nationality'
+            '/check-your-answers-someone-else-nationality',
+            {
+              route: OWN_NATIONALITY_ROUTE,
+              reopenOnChange: OWN_NATIONALITY_FIELD,
+              condition: [
+                req => req.params?.action === 'edit',
+                req => req.sessionModel.get(CONTACT_DETAIL_UPDATES_STATE_KEY)
+                  ?.completedSections?.includes(NATIONALITY_SECTION),
+                { field: OWN_NATIONALITY_FIELD, value: 'no' },
+                { field: SOMEONE_ELSE_NATIONALITY_FIELD, value: 'yes' }
+              ]
+            },
+            {
+              route: '/check-your-answers-nationality',
+              condition: [
+                req => req.params?.action === 'edit' ||
+                  Boolean(req.sessionModel.get(EDIT_RETURN_PATH_KEY)),
+                req => hasCompletedOwnEdit(req, NATIONALITY_SECTION, OWN_NATIONALITY_ROUTE)
+              ]
+            }
           ],
           noChanges: {
             route: SOMEONE_ELSE_NATIONALITY_ROUTE,
+            editRoute: OWN_NATIONALITY_ROUTE,
             when: [
-              { field: 'change-your-nationality', value: 'no' },
+              { field: OWN_NATIONALITY_FIELD, value: 'no' },
               { field: SOMEONE_ELSE_NATIONALITY_FIELD, value: 'no' }
             ],
             header: `${SAA_NO_CHANGES_HEADER}.nationality`
           },
           routes: [
-            '/nationality-change',
+            OWN_NATIONALITY_ROUTE,
             '/correct-nationality',
             '/reason-nationality-change',
             '/upload-nationality-evidence',
@@ -262,7 +289,7 @@ module.exports = {
           ],
           // Add the page fields and loop key as the nationality page stories are built.
           fieldsToUnset: [
-            'change-your-nationality',
+            OWN_NATIONALITY_FIELD,
             SOMEONE_ELSE_NATIONALITY_FIELD
           ]
         }

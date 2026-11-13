@@ -189,6 +189,7 @@ const getFieldsToUnset = (config, inactiveSections, removedSelections) =>
  * - `activeSections`: selected follow-up sections in configured order
  * - `activeRoutes`: all possible routes owned by those active sections
  * - `completedSections`: active sections whose `completeOn` route has posted
+ * - `reopenedSections`: completed sections reopened at a change-sensitive boundary, keyed to that route
  * - `addedSections`: newly selected sections, used to prioritise edit journeys
  * - `inactiveSections`: previously active sections that are no longer selected
  * - `noChangesSection` / `noChangesFrom`: the section that reported no changes, and its reporting page
@@ -231,6 +232,11 @@ const createState = (config, previousState, selections) => {
     activeSections: activeSectionIds,
     activeRoutes,
     completedSections,
+    reopenedSections: Object.fromEntries(
+      Object.entries(previousState.reopenedSections || {}).filter(
+        ([sectionId]) => activeSectionIds.includes(sectionId)
+      )
+    ),
     lastCompletionRoute,
     sectionStartBackLinks: pruneBackLinks(
       previousState.sectionStartBackLinks,
@@ -300,8 +306,21 @@ const invalidateReopenedSections = (state, sections, route, req, previousValues)
     sections.filter(sectionReopensOnRoute(state, route, req, previousValues))
   );
 
+  const reopenedSections = { ...state.reopenedSections };
+  sections.forEach(section => {
+    const boundaries = asArray(section.completeOn).filter(completionIsOnRoute(route));
+    if (!boundaries.length) {
+      return;
+    }
+    if (reopenedIds.includes(section.id) && boundaries.some(boundary => boundary.reopenOnChange)) {
+      reopenedSections[section.id] = route;
+    } else if (reopenedSections[section.id] !== route) {
+      delete reopenedSections[section.id];
+    }
+  });
+
   if (!reopenedIds.length) {
-    return state;
+    return state.reopenedSections ? { ...state, reopenedSections } : state;
   }
 
   const sectionStartBackLinks = Object.fromEntries(
@@ -314,6 +333,7 @@ const invalidateReopenedSections = (state, sections, route, req, previousValues)
   // Reopening a boundary revokes completion and links created by that completion.
   return {
     ...state,
+    reopenedSections,
     completedSections: asArray(state.completedSections).filter(
       sectionId => !reopenedIds.includes(sectionId)
     ),
@@ -415,6 +435,9 @@ const getNoChangesSection = (sections, route, req) =>
 
 const markNoChanges = (state, section, route) => ({
   ...state,
+  reopenedSections: Object.fromEntries(
+    Object.entries(state.reopenedSections || {}).filter(([sectionId]) => sectionId !== section.id)
+  ),
   completedSections: asArray(state.completedSections).filter(
     sectionId => sectionId !== section.id
   ),
@@ -498,6 +521,11 @@ const updateSectionState = (req, config, previousState, route, previousValues = 
 
   state = {
     ...state,
+    reopenedSections: Object.fromEntries(
+      Object.entries(state.reopenedSections || {}).filter(
+        ([sectionId]) => !getSectionIds(completingSections).includes(sectionId)
+      )
+    ),
     completedSections: getCompletedSections(state, completingSections),
     lastCompletionRoute: getLastCompletionRoute(
       state,
