@@ -296,12 +296,13 @@ const steps = {
   },
   '/nationality-change': {
     // Page fields and validation belong to its Nationality story.
+    fields: ['nationality-change'],
     forks: [
       {
         target: '/change-someone-else-nationality',
         continueOnEdit: true,
         condition: {
-          field: 'change-your-nationality',
+          field: 'nationality-change',
           value: 'no'
         }
       }
@@ -309,7 +310,7 @@ const steps = {
     next: '/correct-nationality'
   },
   '/correct-nationality': {
-    // Page fields to be added in its story.
+    fields: ['correct-nationality'],
     next: '/reason-nationality-change'
   },
   '/reason-nationality-change': {

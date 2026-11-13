@@ -462,5 +462,19 @@
   },
   "documents-someone-else-new-dob": {
     "summary-label": "Files uploaded"
+  },
+  "nationality-change": {
+    "legend": "Do you need to change your nationality?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
+  "correct-nationality": {
+    "label": "Select a country"
   }
 }

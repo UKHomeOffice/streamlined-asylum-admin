@@ -253,5 +253,11 @@
     "required": "Confirm your new phone number",
     "internationalPhoneNumber": "Enter a real new phone number",
     "matchField": "Number must be the same"
+  },
+  "nationality-change": {
+    "required": "Select if you need to change your nationality"
+  },
+  "correct-nationality": {
+    "required": "Select your country of nationality"
   }
 }

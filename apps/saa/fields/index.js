@@ -407,5 +407,24 @@ module.exports = {
     matchField: 'new-phone-number',
     className: ['govuk-input', 'govuk-input--width-20'],
     labelClassName: 'govuk-label--s'
-  }
+  },
+  'nationality-change': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    invalidates: ['documents-nationality'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    isPageHeading: true
+  },
+  'correct-nationality': {
+    mixin: 'select',
+    className: ['typeahead'],
+    validate: ['required'],
+    options: [
+      {
+        value: '',
+        label: 'fields.correct-nationality.options.none_selected'
+      }
+    ].concat(countries)
+  },
 };
