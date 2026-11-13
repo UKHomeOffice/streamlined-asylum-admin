@@ -1,5 +1,5 @@
 {
-  "appName": "Streamlined Asylum Admin",
+  "appName": "Send information for your asylum claim",
   "theme": "govUK",
   "behaviours": ["hof/components/clear-session"],
   "translations": "./apps/saa/translations",
