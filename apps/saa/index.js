@@ -361,7 +361,7 @@ const steps = {
     next: '/do-you-need-add-remove-dependant'
   },
   '/change-uk-address': {
-    // Page fields and validation belong to its Address story.
+    fields: ['change-uk-address'],
     forks: [
       {
         target: '/change-contact-address',
@@ -375,7 +375,15 @@ const steps = {
     next: '/home-address'
   },
   '/home-address': {
-    // Address, moved date and letter-delivery fields belong to its Address story.
+    fields: [
+      'home-address-line-1',
+      'home-address-line-2',
+      'home-address-town-or-city',
+      'home-address-county',
+      'home-address-postcode',
+      'home-address-moved-date',
+      'send-letters-to-home-address'
+    ],
     forks: [
       {
         target: '/change-contact-address',
@@ -462,7 +470,7 @@ const steps = {
     next: '/personal-details'
   },
   '/change-contact-address': {
-    // Page fields and validation belong to its Address story.
+    fields: ['change-contact-address'],
     forks: [
       {
         target: '/reason-contact-address-change',
@@ -476,15 +484,23 @@ const steps = {
     next: '/check-your-answers-address'
   },
   '/reason-contact-address-change': {
-    // Page fields to be added in its story.
+    fields: ['reason-contact-address-change'],
     next: '/contact-address'
   },
   '/contact-address': {
-    // Page fields to be added in its story.
+    fields: [
+      'contact-address-full-name',
+      'contact-address-line-1',
+      'contact-address-line-2',
+      'contact-address-town-or-city',
+      'contact-address-county',
+      'contact-address-postcode'
+    ],
     next: '/check-your-answers-address'
   },
   '/check-your-answers-address': {
-    // Summary to be added in its story.
+    behaviours: [Summary, SummaryLabels, EditRouteReturn],
+    sections: require('./sections/summary-data-address'),
     next: '/do-you-need-add-remove-dependant'
   },
   '/do-you-need-add-remove-dependant': {

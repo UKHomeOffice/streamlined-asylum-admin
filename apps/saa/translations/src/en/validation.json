@@ -197,6 +197,67 @@
     "email": "Enter a real new email address",
     "matchField": "Email address must be the same"
   },
+  "change-uk-address": {
+    "required": "Select if you have a new UK  address"
+  },
+  "change-contact-address": {
+    "required": "Select if you need to change the address we send your letters to"
+  },
+  "reason-contact-address-change": {
+    "required": "Enter why you need letters sent to a different address",
+    "maxlength": "Reason must be between 1 and 500 characters",
+    "notUrl": "Reason must not contain a URL"
+  },
+  "contact-address-full-name": {
+    "required": "Enter the full name of the person you want to receive your letters"
+  },
+  "contact-address-line-1": {
+    "required": "Enter the first line of your contact address",
+    "notUrl": "First line of address cannot contain a URL",
+    "maxlength": "First line of address should be no more than 60 characters, including spaces"
+  },
+  "contact-address-line-2": {
+    "notUrl": "Second line of address cannot contain a URL",
+    "maxlength": "Second line of address should be no more than 60 characters, including spaces"
+  },
+  "contact-address-town-or-city": {
+    "required": "Enter the town or city of your contact address",
+    "notUrl": "Town or city cannot contain a URL",
+    "maxlength": "Town or city should be no more than 60 characters, including spaces"
+  },
+  "contact-address-county": {
+    "maxlength": "County should be no more than 60 characters, including spaces",
+    "notUrl": "County cannot contain a URL"
+  },
+  "contact-address-postcode": {
+    "required": "Enter the postcode of your contact address",
+    "postcode": "Enter a real UK postcode"
+  },
+  "home-address-line-1": {
+    "required": "Enter address line 1"
+  },
+  "home-address-town-or-city": {
+    "required": "Enter the town or city of your UK address",
+    "notUrl": "Town or city cannot contain a URL",
+    "maxlength": "Town or city should be no more than 60 characters, including spaces"
+  },
+  "home-address-county": {
+    "maxlength": "County should be no more than 60 characters, including spaces",
+    "notUrl": "County cannot contain a URL"
+  },
+  "home-address-postcode": {
+    "required": "Enter the postcode of your UK address",
+    "postcode": "Enter a real UK postcode"
+  },
+  "home-address-moved-date": {
+    "required": "Enter the date you moved to this address",
+    "date": "Enter a real date",
+    "before": "Date must be in the past",
+    "after": "Enter a date after 01 01 1900"
+  },
+  "send-letters-to-home-address": {
+    "required": "Select if we can send letters to this address"
+  },
   "change-your-date-of-birth": {
     "required": "Select if you want to change your date of birth"
   },

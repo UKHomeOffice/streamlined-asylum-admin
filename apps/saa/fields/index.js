@@ -304,6 +304,111 @@ module.exports = {
     matchField: 'new-email-address',
     labelClassName: 'govuk-label--s'
   },
+  'change-uk-address': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    isPageHeading: true
+  },
+  'change-contact-address': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    legend: { className: 'visuallyhidden' }
+  },
+  'reason-contact-address-change': {
+    mixin: 'textarea',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 500 }],
+    attributes: [{ attribute: 'rows', value: 5 }],
+    isPageHeading: true
+  },
+  'contact-address-full-name': {
+    mixin: 'input-text',
+    validate: ['required'],
+    labelClassName: 'govuk-label--s'
+  },
+  'contact-address-line-1': {
+    mixin: 'input-text',
+    validate: [
+      'required',
+      'notUrl',
+      { type: 'maxlength', arguments: 60 }
+    ],
+    labelClassName: 'govuk-label--s'
+  },
+  'contact-address-line-2': {
+    mixin: 'input-text',
+    validate: ['notUrl', { type: 'maxlength', arguments: 60 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'contact-address-town-or-city': {
+    mixin: 'input-text',
+    validate: [
+      'required',
+      'notUrl',
+      { type: 'maxlength', arguments: 60 }
+    ],
+    labelClassName: 'govuk-label--s',
+    className: ['govuk-input', 'govuk-!-width-two-thirds']
+  },
+  'contact-address-county': {
+    mixin: 'input-text',
+    validate: ['notUrl', { type: 'maxlength', arguments: 60 }],
+    labelClassName: 'govuk-label--s',
+    className: ['govuk-input', 'govuk-!-width-two-thirds']
+  },
+  'contact-address-postcode': {
+    mixin: 'input-text',
+    validate: ['required', 'postcode'],
+    labelClassName: 'govuk-label--s',
+    className: ['govuk-input', 'govuk-input--width-10']
+  },
+  'home-address-line-1': {
+    mixin: 'input-text',
+    validate: ['required'],
+    labelClassName: 'govuk-label--s'
+  },
+  'home-address-line-2': {
+    mixin: 'input-text',
+    labelClassName: 'govuk-label--s'
+  },
+  'home-address-town-or-city': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 60 }],
+    labelClassName: 'govuk-label--s',
+    className: ['govuk-input', 'govuk-!-width-two-thirds']
+  },
+  'home-address-county': {
+    mixin: 'input-text',
+    validate: ['notUrl', { type: 'maxlength', arguments: 60 }],
+    labelClassName: 'govuk-label--s',
+    className: ['govuk-input', 'govuk-!-width-two-thirds']
+  },
+  'home-address-postcode': {
+    mixin: 'input-text',
+    validate: ['required', 'postcode'],
+    labelClassName: 'govuk-label--s',
+    className: ['govuk-input', 'govuk-input--width-10']
+  },
+  'home-address-moved-date': dateComponent('home-address-moved-date', {
+    mixin: 'input-date',
+    validate: [
+      'required',
+      'date',
+      { type: 'before', arguments: ['0', 'days'] },
+      { type: 'after', arguments: '1900-01-01' }
+    ],
+    legend: { className: 'govuk-label--s' }
+  }),
+  'send-letters-to-home-address': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    legend: { className: 'govuk-label--s' }
+  },
   'change-your-date-of-birth': {
     mixin: 'radio-group',
     options: ['yes', 'no'],

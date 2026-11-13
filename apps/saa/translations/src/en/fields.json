@@ -376,6 +376,82 @@
   "confirm-new-email-address": {
     "label": "Confirm new email address"
   },
+  "change-uk-address": {
+    "legend": "Have you moved to a new address in the UK?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
+  "change-contact-address": {
+    "legend": "Do you need to change the address we send your letters to?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
+  "reason-contact-address-change": {
+    "label": "Why do you need us to send letters to a different address?"
+  },
+  "contact-address-full-name": {
+    "label": "Full name",
+    "hint": "The name of the person you want to receive your letters"
+  },
+  "contact-address-line-1": {
+    "label": "Address line 1",
+    "summary-label": "Where should we send the letters?"
+  },
+  "contact-address-line-2": {
+    "label": "Address line 2 (optional)"
+  },
+  "contact-address-town-or-city": {
+    "label": "Town or city"
+  },
+  "contact-address-county": {
+    "label": "County (optional)"
+  },
+  "contact-address-postcode": {
+    "label": "Postcode"
+  },
+  "home-address-line-1": {
+    "label": "Address line 1",
+    "summary-label": "UK address where you live now"
+  },
+  "home-address-line-2": {
+    "label": "Address line 2 (optional)"
+  },
+  "home-address-town-or-city": {
+    "label": "Town or city"
+  },
+  "home-address-county": {
+    "label": "County (optional)"
+  },
+  "home-address-postcode": {
+    "label": "Postcode"
+  },
+  "home-address-moved-date": {
+    "legend": "When did you move to this address?",
+    "hint": "For example, 27 3 2020"
+  },
+  "send-letters-to-home-address": {
+    "legend": "Can we send letters to this address?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
   "change-your-date-of-birth": {
     "legend": "Do you need to change your date of birth?",
     "options": {

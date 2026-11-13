@@ -25,6 +25,23 @@ const sections = followUps.getActiveSections(
 );
 const noChangesSections = sections.filter(section => section.noChanges);
 
+test('home address includes the required letter-delivery radio question', () => {
+  const field = 'send-letters-to-home-address';
+  expect(app.steps['/home-address'].fields).toContain(field);
+  expect(fields[field]).toMatchObject({
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required']
+  });
+  expect(fieldTranslations[field]).toEqual({
+    legend: 'Can we send letters to this address?',
+    options: {
+      yes: { label: 'Yes' },
+      no: { label: 'No' }
+    }
+  });
+});
+
 const buildRequest = (selections, edit = false, values = {}) => ({
   baseUrl: app.baseUrl,
   params: edit ? { action: 'edit' } : {},
@@ -62,6 +79,298 @@ const buildController = (route, req) => {
   );
   return new Composed(options);
 };
+
+describe('change UK address question', () => {
+  test('includes a Yes/No radio question and personal details caption', () => {
+    expect(app.steps['/change-uk-address'].fields).toEqual(['change-uk-address']);
+    expect(fields['change-uk-address']).toMatchObject({
+      mixin: 'radio-group',
+      options: ['yes', 'no'],
+      validate: ['required'],
+      isPageHeading: true
+    });
+    expect(pages['change-uk-address'].captionHeading).toBe('Update personal details');
+    expect(fieldTranslations['change-uk-address']).toEqual({
+      legend: 'Have you moved to a new address in the UK?',
+      options: {
+        yes: { label: 'Yes' },
+        no: { label: 'No' }
+      }
+    });
+  });
+
+  test.each([
+    ['yes', undefined],
+    ['no', undefined],
+    ['', 'required']
+  ])('validates "%s" with error %s', (value, errorType) => {
+    const field = 'change-uk-address';
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: value };
+    const controller = buildController('/change-uk-address', req);
+
+    const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeUndefined();
+    }
+  });
+});
+
+describe('change contact address question', () => {
+  test('includes a Yes/No radio question and personal details caption', () => {
+    expect(app.steps['/change-contact-address'].fields).toEqual(['change-contact-address']);
+    expect(fields['change-contact-address']).toMatchObject({
+      mixin: 'radio-group',
+      options: ['yes', 'no'],
+      validate: ['required']
+    });
+    expect(pages['change-contact-address'].captionHeading).toBe('Update personal details');
+    expect(fieldTranslations['change-contact-address']).toEqual({
+      legend: 'Do you need to change the address we send your letters to?',
+      options: {
+        yes: { label: 'Yes' },
+        no: { label: 'No' }
+      }
+    });
+  });
+
+  test.each([
+    ['yes', undefined],
+    ['no', undefined],
+    ['', 'required']
+  ])('validates "%s" with error %s', (value, errorType) => {
+    const field = 'change-contact-address';
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: value };
+    const controller = buildController('/change-contact-address', req);
+
+    const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeUndefined();
+    }
+  });
+});
+
+describe('contact address change reason', () => {
+  const field = 'reason-contact-address-change';
+
+  test('includes a textarea heading and personal details caption', () => {
+    expect(app.steps['/reason-contact-address-change'].fields).toEqual([field]);
+    expect(fields[field]).toMatchObject({
+      mixin: 'textarea',
+      isPageHeading: true
+    });
+    expect(pages[field].captionHeading).toBe('Update personal details');
+    expect(fieldTranslations[field].label)
+      .toBe('Why do you need us to send letters to a different address?');
+  });
+
+  test.each([
+    ['a', undefined],
+    ['Please send letters to my family.', undefined],
+    ['a'.repeat(500), undefined],
+    ['a'.repeat(501), 'maxlength'],
+    ['https://example.com', 'notUrl'],
+    ['Please use www.example.com', 'notUrl'],
+    ['', 'required']
+  ])('validates "%s" with error %s', (value, errorType) => {
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: value };
+    const controller = buildController('/reason-contact-address-change', req);
+
+    const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeUndefined();
+    }
+  });
+});
+
+describe('contact address fields', () => {
+  test('includes the recipient and address fields in order with the requested caption and hint', () => {
+    expect(app.steps['/contact-address'].fields).toEqual([
+      'contact-address-full-name',
+      'contact-address-line-1',
+      'contact-address-line-2',
+      'contact-address-town-or-city',
+      'contact-address-county',
+      'contact-address-postcode'
+    ]);
+    expect(pages['contact-address'].captionHeading).toBe('Update personal details');
+    expect(fieldTranslations['contact-address-full-name']).toEqual({
+      label: 'Full name',
+      hint: 'The name of the person you want to receive your letters'
+    });
+    expect(app.steps['/contact-address'].fields.map(field => fieldTranslations[field].label))
+      .toEqual([
+        'Full name', 'Address line 1', 'Address line 2 (optional)',
+        'Town or city', 'County (optional)', 'Postcode'
+      ]);
+  });
+
+  test.each([
+    ['contact-address-full-name', '', 'required'],
+    ['contact-address-full-name', 'Alex Smith', undefined],
+    ['contact-address-line-1', '', 'required'],
+    ['contact-address-line-1', '1 High Street', undefined],
+    ['contact-address-line-1', 'a'.repeat(60), undefined],
+    ['contact-address-line-1', 'a'.repeat(61), 'maxlength'],
+    ['contact-address-line-1', 'https://example.com', 'notUrl'],
+    ['contact-address-line-2', '', undefined],
+    ['contact-address-line-2', 'a'.repeat(60), undefined],
+    ['contact-address-line-2', 'a'.repeat(61), 'maxlength'],
+    ['contact-address-line-2', 'https://example.com', 'notUrl'],
+    ['contact-address-town-or-city', '', 'required'],
+    ['contact-address-town-or-city', 'a'.repeat(60), undefined],
+    ['contact-address-town-or-city', 'a'.repeat(61), 'maxlength'],
+    ['contact-address-town-or-city', 'https://example.com', 'notUrl'],
+    ['contact-address-county', '', undefined],
+    ['contact-address-county', 'a'.repeat(60), undefined],
+    ['contact-address-county', 'a'.repeat(61), 'maxlength'],
+    ['contact-address-county', 'https://example.com', 'notUrl'],
+    ['contact-address-postcode', '', 'required'],
+    ['contact-address-postcode', 'SW1A 1AA', undefined],
+    ['contact-address-postcode', 'invalid', 'postcode']
+  ])('validates %s value "%s" with error %s', (field, value, errorType) => {
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: value };
+    const controller = buildController('/contact-address', req);
+
+    const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeFalsy();
+    }
+  });
+
+  test.each(
+    ['contact-address-line-1', 'contact-address-town-or-city'].flatMap(field =>
+      ['(', ')', ',', '.', '/', '&', '-'].map(character => [field, character])
+    )
+  )('accepts %s containing "%s"', (field, character) => {
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: `Some ${character} place` };
+    const controller = buildController('/contact-address', req);
+
+    expect(controller.validateField(field, req)).toBeFalsy();
+  });
+
+  test.each(['contact-address-line-1', 'contact-address-town-or-city'])(
+    'allows apostrophes and accented letters and counts spaces towards the limit in %s',
+    field => {
+      const req = buildRequest(['address']);
+      const controller = buildController('/contact-address', req);
+      for (const value of ["St John's", 'Caf\u00e9', `${'a'.repeat(29)} ${'b'.repeat(30)}`]) {
+        req.form.values = { [field]: value };
+        expect(controller.validateField(field, req)).toBeFalsy();
+      }
+      req.form.values = { [field]: `${'a'.repeat(30)} ${'b'.repeat(30)}` };
+      expect(controller.validateField(field, req)).toMatchObject({
+        key: field,
+        type: 'maxlength'
+      });
+    }
+  );
+});
+
+describe.each([
+  ['home-address-town-or-city', 'required'],
+  ['home-address-county', undefined]
+])('home address %s validation', (field, emptyError) => {
+  test.each([
+    ['London', undefined],
+    ['Newcastle upon Tyne', undefined],
+    [`${'a'.repeat(29)} ${'b'.repeat(30)}`, undefined],
+    [`${'a'.repeat(30)} ${'b'.repeat(30)}`, 'maxlength'],
+    ['https://example.com', 'notUrl'],
+    ['London www.example.com', 'notUrl'],
+    ['', emptyError]
+  ])('validates "%s" with error %s', (value, errorType) => {
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: value };
+    const controller = buildController('/home-address', req);
+
+    const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeUndefined();
+    }
+  });
+});
+
+describe('home address postcode validation', () => {
+  test.each([
+    ['SW1A 1AA', undefined],
+    ['sw1a 1aa', undefined],
+    ['SW1A1AA', undefined],
+    ['M1 1AE', undefined],
+    ['not a postcode', 'postcode'],
+    ['12345', 'postcode'],
+    ['SW1A', 'postcode'],
+    ['', 'required']
+  ])('validates "%s" with error %s', (value, errorType) => {
+    const field = 'home-address-postcode';
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: value };
+    const controller = buildController('/home-address', req);
+
+    const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeUndefined();
+    }
+  });
+});
+
+describe('home address moved date validation', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date(2026, 10, 11, 15, 30));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  test.each([
+    ['1899-12-31', 'after'],
+    ['1900-01-01', 'after'],
+    ['1900-01-02', undefined],
+    ['2020-03-27', undefined],
+    ['2026-11-10', undefined],
+    ['2026-11-11', undefined],
+    ['2026-11-12', 'before'],
+    ['2020-02-30', 'date'],
+    ['', 'required']
+  ])('validates "%s" with error %s', (value, errorType) => {
+    const field = 'home-address-moved-date';
+    const req = buildRequest(['address']);
+    req.form.values = { [field]: value };
+    const controller = buildController('/home-address', req);
+
+    const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeUndefined();
+    }
+  });
+});
 
 const post = (route, req, values = {}, complete = false) => {
   req.form.values = values;
@@ -346,20 +655,23 @@ describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
       .toEqual(['nationality', 'email-address', 'photo-identity']);
   });
 
-  test('changing the UK address then declining a contact address still needs address CYA', () => {
-    const req = buildRequest(['address'], edit, { 'change-uk-address': 'yes' });
-    expect(
-      post('/change-contact-address', req, { 'change-contact-address': 'no' })
-        .url
-    ).toBe(`${app.baseUrl}/check-your-answers-address${suffix}`);
-    expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([]);
-    expect(post('/check-your-answers-address', req).url).toBe(
-      `${app.baseUrl}/provide-photo-identity${suffix}`
-    );
-    expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([
-      'address'
-    ]);
-  });
+  test(
+    'changing the UK address then declining a contact address still needs address CYA',
+    () => {
+      const req = buildRequest(['address'], edit, { 'change-uk-address': 'yes' });
+      expect(
+        post('/change-contact-address', req, { 'change-contact-address': 'no' })
+          .url
+      ).toBe(`${app.baseUrl}/check-your-answers-address${suffix}`);
+      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([]);
+      expect(post('/check-your-answers-address', req).url).toBe(
+        `${app.baseUrl}/provide-photo-identity${suffix}`
+      );
+      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([
+        'address'
+      ]);
+    }
+  );
 
   test('email and phone CYA defer EditRouteReturn until the shared identity section completes', () => {
     const req = buildRequest(['email-address', 'phone-number'], edit, {
@@ -1088,6 +1400,20 @@ describe('contact-detail edit completion', () => {
       expect(req.sessionModel.get(config.field)).toEqual(selections);
     }
   );
+
+  test.each([
+    ['yes', '/home-address'],
+    ['no', '/change-contact-address']
+  ])('editing the UK address decision from confirm with %s follows the address flow', (answer, target) => {
+    const req = buildRequest(['address'], true, {
+      steps: sections.flatMap(section => section.routes),
+      'edit-return-path': `${app.baseUrl}/confirm`
+    });
+    completeSelectedSections(req);
+
+    expect(post('/change-uk-address', req, { 'change-uk-address': answer }).url)
+      .toBe(`${app.baseUrl}${target}/edit`);
+  });
 
   test('checkbox edits still complete newly selected sections and their identity dependency', () => {
     const req = buildRequest(['name'], true, {
