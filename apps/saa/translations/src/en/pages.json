@@ -90,9 +90,10 @@
     "add-another-name": "Change another name"
   },
   "nationality-change": {
-    "header": "Do you need to change your nationality?"
+    "captionHeading": "Update personal details"
   },
   "correct-nationality": {
+    "captionHeading": "Update personal details",
     "header": "What is your country of nationality?"
   },
   "reason-nationality-change": {

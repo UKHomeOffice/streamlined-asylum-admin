@@ -325,5 +325,11 @@
   },
   "change-someone-else-nationality": {
     "required": "Select if you need to change their nationality"
+  },
+  "nationality-change": {
+    "required": "Select if you need to change your nationality"
+  },
+  "correct-nationality": {
+    "required": "Select your country of nationality"
   }
 }

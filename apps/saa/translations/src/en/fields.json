@@ -540,7 +540,10 @@
     "summary-label": "Files uploaded"
   },
   "change-someone-else-nationality" : {
-    "legend": "Do you need to change someone else’s nationality?",
+    "legend": "Do you need to change someone else’s nationality?"
+  },
+  "nationality-change": {
+    "legend": "Do you need to change your nationality?",
     "options": {
       "yes": {
         "label": "Yes"
@@ -549,5 +552,8 @@
         "label": "No"
       }
     }
+  },
+  "correct-nationality": {
+    "label": "Select a country"
   }
 }
