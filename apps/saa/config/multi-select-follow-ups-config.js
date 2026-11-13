@@ -90,6 +90,7 @@ module.exports = {
             '/check-your-answers-someone-else-name',
             {
               route: OWN_NAME_ROUTE,
+              reopenOnChange: OWN_NAME_FIELD,
               condition: [
                 req => req.params?.action === 'edit',
                 req => req.sessionModel.get(CONTACT_DETAIL_UPDATES_STATE_KEY)

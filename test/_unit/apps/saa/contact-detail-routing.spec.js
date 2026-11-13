@@ -961,6 +961,39 @@ describe.each([false, true])(
   }
 );
 
+describe('Name decision edits with mandatory follow-ups', () => {
+  test.each([
+    ['/confirm', 'yes'], ['/information-given', 'yes'],
+    ['/confirm', 'no'], ['/information-given', 'no']
+  ])('returning to %s with previous own answer=%s', (returnRoute, previousAnswer) => {
+    const req = buildRequest(['name'], true, {
+      steps: [
+        config.entryPoint, '/do-you-need-to-change-your-name',
+        '/reason-name-change', '/new-name', '/new-name-evidence'
+      ],
+      'do-you-need-to-change-your-name': previousAnswer,
+      'change-someone-elses-name': 'yes',
+      'documents-new-name': [],
+      'edit-return-path': `${app.baseUrl}${returnRoute}`
+    });
+    completeSelectedSections(req);
+    expect(post('/do-you-need-to-change-your-name', req, {
+      'do-you-need-to-change-your-name': 'yes'
+    }, true).url).toBe(`${app.baseUrl}/reason-name-change/edit`);
+    expect(req.sessionModel.get(config.stateKey).completedSections.includes('name'))
+      .toBe(previousAnswer === 'yes');
+    expect(post('/reason-name-change', req, { 'reason-name-change': 'marriage' }, true).url)
+      .toBe(`${app.baseUrl}/new-name/edit`);
+    expect(post('/new-name', req, { 'given-name': 'Updated', 'family-name': 'Name' }, true).url)
+      .toBe(`${app.baseUrl}/new-name-evidence/edit`);
+    expect(post('/new-name-evidence', req, {}, true).url)
+      .toBe(`${app.baseUrl}/check-your-answers-name/edit`);
+    expect(post('/check-your-answers-name', req, {}, true).url).toBe(previousAnswer === 'yes'
+      ? `${app.baseUrl}${returnRoute}`
+      : `${app.baseUrl}/do-you-need-to-change-someone-elses-name/edit`);
+  });
+});
+
 describe('normal DOB decision routing', () => {
   test.each([
     ['yes', ['date-of-birth', 'phone-number'], '/your-phone-number'],
