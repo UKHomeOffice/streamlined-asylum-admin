@@ -407,5 +407,12 @@ module.exports = {
     matchField: 'new-phone-number',
     className: ['govuk-input', 'govuk-input--width-20'],
     labelClassName: 'govuk-label--s'
+  },
+  'change-someone-else-nationality': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    isPageHeading: true
   }
 };

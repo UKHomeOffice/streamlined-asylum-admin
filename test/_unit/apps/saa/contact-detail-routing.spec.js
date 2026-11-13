@@ -31,12 +31,10 @@ const buildRequest = (selections, edit = false, values = {}) => ({
   body: {},
   form: { values: {} },
   translate: key =>
-    key
-      .split('.')
-      .reduce((value, part) => value?.[part], {
-        pages,
-        fields: fieldTranslations
-      }) || key,
+    key.split('.').reduce((value, part) => value?.[part], {
+      pages,
+      fields: fieldTranslations
+    }) || key,
   sessionModel: new Model({
     [config.field]: selections,
     [config.stateKey]: followUps.createState(config, {}, selections),
@@ -97,6 +95,172 @@ const completeSelectedSections = req => {
     completedSections: state.activeSections.slice()
   });
 };
+
+describe('someone-else Nationality decision validation', () => {
+  const route = '/change-someone-else-nationality';
+  const field = 'change-someone-else-nationality';
+
+  test('an unanswered decision reports the translated required error without saving or advancing', done => {
+    const req = buildRequest(['nationality'], false, {
+      steps: [config.entryPoint, '/check-your-answers-nationality'],
+      'change-your-nationality': 'yes'
+    });
+    req.method = 'POST';
+    req.url = '/';
+    req.path = route;
+    const controller = buildController(route, req);
+    const res = { locals: {}, redirect: jest.fn() };
+    const validation = require('../../../../apps/saa/translations/src/en/validation.json');
+    req.translate = key => {
+      const translations = { validation, fields: fieldTranslations };
+      return key.split('.').reduce((value, part) => value?.[part], translations) || key;
+    };
+    checkProgress(route, controller, app.steps)(req, res, err => expect(err).toBeUndefined());
+    const previousState = req.sessionModel.get(config.stateKey);
+    const previousSteps = req.sessionModel.get('steps').slice();
+    const save = jest.spyOn(controller, 'saveValues');
+    const success = jest.spyOn(controller, 'successHandler');
+
+    controller.post(req, res, errors => {
+      try {
+        expect(errors[field]).toMatchObject({ key: field, type: 'required' });
+        expect(controller.getErrorMessage(errors[field], req, res))
+          .toBe('Select if you need to change their nationality');
+        expect(save).not.toHaveBeenCalled();
+        expect(success).not.toHaveBeenCalled();
+        expect(res.redirect).not.toHaveBeenCalled();
+        expect(req.sessionModel.get(field)).toBeUndefined();
+        expect(req.sessionModel.get(config.stateKey)).toEqual(previousState);
+        expect(req.sessionModel.get('steps')).toEqual(previousSteps);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test.each(['yes', 'no'])('answer %s passes validation', answer => {
+    const req = buildRequest(['nationality']);
+    req.form.values = { [field]: answer };
+    const controller = buildController(route, req);
+    const next = jest.fn();
+
+    controller._validate(req, { locals: {} }, next);
+
+    expect(next).toHaveBeenCalledWith();
+  });
+});
+
+describe('declining personal details', () => {
+  const selections = config.options.map(option => option.value);
+  const staleValues = Object.fromEntries(
+    sections.flatMap(section => section.fieldsToUnset || []).map(field => [field, 'stale'])
+  );
+  const unrelated = {
+    'add-remove-dependant': 'yes',
+    addremovechildpartner: { aggregatedValues: [{ fields: [] }] },
+    'send-evidence-for-your-claim': 'yes',
+    'documents-help-your-claim': [{ id: 'supporting-evidence' }],
+    'someone-on-claim-died': 'yes',
+    reportadeath: { aggregatedValues: [{ fields: [] }] },
+    'something-else': 'yes'
+  };
+
+  test.each([undefined, '/confirm', '/information-given'])(
+    'parent No clears all dynamic sections and preserves unrelated data (return=%s)',
+    returnRoute => {
+      const req = buildRequest(selections, Boolean(returnRoute), {
+        ...staleValues,
+        ...unrelated,
+        steps: ['/who-are-you', config.entryPoint, ...sections.flatMap(section => section.routes)],
+        'edit-return-path': returnRoute ? `${app.baseUrl}${returnRoute}` : undefined,
+        'no-changes-made': 'no'
+      });
+      completeSelectedSections(req);
+
+      expect(post('/personal-details', req, { 'change-personal-details': 'no' }, true).url)
+        .toBe(`${app.baseUrl}${config.exitPoint}${returnRoute ? '/edit' : ''}`);
+      expect(req.sessionModel.get('change-personal-details')).toBe('no');
+      Object.keys(staleValues).forEach(field => expect(req.sessionModel.get(field)).toBeUndefined());
+      expect(req.sessionModel.get(config.field)).toBeUndefined();
+      expect(req.sessionModel.get('no-changes-made')).toBeUndefined();
+      expect(req.sessionModel.get(config.stateKey)).toMatchObject({
+        selections: [], activeSections: [], completedSections: [], sectionStartBackLinks: {}
+      });
+      sections.flatMap(section => section.routes)
+        .forEach(route => expect(req.sessionModel.get('steps')).not.toContain(route));
+      Object.entries(unrelated).forEach(([field, value]) => {
+        expect(req.sessionModel.get(field)).toEqual(value);
+      });
+
+      const Page = require('../../../../apps/saa/behaviours/summary-labels')(
+        require('hof').components.summary(class {})
+      );
+      req.form.options = { fieldsConfig: fields, steps: app.steps };
+      req.translate = keys => [].concat(keys)[0];
+      const summaries = require('../../../../apps/saa/sections/summary-data-sections');
+      ['name', 'someone-else-new-name', 'date-of-birth', 'someone-else-date-of-birth',
+        'email-address', 'phone-number', 'address-final'].forEach(section => {
+        if (summaries[section]) {
+          expect(new Page().getFieldsForRow(summaries[section].steps, req)).toEqual([]);
+        }
+      });
+    }
+  );
+
+  test('parent No clears stale values even without saved orchestration state', () => {
+    const req = buildRequest([], true, {
+      ...staleValues,
+      'edit-return-path': `${app.baseUrl}/confirm`,
+      'add-remove-dependant': 'yes',
+      steps: ['/who-are-you', config.entryPoint]
+    });
+    req.sessionModel.unset(config.stateKey);
+    post('/personal-details', req, { 'change-personal-details': 'no' }, true);
+    Object.keys(staleValues).forEach(field => expect(req.sessionModel.get(field)).toBeUndefined());
+  });
+
+  test('parent No removes inactive action history while preserving unrelated and similarly named routes', () => {
+    const removed = [
+      '/new-name',
+      '/new-name/change',
+      '/new-name/edit/0',
+      '/check-your-answers-someone-else-name/delete/1'
+    ];
+    const preserved = [
+      '/who-are-you',
+      '/new-name-extra/edit/0',
+      '/dependants/delete/1',
+      '/something-else/edit',
+      '/new-name/editor'
+    ];
+    const req = buildRequest(selections, true, {
+      'add-remove-dependant': 'yes',
+      steps: [...removed, ...preserved]
+    });
+
+    post('/personal-details', req, { 'change-personal-details': 'no' }, true);
+
+    removed.forEach(route => expect(req.sessionModel.get('steps')).not.toContain(route));
+    preserved.forEach(route => expect(req.sessionModel.get('steps')).toContain(route));
+  });
+
+  test('parent Yes preserves existing selected sections and their saved data', () => {
+    const req = buildRequest(selections, true, {
+      ...staleValues,
+      steps: ['/who-are-you', config.entryPoint],
+      'edit-return-path': `${app.baseUrl}/confirm`
+    });
+    completeSelectedSections(req);
+    expect(post('/personal-details', req, { 'change-personal-details': 'yes' }, true).url)
+      .toBe(`${app.baseUrl}${config.entryPoint}/edit`);
+    Object.entries(staleValues).forEach(([field, value]) => expect(req.sessionModel.get(field)).toEqual(value));
+    expect(req.sessionModel.get(config.field)).toEqual(selections);
+    expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(
+      sections.map(section => section.id)
+    );
+  });
+});
 
 describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
   const suffix = edit ? '/edit' : '';
@@ -315,7 +479,7 @@ describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
     }
   );
 
-  test('unanswered Nationality placeholders complete before collecting Email and shared identity', () => {
+  test('Nationality with someone-else Yes completes before collecting Email and shared identity', () => {
     const nationality = sections.find(section => section.id === 'nationality');
     const req = buildRequest(['nationality', 'email-address'], edit, {
       steps: [config.entryPoint],
@@ -323,27 +487,47 @@ describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
     });
 
     nationality.routes.slice(0, -1).forEach((route, index) => {
-      expect(post(route, req, {}, true).url)
-        .toBe(`${app.baseUrl}${nationality.routes[index + 1]}${suffix}`);
-      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([]);
+      const values =
+        route === '/change-someone-else-nationality'
+          ? { 'change-someone-else-nationality': 'yes' }
+          : {};
+      expect(post(route, req, values, true).url).toBe(
+        `${app.baseUrl}${nationality.routes[index + 1]}${suffix}`
+      );
+      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(
+        []
+      );
     });
-    expect(post('/check-your-answers-someone-else-nationality', req, {}, true).url)
-      .toBe(`${app.baseUrl}/new-email-address${suffix}`);
-    expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(['nationality']);
+    expect(
+      post('/check-your-answers-someone-else-nationality', req, {}, true).url
+    ).toBe(`${app.baseUrl}/new-email-address${suffix}`);
+    expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([
+      'nationality'
+    ]);
     expect(req.sessionModel.get('change-your-nationality')).toBeUndefined();
-    expect(req.sessionModel.get('change-someone-else-nationality')).toBeUndefined();
+    expect(req.sessionModel.get('change-someone-else-nationality')).toBe('yes');
 
-    post('/new-email-address', req, {
-      'old-email-address': 'old@example.com',
-      'new-email-address': 'new@example.com',
-      'confirm-new-email-address': 'new@example.com'
-    }, true);
-    expect(post('/check-your-answers-email', req, {}, true).url)
-      .toBe(`${app.baseUrl}/provide-photo-identity${suffix}`);
-    expect(post('/provide-photo-identity', req, {}, true).url)
-      .toBe(`${app.baseUrl}${edit ? '/confirm' : config.exitPoint}`);
-    expect(req.sessionModel.get(config.stateKey).completedSections)
-      .toEqual(['nationality', 'email-address', 'photo-identity']);
+    post(
+      '/new-email-address',
+      req,
+      {
+        'old-email-address': 'old@example.com',
+        'new-email-address': 'new@example.com',
+        'confirm-new-email-address': 'new@example.com'
+      },
+      true
+    );
+    expect(post('/check-your-answers-email', req, {}, true).url).toBe(
+      `${app.baseUrl}/provide-photo-identity${suffix}`
+    );
+    expect(post('/provide-photo-identity', req, {}, true).url).toBe(
+      `${app.baseUrl}${edit ? '/confirm' : config.exitPoint}`
+    );
+    expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([
+      'nationality',
+      'email-address',
+      'photo-identity'
+    ]);
   });
 
   test('changing the UK address then declining a contact address still needs address CYA', () => {
@@ -409,7 +593,9 @@ describe('someone-else name summary integration', () => {
     'someone-else-old-family-name': 'Name',
     'someone-else-new-given-name': 'New',
     'someone-else-new-family-name': 'Name',
-    'documents-someone-else-new-name': [{ id: 'existing-upload', name: 'evidence.pdf' }]
+    'documents-someone-else-new-name': [
+      { id: 'existing-upload', name: 'evidence.pdf' }
+    ]
   };
   const visitSummary = req => {
     const controller = buildController(route, req);
@@ -430,13 +616,17 @@ describe('someone-else name summary integration', () => {
         steps: [config.entryPoint, '/someone-else-new-name-evidence'],
         'do-you-need-to-change-your-name': 'no',
         'change-someone-elses-name': 'yes',
-        'edit-return-path': returnPath ? `${app.baseUrl}${returnPath}` : undefined
+        'edit-return-path': returnPath
+          ? `${app.baseUrl}${returnPath}`
+          : undefined
       });
       req.translate = keys => [].concat(keys)[0];
       expect(visitSummary(req).res.redirect).toHaveBeenCalledWith(
         `${app.baseUrl}${route}`
       );
-      expect(req.sessionModel.get('someoneelsenewname').aggregatedValues).toEqual([
+      expect(
+        req.sessionModel.get('someoneelsenewname').aggregatedValues
+      ).toEqual([
         expect.objectContaining({
           fields: expect.arrayContaining([
             expect.objectContaining({
@@ -449,7 +639,9 @@ describe('someone-else name summary integration', () => {
       Object.keys(nameFields).forEach(field => {
         expect(req.sessionModel.get(field)).toBeUndefined();
       });
-      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([]);
+      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(
+        []
+      );
 
       const summary = visitSummary(req);
       expect(summary.res.redirect).not.toHaveBeenCalled();
@@ -459,21 +651,32 @@ describe('someone-else name summary integration', () => {
         addStep: 'relationship-name-change'
       });
       const suffix = edit ? '/edit' : '';
-      expect(post(route, req, {}, true).url)
-        .toBe(`${app.baseUrl}/your-phone-number${suffix}`);
-      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(['name']);
+      expect(post(route, req, {}, true).url).toBe(
+        `${app.baseUrl}/your-phone-number${suffix}`
+      );
+      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([
+        'name'
+      ]);
       const phone = buildController('/your-phone-number', req);
-      expect(phone.locals(req, { locals: {} }).backLink)
-        .toBe(`${app.baseUrl}${route}${suffix}`);
+      expect(phone.locals(req, { locals: {} }).backLink).toBe(
+        `${app.baseUrl}${route}${suffix}`
+      );
       post('/your-phone-number', req, { 'your-phone-number': 'yes' }, true);
-      post('/new-phone-number', req, {
-        'new-phone-number': '07700900001',
-        'confirm-new-phone-number': '07700900001'
-      }, true);
-      expect(post('/check-your-answers-phone-number', req, {}, true).url)
-        .toBe(`${app.baseUrl}/provide-photo-identity${suffix}`);
-      expect(post('/provide-photo-identity', req, {}, true).url)
-        .toBe(`${app.baseUrl}${returnPath || config.exitPoint}`);
+      post(
+        '/new-phone-number',
+        req,
+        {
+          'new-phone-number': '07700900001',
+          'confirm-new-phone-number': '07700900001'
+        },
+        true
+      );
+      expect(post('/check-your-answers-phone-number', req, {}, true).url).toBe(
+        `${app.baseUrl}/provide-photo-identity${suffix}`
+      );
+      expect(post('/provide-photo-identity', req, {}, true).url).toBe(
+        `${app.baseUrl}${returnPath || config.exitPoint}`
+      );
     }
   );
 
@@ -485,12 +688,19 @@ describe('someone-else name summary integration', () => {
       'edit-return-path': `${app.baseUrl}/confirm`
     });
     visitSummary(req);
-    expect(post('/relationship-name-change', req, {
-      'relationship-name-change': 'child'
-    }).url).toBe(`${app.baseUrl}/reason-someone-else-name-change/edit`);
-    req.sessionModel.set({ ...nameFields, 'someone-else-new-given-name': 'Another' });
+    expect(
+      post('/relationship-name-change', req, {
+        'relationship-name-change': 'child'
+      }).url
+    ).toBe(`${app.baseUrl}/reason-someone-else-name-change/edit`);
+    req.sessionModel.set({
+      ...nameFields,
+      'someone-else-new-given-name': 'Another'
+    });
     visitSummary(req);
-    expect(req.sessionModel.get('someoneelsenewname').aggregatedValues).toHaveLength(2);
+    expect(
+      req.sessionModel.get('someoneelsenewname').aggregatedValues
+    ).toHaveLength(2);
 
     req.params = { action: 'edit', id: '0' };
     expect(visitSummary(req).res.redirect).toHaveBeenCalledWith(
@@ -502,9 +712,14 @@ describe('someone-else name summary integration', () => {
     visitSummary(req);
     const items = req.sessionModel.get('someoneelsenewname').aggregatedValues;
     expect(items).toHaveLength(2);
-    expect(items.map(item => item.fields.find(
-      field => field.field === 'someone-else-new-given-name'
-    ).value)).toEqual(['Corrected', 'Another']);
+    expect(
+      items.map(
+        item =>
+          item.fields.find(
+            field => field.field === 'someone-else-new-given-name'
+          ).value
+      )
+    ).toEqual(['Corrected', 'Another']);
     expect(post(route, req, {}, true).url).toBe(`${app.baseUrl}/confirm`);
   });
 
@@ -513,7 +728,9 @@ describe('someone-else name summary integration', () => {
     removal => {
       const req = buildRequest(['name', 'phone-number'], true, nameFields);
       visitSummary(req);
-      expect(req.sessionModel.get('someoneelsenewname').aggregatedValues).toHaveLength(1);
+      expect(
+        req.sessionModel.get('someoneelsenewname').aggregatedValues
+      ).toHaveLength(1);
       if (removal === 'checkboxes') {
         post(config.entryPoint, req, { [config.field]: ['phone-number'] });
       } else {
@@ -522,7 +739,9 @@ describe('someone-else name summary integration', () => {
         post('/no-changes-made', req, { 'no-changes-made': 'yes' });
       }
       expect(req.sessionModel.get('someoneelsenewname')).toBeUndefined();
-      expect(req.sessionModel.get('documents-someone-else-new-name')).toBeUndefined();
+      expect(
+        req.sessionModel.get('documents-someone-else-new-name')
+      ).toBeUndefined();
       expect(req.sessionModel.get(config.field)).toEqual(['phone-number']);
     }
   );
@@ -634,74 +853,252 @@ describe.each([false, true])('own-name decision routing (edit=%s)', edit => {
   });
 });
 
-describe.each([false, true])('claimant Name summary edits (edit URL=%s)', edit => {
-  const route = '/check-your-answers-name';
-  const savedPeople = {
-    aggregatedValues: [{
-      fields: [
-        { field: 'someone-else-new-given-name', value: 'Saved' },
-        { field: 'documents-someone-else-new-name', value: [{ id: 'existing-upload' }] }
+describe.each([false, true])(
+  'claimant Name summary edits (edit URL=%s)',
+  edit => {
+    const route = '/check-your-answers-name';
+    const savedPeople = {
+      aggregatedValues: [
+        {
+          fields: [
+            { field: 'someone-else-new-given-name', value: 'Saved' },
+            {
+              field: 'documents-someone-else-new-name',
+              value: [{ id: 'existing-upload' }]
+            }
+          ]
+        }
       ]
-    }]
-  };
-  const buildNameRequest = (selections, returnRoute) =>
-    buildRequest(selections, edit, {
-      steps: [config.entryPoint, '/reason-name-change', '/new-name', '/new-name-evidence'],
-      'do-you-need-to-change-your-name': 'yes',
+    };
+    const buildNameRequest = (selections, returnRoute) =>
+      buildRequest(selections, edit, {
+        steps: [
+          config.entryPoint,
+          '/reason-name-change',
+          '/new-name',
+          '/new-name-evidence'
+        ],
+        'do-you-need-to-change-your-name': 'yes',
+        'change-someone-elses-name': 'yes',
+        'documents-new-name': [],
+        someoneelsenewname: savedPeople,
+        'edit-return-path': returnRoute
+          ? `${app.baseUrl}${returnRoute}`
+          : undefined
+      });
+
+    test.each([
+      ['/confirm', true],
+      ['/confirm', false],
+      ['/information-given', true],
+      ['/information-given', false]
+    ])(
+      'completed claimant Name edits return to %s with saved people=%s',
+      (returnRoute, hasPeople) => {
+        const req = buildNameRequest(['name'], returnRoute);
+        if (!hasPeople) {
+          req.sessionModel.unset('someoneelsenewname');
+          req.sessionModel.set('change-someone-elses-name', 'no');
+        }
+        completeSelectedSections(req);
+        const peopleBefore = req.sessionModel.get('someoneelsenewname');
+        post(
+          '/new-name',
+          req,
+          { 'given-name': 'Updated', 'family-name': 'Name' },
+          true
+        );
+        post('/new-name-evidence', req, {}, true);
+
+        expect(post(route, req, {}, true).url).toBe(
+          `${app.baseUrl}${returnRoute}`
+        );
+        expect(req.sessionModel.get('given-name')).toBe('Updated');
+        expect(req.sessionModel.get('someoneelsenewname')).toEqual(
+          peopleBefore
+        );
+        expect(req.sessionModel.get('documents-new-name')).toEqual([]);
+        expect(
+          req.sessionModel.get(config.stateKey).completedSections
+        ).toContain('name');
+      }
+    );
+
+    test.each(['/confirm', '/information-given'])(
+      'completed Name edits preserve saved people and still collect unfinished Phone before %s',
+      returnRoute => {
+        const req = buildNameRequest(['name', 'phone-number'], returnRoute);
+        const state = req.sessionModel.get(config.stateKey);
+        req.sessionModel.set(config.stateKey, {
+          ...state,
+          completedSections: ['name']
+        });
+
+        expect(post(route, req, {}, true).url).toBe(
+          `${app.baseUrl}/your-phone-number${edit ? '/edit' : ''}`
+        );
+        expect(req.sessionModel.get('someoneelsenewname')).toEqual(savedPeople);
+        expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(
+          ['name']
+        );
+      }
+    );
+
+    test.each([undefined, '/confirm', '/information-given'])(
+      'an incomplete Name section still asks about someone else (return=%s)',
+      returnRoute => {
+        const req = buildNameRequest(['name'], returnRoute);
+
+        expect(post(route, req, {}, true).url).toBe(
+          `${app.baseUrl}/do-you-need-to-change-someone-elses-name${edit ? '/edit' : ''}`
+        );
+        expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(
+          []
+        );
+        expect(req.sessionModel.get('someoneelsenewname')).toEqual(savedPeople);
+      }
+    );
+  }
+);
+
+describe('Name decision edits with mandatory follow-ups', () => {
+  test.each([
+    ['/confirm', 'yes'], ['/information-given', 'yes'],
+    ['/confirm', 'no'], ['/information-given', 'no']
+  ])('returning to %s with previous own answer=%s', (returnRoute, previousAnswer) => {
+    const req = buildRequest(['name'], true, {
+      steps: [
+        config.entryPoint, '/do-you-need-to-change-your-name',
+        '/reason-name-change', '/new-name', '/new-name-evidence'
+      ],
+      'do-you-need-to-change-your-name': previousAnswer,
       'change-someone-elses-name': 'yes',
       'documents-new-name': [],
-      someoneelsenewname: savedPeople,
-      'edit-return-path': returnRoute ? `${app.baseUrl}${returnRoute}` : undefined
+      'edit-return-path': `${app.baseUrl}${returnRoute}`
     });
-
-  test.each([
-    ['/confirm', true],
-    ['/confirm', false],
-    ['/information-given', true],
-    ['/information-given', false]
-  ])('completed claimant Name edits return to %s with saved people=%s', (returnRoute, hasPeople) => {
-    const req = buildNameRequest(['name'], returnRoute);
-    if (!hasPeople) {
-      req.sessionModel.unset('someoneelsenewname');
-      req.sessionModel.set('change-someone-elses-name', 'no');
-    }
     completeSelectedSections(req);
-    const peopleBefore = req.sessionModel.get('someoneelsenewname');
-    post('/new-name', req, { 'given-name': 'Updated', 'family-name': 'Name' }, true);
-    post('/new-name-evidence', req, {}, true);
+    expect(post('/do-you-need-to-change-your-name', req, {
+      'do-you-need-to-change-your-name': 'yes'
+    }, true).url).toBe(`${app.baseUrl}/reason-name-change/edit`);
+    expect(req.sessionModel.get(config.stateKey).completedSections.includes('name'))
+      .toBe(previousAnswer === 'yes');
+    expect(post('/reason-name-change', req, { 'reason-name-change': 'marriage' }, true).url)
+      .toBe(`${app.baseUrl}/new-name/edit`);
+    expect(post('/new-name', req, { 'given-name': 'Updated', 'family-name': 'Name' }, true).url)
+      .toBe(`${app.baseUrl}/new-name-evidence/edit`);
+    expect(post('/new-name-evidence', req, {}, true).url)
+      .toBe(`${app.baseUrl}/check-your-answers-name/edit`);
+    expect(post('/check-your-answers-name', req, {}, true).url)
+      .toBe(`${app.baseUrl}${returnRoute}`);
+    expect(req.sessionModel.get(config.stateKey).reopenedSections).toEqual({});
+  });
+});
 
-    expect(post(route, req, {}, true).url).toBe(`${app.baseUrl}${returnRoute}`);
-    expect(req.sessionModel.get('given-name')).toBe('Updated');
-    expect(req.sessionModel.get('someoneelsenewname')).toEqual(peopleBefore);
-    expect(req.sessionModel.get('documents-new-name')).toEqual([]);
-    expect(req.sessionModel.get(config.stateKey).completedSections).toContain('name');
+describe.each([
+  {
+    section: 'name', own: '/do-you-need-to-change-your-name',
+    ownField: 'do-you-need-to-change-your-name', otherField: 'change-someone-elses-name',
+    other: '/do-you-need-to-change-someone-elses-name', aggregate: 'someoneelsenewname',
+    summary: '/check-your-answers-name',
+    details: [
+      ['/reason-name-change', { 'reason-name-change': 'marriage' }],
+      ['/new-name', { 'given-name': 'Updated', 'family-name': 'Name' }],
+      ['/new-name-evidence', {}]
+    ]
+  },
+  {
+    section: 'date-of-birth', own: '/change-your-date-of-birth',
+    ownField: 'change-your-date-of-birth', otherField: 'change-someone-else-date-of-birth',
+    other: '/change-someone-else-date-of-birth', aggregate: 'someoneelsenewdob',
+    summary: '/check-your-answers-date-of-birth',
+    details: [
+      ['/correct-date-of-birth', { 'correct-date-of-birth': '2000-01-01' }],
+      ['/new-date-of-birth-evidence', {}]
+    ]
+  },
+  {
+    section: 'nationality', own: '/nationality-change',
+    ownField: 'change-your-nationality', otherField: 'change-someone-else-nationality',
+    other: '/change-someone-else-nationality', aggregate: 'saved-nationality-test',
+    summary: '/check-your-answers-nationality',
+    details: [
+      ['/correct-nationality', {}], ['/reason-nationality-change', {}],
+      ['/upload-nationality-evidence', {}]
+    ]
+  }
+])('$section own-branch edit completion', journey => {
+  const savedPeople = { aggregatedValues: [{ fields: [{ field: 'saved-person', value: 'Kept' }] }] };
+  const build = (edit, completed) => {
+    const req = buildRequest([journey.section, 'phone-number'], edit, {
+      steps: ['/personal-details', config.entryPoint, ...sections.flatMap(section => section.routes)],
+      [journey.ownField]: 'no',
+      [journey.otherField]: 'yes',
+      [journey.aggregate]: savedPeople,
+      'edit-return-path': edit ? `${app.baseUrl}/confirm` : undefined
+    });
+    if (completed) {
+      completeSelectedSections(req);
+    }
+    return req;
+  };
+  const enterOwnDetails = req => {
+    const suffix = req.params.action === 'edit' ? '/edit' : '';
+    expect(post(journey.own, req, { [journey.ownField]: 'yes' }, true).url)
+      .toBe(`${app.baseUrl}${journey.details[0][0]}${suffix}`);
+    expect(req.sessionModel.get(config.stateKey).completedSections).not.toContain(journey.section);
+    journey.details.forEach(([route, values]) => post(route, req, values, true));
+  };
+
+  test.each(['/confirm', '/information-given'])('completed No-to-Yes edit returns to %s and preserves saved people',
+    returnRoute => {
+      const req = build(true, true);
+      req.sessionModel.set('edit-return-path', `${app.baseUrl}${returnRoute}`);
+      enterOwnDetails(req);
+      expect(post(journey.summary, req, {}, true).url).toBe(`${app.baseUrl}${returnRoute}`);
+      expect(req.sessionModel.get(journey.aggregate)).toEqual(savedPeople);
+      expect(req.sessionModel.get(config.stateKey).reopenedSections).toEqual({});
+    }
+  );
+
+  test.each([false, true])('incomplete journey (edit=%s) still asks the someone-else question', edit => {
+    const req = build(edit, false);
+    enterOwnDetails(req);
+    expect(post(journey.summary, req, {}, true).url)
+      .toBe(`${app.baseUrl}${journey.other}${edit ? '/edit' : ''}`);
   });
 
-  test.each(['/confirm', '/information-given'])(
-    'completed Name edits preserve saved people and still collect unfinished Phone before %s',
-    returnRoute => {
-      const req = buildNameRequest(['name', 'phone-number'], returnRoute);
-      const state = req.sessionModel.get(config.stateKey);
-      req.sessionModel.set(config.stateKey, { ...state, completedSections: ['name'] });
+  test('an unfinished selected section is not skipped after the own mini-CYA', () => {
+    const req = build(true, true);
+    req.sessionModel.set(config.stateKey, {
+      ...req.sessionModel.get(config.stateKey), completedSections: [journey.section]
+    });
+    enterOwnDetails(req);
+    expect(post(journey.summary, req, {}, true).url).toBe(`${app.baseUrl}/your-phone-number/edit`);
+  });
 
-      expect(post(route, req, {}, true).url)
-        .toBe(`${app.baseUrl}/your-phone-number${edit ? '/edit' : ''}`);
-      expect(req.sessionModel.get('someoneelsenewname')).toEqual(savedPeople);
-      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(['name']);
-    }
-  );
+  test('reopening someone-else details cancels the pending own-edit shortcut', () => {
+    const req = build(true, true);
+    enterOwnDetails(req);
+    post(journey.other, req, { [journey.otherField]: 'yes' }, true);
+    expect(post(journey.summary, req, {}, true).url).toBe(`${app.baseUrl}${journey.other}/edit`);
+  });
 
-  test.each([undefined, '/confirm', '/information-given'])(
-    'an incomplete Name section still asks about someone else (return=%s)',
-    returnRoute => {
-      const req = buildNameRequest(['name'], returnRoute);
+  test.each(['yes', 'no'])('own Yes-to-No edit uses the retained someone-else answer=%s', otherAnswer => {
+    const req = build(true, true);
+    req.sessionModel.set({
+      [journey.ownField]: 'yes', [journey.otherField]: otherAnswer
+    });
+    expect(post(journey.own, req, { [journey.ownField]: 'no' }, true).url).toBe(
+      `${app.baseUrl}${otherAnswer === 'yes' ? '/confirm' : '/no-changes-made/edit'}`
+    );
+  });
 
-      expect(post(route, req, {}, true).url)
-        .toBe(`${app.baseUrl}/do-you-need-to-change-someone-elses-name${edit ? '/edit' : ''}`);
-      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([]);
-      expect(req.sessionModel.get('someoneelsenewname')).toEqual(savedPeople);
-    }
-  );
+  test('deselecting the section clears pending edit-return provenance', () => {
+    const req = build(true, true);
+    enterOwnDetails(req);
+    post(config.entryPoint, req, { [config.field]: ['phone-number'] }, true);
+    expect(req.sessionModel.get(config.stateKey).reopenedSections).toEqual({});
+  });
 });
 
 describe('normal DOB decision routing', () => {
@@ -709,266 +1106,409 @@ describe('normal DOB decision routing', () => {
     ['yes', ['date-of-birth', 'phone-number'], '/your-phone-number'],
     ['yes', ['date-of-birth'], config.exitPoint],
     ['no', ['date-of-birth'], '/no-changes-made']
-  ])('someone-else No with own=%s and selections=%p goes to %s', (own, selections, nextRoute) => {
-    const req = buildRequest(selections, false, {
-      steps: [
-        config.entryPoint,
-        '/change-your-date-of-birth',
-        ...(own === 'yes' ? [
-          '/correct-date-of-birth',
-          '/new-date-of-birth-evidence',
-          '/check-your-answers-date-of-birth'
-        ] : [])
-      ],
-      'change-your-date-of-birth': own,
-      'change-someone-else-date-of-birth': 'yes',
-      'documents-someone-else-new-dob': [{ id: 'other-upload' }]
-    });
-
-    expect(post('/change-someone-else-date-of-birth', req, {
-      'change-someone-else-date-of-birth': 'no'
-    }, true).url).toBe(`${app.baseUrl}${nextRoute}`);
-    expect(req.sessionModel.get('documents-someone-else-new-dob')).toBeUndefined();
-  });
-});
-
-describe.each(['/confirm', '/information-given'])('DOB decision edits returning to %s', returnRoute => {
-  const ownRoute = '/change-your-date-of-birth';
-  const otherRoute = '/change-someone-else-date-of-birth';
-  const savedPeople = {
-    aggregatedValues: [{
-      fields: [
-        { field: 'someone-else-correct-date-of-birth', value: '2000-01-01' },
-        { field: 'documents-someone-else-new-dob', value: [{ id: 'saved-other-upload' }] }
-      ]
-    }]
-  };
-  const buildDobRequest = values => {
-    const req = buildRequest(['date-of-birth', 'phone-number'], true, {
-      steps: [config.entryPoint, ...sections.flatMap(section => section.routes)],
-      'edit-return-path': `${app.baseUrl}${returnRoute}`,
-      'change-your-date-of-birth': 'yes',
-      'change-someone-else-date-of-birth': 'yes',
-      'correct-date-of-birth': '1990-01-01',
-      'documents-new-dob': [{ id: 'own-upload' }],
-      'relationship-date-of-birth': 'my-child',
-      'someone-else-correct-date-of-birth-given-name': 'Saved',
-      'someone-else-correct-date-of-birth-family-name': 'Person',
-      'someone-else-correct-date-of-birth': '2000-01-01',
-      'documents-someone-else-new-dob': [{ id: 'pending-other-upload' }],
-      someoneelsenewdob: savedPeople,
-      'new-phone-number': '07700900001',
-      'documents-update-contact': [{ id: 'identity-upload' }],
-      ...values
-    });
-    completeSelectedSections(req);
-    return req;
-  };
-
-  test.each(['yes', 'no'])(
-    'own Yes to No with someone else=%s clears only own DOB data and uses the correct edit exit',
-    someoneElse => {
-      const req = buildDobRequest({ 'change-someone-else-date-of-birth': someoneElse });
-      const expected = someoneElse === 'yes' ? returnRoute : '/no-changes-made/edit';
-      expect(post(ownRoute, req, { 'change-your-date-of-birth': 'no' }, true).url)
-        .toBe(`${app.baseUrl}${expected}`);
-      expect(req.sessionModel.get('change-your-date-of-birth')).toBe('no');
-      expect(req.sessionModel.get('correct-date-of-birth')).toBeUndefined();
-      expect(req.sessionModel.get('documents-new-dob')).toBeUndefined();
-      expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
-      expect(req.sessionModel.get('documents-someone-else-new-dob'))
-        .toEqual([{ id: 'pending-other-upload' }]);
-      expect(req.sessionModel.get('new-phone-number')).toBe('07700900001');
-      expect(req.sessionModel.get('documents-update-contact')).toEqual([{ id: 'identity-upload' }]);
-      if (someoneElse === 'no') {
-        expect(req.sessionModel.get(config.stateKey).completedSections).not.toContain('date-of-birth');
-        const page = buildController('/no-changes-made', req);
-        expect(page.locals(req, { locals: {} }).backLink)
-          .toBe(`${app.baseUrl}${ownRoute}/edit`);
-        expect(post('/no-changes-made', req, { 'no-changes-made': 'no' }).url)
-          .toBe(`${app.baseUrl}${ownRoute}/edit`);
-      }
-    }
-  );
-
-  test('own No to Yes collects the corrected date even when that page was already visited', () => {
-    const req = buildDobRequest({ 'change-your-date-of-birth': 'no' });
-    expect(post(ownRoute, req, { 'change-your-date-of-birth': 'yes' }, true).url)
-      .toBe(`${app.baseUrl}/correct-date-of-birth/edit`);
-    expect(req.sessionModel.get(config.stateKey).completedSections).not.toContain('date-of-birth');
-    expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
-    post('/correct-date-of-birth', req, { 'correct-date-of-birth': '1991-02-03' }, true);
-    post('/new-date-of-birth-evidence', req, {}, true);
-    expect(post('/check-your-answers-date-of-birth', req, {}, true).url)
-      .toBe(`${app.baseUrl}${otherRoute}/edit`);
-  });
-
-  test.each(['yes', 'no'])(
-    'unchanged own Yes with someone else=%s returns from mini-CYA without repeating the question',
-    someoneElse => {
-      const req = buildDobRequest({ 'change-someone-else-date-of-birth': someoneElse });
-      expect(post(ownRoute, req, { 'change-your-date-of-birth': 'yes' }, true).url)
-        .toBe(`${app.baseUrl}/correct-date-of-birth/edit`);
-      expect(req.sessionModel.get(config.stateKey).completedSections).toContain('date-of-birth');
-      expect(req.sessionModel.get('documents-new-dob')).toEqual([{ id: 'own-upload' }]);
-      expect(post('/correct-date-of-birth', req, { 'correct-date-of-birth': '1991-02-03' }, true).url)
-        .toBe(`${app.baseUrl}/new-date-of-birth-evidence/edit`);
-      expect(post('/new-date-of-birth-evidence', req, {}, true).url)
-        .toBe(`${app.baseUrl}/check-your-answers-date-of-birth/edit`);
-      expect(post('/check-your-answers-date-of-birth', req, {}, true).url)
-        .toBe(`${app.baseUrl}${returnRoute}`);
-      expect(req.sessionModel.get('correct-date-of-birth')).toBe('1991-02-03');
-      expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
-    }
-  );
-
-  test('the own-No completion still visits another unfinished selected section', () => {
-    const req = buildDobRequest({});
-    req.sessionModel.set(config.stateKey, {
-      ...req.sessionModel.get(config.stateKey),
-      completedSections: ['date-of-birth']
-    });
-    expect(post(ownRoute, req, { 'change-your-date-of-birth': 'no' }, true).url)
-      .toBe(`${app.baseUrl}/your-phone-number/edit`);
-    expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
-  });
-
-  test('confirming no changes from the own decision removes DOB and preserves the summary return', () => {
-    const req = buildDobRequest({ 'change-someone-else-date-of-birth': 'no' });
-    expect(post(ownRoute, req, { 'change-your-date-of-birth': 'no' }, true).url)
-      .toBe(`${app.baseUrl}/no-changes-made/edit`);
-    expect(post('/no-changes-made', req, { 'no-changes-made': 'yes' }, true).url)
-      .toBe(`${app.baseUrl}${returnRoute}`);
-    expect(req.sessionModel.get(config.field)).toEqual(['phone-number']);
-    const dobSection = sections.find(section => section.id === 'date-of-birth');
-    dobSection.fieldsToUnset.forEach(field => expect(req.sessionModel.get(field)).toBeUndefined());
-    expect(req.sessionModel.get('new-phone-number')).toBe('07700900001');
-    expect(req.sessionModel.get('documents-update-contact')).toEqual([{ id: 'identity-upload' }]);
-  });
-
-  test.each(['yes', 'no'])(
-    'someone-else Yes to No with own=%s clears their collection and pending evidence only',
-    own => {
-      const req = buildDobRequest({ 'change-your-date-of-birth': own });
-      const expected = own === 'yes' ? returnRoute : '/no-changes-made/edit';
-      expect(post(otherRoute, req, { 'change-someone-else-date-of-birth': 'no' }, true).url)
-        .toBe(`${app.baseUrl}${expected}`);
-      expect(req.sessionModel.get('change-someone-else-date-of-birth')).toBe('no');
-      [
-        'someoneelsenewdob',
-        'relationship-date-of-birth',
-        'someone-else-correct-date-of-birth-given-name',
-        'someone-else-correct-date-of-birth-family-name',
-        'someone-else-correct-date-of-birth',
-        'documents-someone-else-new-dob'
-      ].forEach(field => expect(req.sessionModel.get(field)).toBeUndefined());
-      expect(req.sessionModel.get('correct-date-of-birth')).toBe('1990-01-01');
-      expect(req.sessionModel.get('documents-new-dob')).toEqual([{ id: 'own-upload' }]);
-      expect(req.sessionModel.get('new-phone-number')).toBe('07700900001');
-      if (own === 'no') {
-        const page = buildController('/no-changes-made', req);
-        expect(page.locals(req, { locals: {} }).backLink)
-          .toBe(`${app.baseUrl}${otherRoute}/edit`);
-      }
-    }
-  );
-
-  test('someone-else No to Yes collects their relationship instead of returning early', () => {
-    const req = buildDobRequest({ 'change-someone-else-date-of-birth': 'no' });
-    expect(post(otherRoute, req, { 'change-someone-else-date-of-birth': 'yes' }, true).url)
-      .toBe(`${app.baseUrl}/relationship-date-of-birth/edit`);
-    expect(req.sessionModel.get(config.stateKey).completedSections).not.toContain('date-of-birth');
-  });
-
-  test('an unfinished DOB section cannot use the own-No shortcut to skip someone-else details', () => {
-    const req = buildRequest(['date-of-birth'], true, {
-      steps: [config.entryPoint],
-      'edit-return-path': `${app.baseUrl}${returnRoute}`,
-      'change-your-date-of-birth': 'yes',
-      'change-someone-else-date-of-birth': 'yes'
-    });
-    expect(post(ownRoute, req, { 'change-your-date-of-birth': 'no' }, true).url)
-      .toBe(`${app.baseUrl}${otherRoute}/edit`);
-    expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([]);
-    expect(req.sessionModel.get('someoneelsenewdob')).toBeUndefined();
-  });
-});
-
-describe.each([false, true])('claimant DOB summary edits (edit URL=%s)', edit => {
-  const route = '/check-your-answers-date-of-birth';
-  const savedPeople = {
-    aggregatedValues: [{
-      fields: [
-        { field: 'someone-else-correct-date-of-birth-given-name', value: 'Saved' },
-        { field: 'someone-else-correct-date-of-birth', value: '2000-01-01' },
-        { field: 'documents-someone-else-new-dob', value: [{ id: 'existing-upload' }] }
-      ]
-    }]
-  };
-  const buildDobRequest = (selections, returnRoute) =>
-    buildRequest(selections, edit, {
-      steps: [
-        config.entryPoint,
-        '/change-your-date-of-birth',
-        '/correct-date-of-birth',
-        '/new-date-of-birth-evidence'
-      ],
-      'change-your-date-of-birth': 'yes',
-      'change-someone-else-date-of-birth': 'yes',
-      someoneelsenewdob: savedPeople,
-      'edit-return-path': returnRoute ? `${app.baseUrl}${returnRoute}` : undefined
-    });
-
-  test.each([
-    ['/confirm', true],
-    ['/confirm', false],
-    ['/information-given', true],
-    ['/information-given', false]
   ])(
-    'completed claimant DOB edits return to %s with saved people=%s',
-    (returnRoute, hasPeople) => {
-      const req = buildDobRequest(['date-of-birth'], returnRoute);
-      if (!hasPeople) {
-        req.sessionModel.unset('someoneelsenewdob');
-        req.sessionModel.set('change-someone-else-date-of-birth', 'no');
-      }
-      completeSelectedSections(req);
-      const peopleBefore = req.sessionModel.get('someoneelsenewdob');
-      post('/correct-date-of-birth', req, { 'correct-date-of-birth': '1990-02-02' }, true);
+    'someone-else No with own=%s and selections=%p goes to %s',
+    (own, selections, nextRoute) => {
+      const req = buildRequest(selections, false, {
+        steps: [
+          config.entryPoint,
+          '/change-your-date-of-birth',
+          ...(own === 'yes'
+            ? [
+              '/correct-date-of-birth',
+              '/new-date-of-birth-evidence',
+              '/check-your-answers-date-of-birth'
+            ]
+            : [])
+        ],
+        'change-your-date-of-birth': own,
+        'change-someone-else-date-of-birth': 'yes',
+        'documents-someone-else-new-dob': [{ id: 'other-upload' }]
+      });
 
-      expect(post(route, req, {}, true).url).toBe(`${app.baseUrl}${returnRoute}`);
-      expect(req.sessionModel.get('correct-date-of-birth')).toBe('1990-02-02');
-      expect(req.sessionModel.get('someoneelsenewdob')).toEqual(peopleBefore);
-      expect(req.sessionModel.get(config.stateKey).completedSections).toContain('date-of-birth');
-    }
-  );
-
-  test.each(['/confirm', '/information-given'])(
-    'completed DOB edits preserve saved people and still collect unfinished Phone before %s',
-    returnRoute => {
-      const req = buildDobRequest(['date-of-birth', 'phone-number'], returnRoute);
-      const state = req.sessionModel.get(config.stateKey);
-      req.sessionModel.set(config.stateKey, { ...state, completedSections: ['date-of-birth'] });
-
-      expect(post(route, req, {}, true).url)
-        .toBe(`${app.baseUrl}/your-phone-number${edit ? '/edit' : ''}`);
-      expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
-      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(['date-of-birth']);
-    }
-  );
-
-  test.each([undefined, '/confirm', '/information-given'])(
-    'an incomplete DOB section still asks about someone else (return=%s)',
-    returnRoute => {
-      const req = buildDobRequest(['date-of-birth'], returnRoute);
-
-      expect(post(route, req, {}, true).url)
-        .toBe(`${app.baseUrl}/change-someone-else-date-of-birth${edit ? '/edit' : ''}`);
-      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([]);
-      expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
+      expect(
+        post(
+          '/change-someone-else-date-of-birth',
+          req,
+          {
+            'change-someone-else-date-of-birth': 'no'
+          },
+          true
+        ).url
+      ).toBe(`${app.baseUrl}${nextRoute}`);
+      expect(
+        req.sessionModel.get('documents-someone-else-new-dob')
+      ).toBeUndefined();
     }
   );
 });
+
+describe.each(['/confirm', '/information-given'])(
+  'DOB decision edits returning to %s',
+  returnRoute => {
+    const ownRoute = '/change-your-date-of-birth';
+    const otherRoute = '/change-someone-else-date-of-birth';
+    const savedPeople = {
+      aggregatedValues: [
+        {
+          fields: [
+            {
+              field: 'someone-else-correct-date-of-birth',
+              value: '2000-01-01'
+            },
+            {
+              field: 'documents-someone-else-new-dob',
+              value: [{ id: 'saved-other-upload' }]
+            }
+          ]
+        }
+      ]
+    };
+    const buildDobRequest = values => {
+      const req = buildRequest(['date-of-birth', 'phone-number'], true, {
+        steps: [
+          config.entryPoint,
+          ...sections.flatMap(section => section.routes)
+        ],
+        'edit-return-path': `${app.baseUrl}${returnRoute}`,
+        'change-your-date-of-birth': 'yes',
+        'change-someone-else-date-of-birth': 'yes',
+        'correct-date-of-birth': '1990-01-01',
+        'documents-new-dob': [{ id: 'own-upload' }],
+        'relationship-date-of-birth': 'my-child',
+        'someone-else-correct-date-of-birth-given-name': 'Saved',
+        'someone-else-correct-date-of-birth-family-name': 'Person',
+        'someone-else-correct-date-of-birth': '2000-01-01',
+        'documents-someone-else-new-dob': [{ id: 'pending-other-upload' }],
+        someoneelsenewdob: savedPeople,
+        'new-phone-number': '07700900001',
+        'documents-update-contact': [{ id: 'identity-upload' }],
+        ...values
+      });
+      completeSelectedSections(req);
+      return req;
+    };
+
+    test.each(['yes', 'no'])(
+      'own Yes to No with someone else=%s clears only own DOB data and uses the correct edit exit',
+      someoneElse => {
+        const req = buildDobRequest({
+          'change-someone-else-date-of-birth': someoneElse
+        });
+        const expected =
+          someoneElse === 'yes' ? returnRoute : '/no-changes-made/edit';
+        expect(
+          post(ownRoute, req, { 'change-your-date-of-birth': 'no' }, true).url
+        ).toBe(`${app.baseUrl}${expected}`);
+        expect(req.sessionModel.get('change-your-date-of-birth')).toBe('no');
+        expect(req.sessionModel.get('correct-date-of-birth')).toBeUndefined();
+        expect(req.sessionModel.get('documents-new-dob')).toBeUndefined();
+        expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
+        expect(req.sessionModel.get('documents-someone-else-new-dob')).toEqual([
+          { id: 'pending-other-upload' }
+        ]);
+        expect(req.sessionModel.get('new-phone-number')).toBe('07700900001');
+        expect(req.sessionModel.get('documents-update-contact')).toEqual([
+          { id: 'identity-upload' }
+        ]);
+        if (someoneElse === 'no') {
+          expect(
+            req.sessionModel.get(config.stateKey).completedSections
+          ).not.toContain('date-of-birth');
+          const page = buildController('/no-changes-made', req);
+          expect(page.locals(req, { locals: {} }).backLink).toBe(
+            `${app.baseUrl}${ownRoute}/edit`
+          );
+          expect(
+            post('/no-changes-made', req, { 'no-changes-made': 'no' }).url
+          ).toBe(`${app.baseUrl}${ownRoute}/edit`);
+        }
+      }
+    );
+
+    test('own No to Yes collects the corrected date even when that page was already visited', () => {
+      const req = buildDobRequest({ 'change-your-date-of-birth': 'no' });
+      expect(
+        post(ownRoute, req, { 'change-your-date-of-birth': 'yes' }, true).url
+      ).toBe(`${app.baseUrl}/correct-date-of-birth/edit`);
+      expect(
+        req.sessionModel.get(config.stateKey).completedSections
+      ).not.toContain('date-of-birth');
+      expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
+      post(
+        '/correct-date-of-birth',
+        req,
+        { 'correct-date-of-birth': '1991-02-03' },
+        true
+      );
+      post('/new-date-of-birth-evidence', req, {}, true);
+      expect(post('/check-your-answers-date-of-birth', req, {}, true).url).toBe(
+        `${app.baseUrl}${returnRoute}`
+      );
+      expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
+      expect(req.sessionModel.get(config.stateKey).reopenedSections).toEqual({});
+    });
+
+    test.each(['yes', 'no'])(
+      'unchanged own Yes with someone else=%s returns from mini-CYA without repeating the question',
+      someoneElse => {
+        const req = buildDobRequest({
+          'change-someone-else-date-of-birth': someoneElse
+        });
+        expect(
+          post(ownRoute, req, { 'change-your-date-of-birth': 'yes' }, true).url
+        ).toBe(`${app.baseUrl}/correct-date-of-birth/edit`);
+        expect(
+          req.sessionModel.get(config.stateKey).completedSections
+        ).toContain('date-of-birth');
+        expect(req.sessionModel.get('documents-new-dob')).toEqual([
+          { id: 'own-upload' }
+        ]);
+        expect(
+          post(
+            '/correct-date-of-birth',
+            req,
+            { 'correct-date-of-birth': '1991-02-03' },
+            true
+          ).url
+        ).toBe(`${app.baseUrl}/new-date-of-birth-evidence/edit`);
+        expect(post('/new-date-of-birth-evidence', req, {}, true).url).toBe(
+          `${app.baseUrl}/check-your-answers-date-of-birth/edit`
+        );
+        expect(
+          post('/check-your-answers-date-of-birth', req, {}, true).url
+        ).toBe(`${app.baseUrl}${returnRoute}`);
+        expect(req.sessionModel.get('correct-date-of-birth')).toBe(
+          '1991-02-03'
+        );
+        expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
+      }
+    );
+
+    test('the own-No completion still visits another unfinished selected section', () => {
+      const req = buildDobRequest({});
+      req.sessionModel.set(config.stateKey, {
+        ...req.sessionModel.get(config.stateKey),
+        completedSections: ['date-of-birth']
+      });
+      expect(
+        post(ownRoute, req, { 'change-your-date-of-birth': 'no' }, true).url
+      ).toBe(`${app.baseUrl}/your-phone-number/edit`);
+      expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
+    });
+
+    test('confirming no changes from the own decision removes DOB and preserves the summary return', () => {
+      const req = buildDobRequest({
+        'change-someone-else-date-of-birth': 'no'
+      });
+      expect(
+        post(ownRoute, req, { 'change-your-date-of-birth': 'no' }, true).url
+      ).toBe(`${app.baseUrl}/no-changes-made/edit`);
+      expect(
+        post('/no-changes-made', req, { 'no-changes-made': 'yes' }, true).url
+      ).toBe(`${app.baseUrl}${returnRoute}`);
+      expect(req.sessionModel.get(config.field)).toEqual(['phone-number']);
+      const dobSection = sections.find(
+        section => section.id === 'date-of-birth'
+      );
+      dobSection.fieldsToUnset.forEach(field =>
+        expect(req.sessionModel.get(field)).toBeUndefined()
+      );
+      expect(req.sessionModel.get('new-phone-number')).toBe('07700900001');
+      expect(req.sessionModel.get('documents-update-contact')).toEqual([
+        { id: 'identity-upload' }
+      ]);
+    });
+
+    test.each(['yes', 'no'])(
+      'someone-else Yes to No with own=%s clears their collection and pending evidence only',
+      own => {
+        const req = buildDobRequest({ 'change-your-date-of-birth': own });
+        const expected = own === 'yes' ? returnRoute : '/no-changes-made/edit';
+        expect(
+          post(
+            otherRoute,
+            req,
+            { 'change-someone-else-date-of-birth': 'no' },
+            true
+          ).url
+        ).toBe(`${app.baseUrl}${expected}`);
+        expect(req.sessionModel.get('change-someone-else-date-of-birth')).toBe(
+          'no'
+        );
+        [
+          'someoneelsenewdob',
+          'relationship-date-of-birth',
+          'someone-else-correct-date-of-birth-given-name',
+          'someone-else-correct-date-of-birth-family-name',
+          'someone-else-correct-date-of-birth',
+          'documents-someone-else-new-dob'
+        ].forEach(field => expect(req.sessionModel.get(field)).toBeUndefined());
+        expect(req.sessionModel.get('correct-date-of-birth')).toBe(
+          '1990-01-01'
+        );
+        expect(req.sessionModel.get('documents-new-dob')).toEqual([
+          { id: 'own-upload' }
+        ]);
+        expect(req.sessionModel.get('new-phone-number')).toBe('07700900001');
+        if (own === 'no') {
+          const page = buildController('/no-changes-made', req);
+          expect(page.locals(req, { locals: {} }).backLink).toBe(
+            `${app.baseUrl}${otherRoute}/edit`
+          );
+        }
+      }
+    );
+
+    test('someone-else No to Yes collects their relationship instead of returning early', () => {
+      const req = buildDobRequest({
+        'change-someone-else-date-of-birth': 'no'
+      });
+      expect(
+        post(
+          otherRoute,
+          req,
+          { 'change-someone-else-date-of-birth': 'yes' },
+          true
+        ).url
+      ).toBe(`${app.baseUrl}/relationship-date-of-birth/edit`);
+      expect(
+        req.sessionModel.get(config.stateKey).completedSections
+      ).not.toContain('date-of-birth');
+    });
+
+    test('an unfinished DOB section cannot use the own-No shortcut to skip someone-else details', () => {
+      const req = buildRequest(['date-of-birth'], true, {
+        steps: [config.entryPoint],
+        'edit-return-path': `${app.baseUrl}${returnRoute}`,
+        'change-your-date-of-birth': 'yes',
+        'change-someone-else-date-of-birth': 'yes'
+      });
+      expect(
+        post(ownRoute, req, { 'change-your-date-of-birth': 'no' }, true).url
+      ).toBe(`${app.baseUrl}${otherRoute}/edit`);
+      expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(
+        []
+      );
+      expect(req.sessionModel.get('someoneelsenewdob')).toBeUndefined();
+    });
+  }
+);
+
+describe.each([false, true])(
+  'claimant DOB summary edits (edit URL=%s)',
+  edit => {
+    const route = '/check-your-answers-date-of-birth';
+    const savedPeople = {
+      aggregatedValues: [
+        {
+          fields: [
+            {
+              field: 'someone-else-correct-date-of-birth-given-name',
+              value: 'Saved'
+            },
+            {
+              field: 'someone-else-correct-date-of-birth',
+              value: '2000-01-01'
+            },
+            {
+              field: 'documents-someone-else-new-dob',
+              value: [{ id: 'existing-upload' }]
+            }
+          ]
+        }
+      ]
+    };
+    const buildDobRequest = (selections, returnRoute) =>
+      buildRequest(selections, edit, {
+        steps: [
+          config.entryPoint,
+          '/change-your-date-of-birth',
+          '/correct-date-of-birth',
+          '/new-date-of-birth-evidence'
+        ],
+        'change-your-date-of-birth': 'yes',
+        'change-someone-else-date-of-birth': 'yes',
+        someoneelsenewdob: savedPeople,
+        'edit-return-path': returnRoute
+          ? `${app.baseUrl}${returnRoute}`
+          : undefined
+      });
+
+    test.each([
+      ['/confirm', true],
+      ['/confirm', false],
+      ['/information-given', true],
+      ['/information-given', false]
+    ])(
+      'completed claimant DOB edits return to %s with saved people=%s',
+      (returnRoute, hasPeople) => {
+        const req = buildDobRequest(['date-of-birth'], returnRoute);
+        if (!hasPeople) {
+          req.sessionModel.unset('someoneelsenewdob');
+          req.sessionModel.set('change-someone-else-date-of-birth', 'no');
+        }
+        completeSelectedSections(req);
+        const peopleBefore = req.sessionModel.get('someoneelsenewdob');
+        post(
+          '/correct-date-of-birth',
+          req,
+          { 'correct-date-of-birth': '1990-02-02' },
+          true
+        );
+
+        expect(post(route, req, {}, true).url).toBe(
+          `${app.baseUrl}${returnRoute}`
+        );
+        expect(req.sessionModel.get('correct-date-of-birth')).toBe(
+          '1990-02-02'
+        );
+        expect(req.sessionModel.get('someoneelsenewdob')).toEqual(peopleBefore);
+        expect(
+          req.sessionModel.get(config.stateKey).completedSections
+        ).toContain('date-of-birth');
+      }
+    );
+
+    test.each(['/confirm', '/information-given'])(
+      'completed DOB edits preserve saved people and still collect unfinished Phone before %s',
+      returnRoute => {
+        const req = buildDobRequest(
+          ['date-of-birth', 'phone-number'],
+          returnRoute
+        );
+        const state = req.sessionModel.get(config.stateKey);
+        req.sessionModel.set(config.stateKey, {
+          ...state,
+          completedSections: ['date-of-birth']
+        });
+
+        expect(post(route, req, {}, true).url).toBe(
+          `${app.baseUrl}/your-phone-number${edit ? '/edit' : ''}`
+        );
+        expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
+        expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(
+          ['date-of-birth']
+        );
+      }
+    );
+
+    test.each([undefined, '/confirm', '/information-given'])(
+      'an incomplete DOB section still asks about someone else (return=%s)',
+      returnRoute => {
+        const req = buildDobRequest(['date-of-birth'], returnRoute);
+
+        expect(post(route, req, {}, true).url).toBe(
+          `${app.baseUrl}/change-someone-else-date-of-birth${edit ? '/edit' : ''}`
+        );
+        expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(
+          []
+        );
+        expect(req.sessionModel.get('someoneelsenewdob')).toEqual(savedPeople);
+      }
+    );
+  }
+);
 
 describe('contact-detail edit completion', () => {
   test.each([
@@ -976,30 +1516,37 @@ describe('contact-detail edit completion', () => {
     ['/check-your-answers-phone-number', '/confirm'],
     ['/check-your-answers-email', '/information-given'],
     ['/check-your-answers-phone-number', '/information-given']
-  ])('%s honours the summary return path %s without an edit URL', (route, returnRoute) => {
-    const req = buildRequest(['email-address', 'phone-number'], false);
-    completeSelectedSections(req);
-    req.originalUrl = `${app.baseUrl}${returnRoute}`;
-    const summary = buildController(returnRoute, req);
-    const next = jest.fn();
-    summary.getValues(req, {}, next);
-    expect(next).toHaveBeenCalledWith(null, expect.any(Object));
-    expect(req.sessionModel.get('edit-return-path')).toBe(req.originalUrl);
-    expect(req.params.action).toBeUndefined();
+  ])(
+    '%s honours the summary return path %s without an edit URL',
+    (route, returnRoute) => {
+      const req = buildRequest(['email-address', 'phone-number'], false);
+      completeSelectedSections(req);
+      req.originalUrl = `${app.baseUrl}${returnRoute}`;
+      const summary = buildController(returnRoute, req);
+      const next = jest.fn();
+      summary.getValues(req, {}, next);
+      expect(next).toHaveBeenCalledWith(null, expect.any(Object));
+      expect(req.sessionModel.get('edit-return-path')).toBe(req.originalUrl);
+      expect(req.params.action).toBeUndefined();
 
-    expect(post(route, req).url).toBe(req.originalUrl);
-    expect(req.form.options.continueOnEdit).toBe(true);
-  });
+      expect(post(route, req).url).toBe(req.originalUrl);
+      expect(req.form.options.continueOnEdit).toBe(true);
+    }
+  );
 
   test('a summary return path without an edit URL still collects incomplete selected follow-ups', () => {
     const req = buildRequest(['email-address', 'phone-number'], false, {
       'edit-return-path': `${app.baseUrl}/confirm`
     });
-    expect(post('/check-your-answers-email', req).url)
-      .toBe(`${app.baseUrl}/your-phone-number`);
-    expect(post('/check-your-answers-phone-number', req).url)
-      .toBe(`${app.baseUrl}/provide-photo-identity`);
-    expect(post('/provide-photo-identity', req).url).toBe(`${app.baseUrl}/confirm`);
+    expect(post('/check-your-answers-email', req).url).toBe(
+      `${app.baseUrl}/your-phone-number`
+    );
+    expect(post('/check-your-answers-phone-number', req).url).toBe(
+      `${app.baseUrl}/provide-photo-identity`
+    );
+    expect(post('/provide-photo-identity', req).url).toBe(
+      `${app.baseUrl}/confirm`
+    );
   });
 
   test('a newly added Name section cannot complete merely from an unanswered someone-else follow-up', () => {
@@ -1008,28 +1555,63 @@ describe('contact-detail edit completion', () => {
       'edit-return-path': `${app.baseUrl}/confirm`
     });
     completeSelectedSections(req);
-    expect(post(config.entryPoint, req, {
-      [config.field]: ['name', 'email-address']
-    }, true).url).toBe(`${app.baseUrl}/do-you-need-to-change-your-name/edit`);
-    post('/do-you-need-to-change-your-name', req, {
-      'do-you-need-to-change-your-name': 'yes'
-    }, true);
-    expect(post('/do-you-need-to-change-someone-elses-name', req, {
-      'change-someone-elses-name': 'yes'
-    }).url).toBe(`${app.baseUrl}/relationship-name-change/edit`);
+    expect(
+      post(
+        config.entryPoint,
+        req,
+        {
+          [config.field]: ['name', 'email-address']
+        },
+        true
+      ).url
+    ).toBe(`${app.baseUrl}/do-you-need-to-change-your-name/edit`);
+    post(
+      '/do-you-need-to-change-your-name',
+      req,
+      {
+        'do-you-need-to-change-your-name': 'yes'
+      },
+      true
+    );
+    expect(
+      post('/do-you-need-to-change-someone-elses-name', req, {
+        'change-someone-elses-name': 'yes'
+      }).url
+    ).toBe(`${app.baseUrl}/relationship-name-change/edit`);
 
-    expect(post('/do-you-need-to-change-your-name', req, {
-      'do-you-need-to-change-your-name': 'no'
-    }, true).url).toBe(`${app.baseUrl}/do-you-need-to-change-someone-elses-name/edit`);
-    expect(req.sessionModel.get(config.stateKey).completedSections).not.toContain('name');
+    expect(
+      post(
+        '/do-you-need-to-change-your-name',
+        req,
+        {
+          'do-you-need-to-change-your-name': 'no'
+        },
+        true
+      ).url
+    ).toBe(`${app.baseUrl}/do-you-need-to-change-someone-elses-name/edit`);
+    expect(
+      req.sessionModel.get(config.stateKey).completedSections
+    ).not.toContain('name');
     expect(req.sessionModel.get('someone-else-new-given-name')).toBeUndefined();
-    expect(req.sessionModel.get('documents-someone-else-new-name')).toBeUndefined();
-    expect(post('/do-you-need-to-change-someone-elses-name', req, {
-      'change-someone-elses-name': 'yes'
-    }, true).url).toBe(`${app.baseUrl}/relationship-name-change/edit`);
-    expect(post('/check-your-answers-someone-else-name', req).url)
-      .toBe(`${app.baseUrl}/confirm`);
-    expect(req.sessionModel.get(config.stateKey).completedSections).toContain('name');
+    expect(
+      req.sessionModel.get('documents-someone-else-new-name')
+    ).toBeUndefined();
+    expect(
+      post(
+        '/do-you-need-to-change-someone-elses-name',
+        req,
+        {
+          'change-someone-elses-name': 'yes'
+        },
+        true
+      ).url
+    ).toBe(`${app.baseUrl}/relationship-name-change/edit`);
+    expect(post('/check-your-answers-someone-else-name', req).url).toBe(
+      `${app.baseUrl}/confirm`
+    );
+    expect(req.sessionModel.get(config.stateKey).completedSections).toContain(
+      'name'
+    );
   });
 
   test.each([
@@ -1119,40 +1701,78 @@ describe('contact-detail edit completion', () => {
     edit => {
       const suffix = edit ? '/edit' : '';
       const req = buildRequest(['name'], edit, {
-        steps: ['/personal-details', config.entryPoint, ...sections.find(section => section.id === 'name').routes],
+        steps: [
+          '/personal-details',
+          config.entryPoint,
+          ...sections.find(section => section.id === 'name').routes
+        ],
         'edit-return-path': edit ? `${app.baseUrl}/confirm` : undefined
       });
       completeSelectedSections(req);
-      expect(post(config.entryPoint, req, {
-        [config.field]: ['name', 'email-address', 'phone-number']
-      }, true).url).toBe(`${app.baseUrl}/new-email-address${suffix}`);
-      post('/new-email-address', req, {
-        'new-email-address': 'updated@example.com',
-        'confirm-new-email-address': 'updated@example.com'
-      }, true);
-      expect(post('/check-your-answers-email', req, {}, true).url)
-        .toBe(`${app.baseUrl}/your-phone-number${suffix}`);
-      expect(post('/your-phone-number', req, {
-        'your-phone-number': 'yes',
-        'whose-phone-number': 'mine'
-      }, true).url).toBe(`${app.baseUrl}/new-phone-number${suffix}`);
+      expect(
+        post(
+          config.entryPoint,
+          req,
+          {
+            [config.field]: ['name', 'email-address', 'phone-number']
+          },
+          true
+        ).url
+      ).toBe(`${app.baseUrl}/new-email-address${suffix}`);
+      post(
+        '/new-email-address',
+        req,
+        {
+          'new-email-address': 'updated@example.com',
+          'confirm-new-email-address': 'updated@example.com'
+        },
+        true
+      );
+      expect(post('/check-your-answers-email', req, {}, true).url).toBe(
+        `${app.baseUrl}/your-phone-number${suffix}`
+      );
+      expect(
+        post(
+          '/your-phone-number',
+          req,
+          {
+            'your-phone-number': 'yes',
+            'whose-phone-number': 'mine'
+          },
+          true
+        ).url
+      ).toBe(`${app.baseUrl}/new-phone-number${suffix}`);
       expect(req.sessionModel.get('steps')).toContain('/your-phone-number');
-      expect(req.sessionModel.get(config.stateKey).completedSections).not.toContain('phone-number');
+      expect(
+        req.sessionModel.get(config.stateKey).completedSections
+      ).not.toContain('phone-number');
 
-      expect(post('/check-your-answers-email', req, {}, true).url)
-        .toBe(`${app.baseUrl}/your-phone-number${suffix}`);
+      expect(post('/check-your-answers-email', req, {}, true).url).toBe(
+        `${app.baseUrl}/your-phone-number${suffix}`
+      );
       expect(req.sessionModel.get('new-phone-number')).toBeUndefined();
-      expect(req.sessionModel.get(config.stateKey).completedSections).not.toContain('phone-number');
+      expect(
+        req.sessionModel.get(config.stateKey).completedSections
+      ).not.toContain('phone-number');
 
-      post('/new-phone-number', req, {
-        'new-phone-number': '07700900001',
-        'confirm-new-phone-number': '07700900001'
-      }, true);
-      expect(post('/check-your-answers-phone-number', req, {}, true).url)
-        .toBe(`${app.baseUrl}/provide-photo-identity${suffix}`);
-      expect(req.sessionModel.get(config.stateKey).completedSections).toContain('phone-number');
-      expect(post('/provide-photo-identity', req, {}, true).url)
-        .toBe(`${app.baseUrl}${edit ? '/confirm' : config.exitPoint}`);
+      post(
+        '/new-phone-number',
+        req,
+        {
+          'new-phone-number': '07700900001',
+          'confirm-new-phone-number': '07700900001'
+        },
+        true
+      );
+      expect(post('/check-your-answers-phone-number', req, {}, true).url).toBe(
+        `${app.baseUrl}/provide-photo-identity${suffix}`
+      );
+      expect(req.sessionModel.get(config.stateKey).completedSections).toContain(
+        'phone-number'
+      );
+      expect(post('/provide-photo-identity', req, {}, true).url).toBe(
+        `${app.baseUrl}${edit ? '/confirm' : config.exitPoint}`
+      );
     }
   );
 
@@ -1174,11 +1794,13 @@ describe('contact-detail edit completion', () => {
 });
 
 describe('contact-detail selection cleanup', () => {
-  test.each(noChangesSections.flatMap(section =>
-    ['/confirm', '/information-given'].flatMap(summary =>
-      ['no', 'yes'].map(dependants => ({ section, summary, dependants }))
+  test.each(
+    noChangesSections.flatMap(section =>
+      ['/confirm', '/information-given'].flatMap(summary =>
+        ['no', 'yes'].map(dependants => ({ section, summary, dependants }))
+      )
     )
-  ))(
+  )(
     '$section.id removal returning to $summary with dependants=$dependants respects remaining selections',
     ({ section, summary, dependants }) => {
       const req = buildRequest([section.value], true, {
@@ -1189,7 +1811,9 @@ describe('contact-detail selection cleanup', () => {
 
       expect(
         post('/no-changes-made', req, { 'no-changes-made': 'yes' }).url
-      ).toBe(`${app.baseUrl}${dependants === 'yes' ? summary : '/something-else'}`);
+      ).toBe(
+        `${app.baseUrl}${dependants === 'yes' ? summary : '/something-else'}`
+      );
       expect(req.sessionModel.get('change-personal-details')).toBe('no');
       expect(req.sessionModel.get(config.field)).toBeUndefined();
     }
