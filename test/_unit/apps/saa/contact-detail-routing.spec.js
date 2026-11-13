@@ -1401,6 +1401,20 @@ describe('contact-detail edit completion', () => {
     }
   );
 
+  test.each([
+    ['yes', '/home-address'],
+    ['no', '/change-contact-address']
+  ])('editing the UK address decision from confirm with %s follows the address flow', (answer, target) => {
+    const req = buildRequest(['address'], true, {
+      steps: sections.flatMap(section => section.routes),
+      'edit-return-path': `${app.baseUrl}/confirm`
+    });
+    completeSelectedSections(req);
+
+    expect(post('/change-uk-address', req, { 'change-uk-address': answer }).url)
+      .toBe(`${app.baseUrl}${target}/edit`);
+  });
+
   test('checkbox edits still complete newly selected sections and their identity dependency', () => {
     const req = buildRequest(['name'], true, {
       steps: sections.find(section => section.id === 'name').routes,

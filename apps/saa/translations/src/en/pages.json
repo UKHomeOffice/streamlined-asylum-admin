@@ -320,6 +320,9 @@
       "address": {
         "header": "Change your address"
       },
+      "address-final": {
+        "header": "Address"
+      },
       "phone-number": {
         "header": "Change your phone number"
       },

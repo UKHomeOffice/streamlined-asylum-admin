@@ -408,6 +408,79 @@ describe('address rows on the check-your-answers page', () => {
     expect(html).toContain('href="/changes/home-address"');
     expect(html).toContain('continue');
   });
+
+  test.each([
+    {
+      'change-uk-address': 'yes',
+      'home-address-line-1': '21 Elmhurst Lane',
+      'home-address-line-2': 'South Norwood',
+      'home-address-town-or-city': 'London',
+      'home-address-postcode': 'SE25 6RJ',
+      'home-address-moved-date': '2020-03-27',
+      'send-letters-to-home-address': 'yes'
+    },
+    {
+      'change-uk-address': 'yes',
+      'home-address-line-1': '1 High Street',
+      'home-address-town-or-city': 'London',
+      'home-address-postcode': 'SE25 6RJ',
+      'home-address-moved-date': '2020-03-27',
+      'send-letters-to-home-address': 'no',
+      'change-contact-address': 'yes',
+      'reason-contact-address-change': 'A different address is needed',
+      'contact-address-full-name': 'Alex Smith',
+      'contact-address-line-1': '2 High Street',
+      'contact-address-town-or-city': 'London',
+      'contact-address-postcode': 'SE25 6RJ'
+    },
+    {
+      'change-uk-address': 'no',
+      'home-address-line-1': 'Old home address',
+      'change-contact-address': 'no',
+      'contact-address-line-1': 'Old correspondence address'
+    }
+  ])('shows the same address answers on the final summary', session => {
+    const req = createRequest(session);
+    const page = new ConfirmPage();
+    const miniRows = page.getFieldsForRow(addressSection.steps, req);
+    const finalRows = page.getFieldsForRow(sections['address-final'].steps, req);
+
+    expect(finalRows.map(({ field, label, value }) => ({ field, label, value })))
+      .toEqual(miniRows.map(({ field, label, value }) => ({ field, label, value })));
+    expect(finalRows.map(row => [row.field, row.changeLink])).toEqual(
+      finalRows.map(row => [
+        row.field,
+        row.field === 'change-uk-address'
+          ? '/changes/change-uk-address/edit'
+          : '/changes/check-your-answers-address'
+      ])
+    );
+    expect(pages.confirm.sections['address-final'].header).toBe('Address');
+  });
+
+  test('renders the Address heading and the multiline answer on the final summary', () => {
+    const req = createRequest({
+      'change-uk-address': 'yes',
+      'home-address-line-1': '21 Elmhurst Lane',
+      'home-address-town-or-city': 'London',
+      'home-address-postcode': 'SE25 6RJ'
+    });
+    req.form.options.sections = { 'address-final': sections['address-final'] };
+    const rows = new ConfirmPage().getRowsForSummarySections(req);
+    const summaryTable = Hogan.compile(
+      fs.readFileSync(
+        path.resolve(__dirname, '../../../../apps/saa/views/partials/summary-table.html'),
+        'utf8'
+      )
+    );
+    const html = summaryTable.render(rows[0]);
+
+    expect(rows).toHaveLength(1);
+    expect(html).toContain('<h2 class="section-header">Address</h2>');
+    expect(html).toContain('>21 Elmhurst Lane\nLondon\nSE25 6RJ</dd>');
+    expect(html).toContain('href="/changes/change-uk-address/edit"');
+    expect(html).toContain('href="/changes/check-your-answers-address"');
+  });
 });
 
 describe('name rows on the confirm page', () => {

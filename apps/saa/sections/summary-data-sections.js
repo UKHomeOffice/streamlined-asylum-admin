@@ -8,6 +8,7 @@ const evidenceSummary = require('./summary-data-evidence-help-your-claim');
 const emailAddressSummary = require('./summary-data-email-address');
 const dateOfBirthSummary = require('./summary-data-date-of-birth');
 const phoneNumberSummary = require('./summary-data-phone-number');
+const addressSummary = require('./summary-data-address');
 const nameSummary = require('./summary-data-name');
 const { formatDate, formatUanForDisplay } = require('../../../utils');
 
@@ -39,6 +40,13 @@ const phoneNumberRows = phoneNumberSummary['phone-number'].steps.map(row => ({
   ...row,
   changeLink: `${SAA_BASE_URL}/check-your-answers-phone-number`,
   dependsOn: 'change-personal-details'
+}));
+
+const addressRows = addressSummary.address.steps.map(row => ({
+  ...row,
+  changeLink: row.field === 'change-uk-address'
+    ? `${SAA_BASE_URL}/change-uk-address/edit`
+    : `${SAA_BASE_URL}/check-your-answers-address`
 }));
 
 // Read-only rows for every item of an aggregate; Change goes to that aggregate's summary page.
@@ -219,6 +227,9 @@ module.exports = {
       },
       aggregateSummaryRow('someoneelsenewdob')
     ]
+  },
+  'address-final': {
+    steps: addressRows
   },
   'email-address': {
     steps: emailAddressRows
