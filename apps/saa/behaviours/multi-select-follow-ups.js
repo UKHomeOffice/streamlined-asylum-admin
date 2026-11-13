@@ -585,6 +585,22 @@ const updateEntryState = (req, config, previousState) => {
   return nextState;
 };
 
+const clearAllSections = (req, config, previousState) => {
+  // Include every configured section so resumed sessions with missing state are also cleared.
+  const selections = config.options.map(option => option.value);
+  const state = createState(config, {
+    ...previousState,
+    selections,
+    activeSections: getSectionIds(getActiveSections(config, selections))
+  }, []);
+  clearInactiveValues(req, state);
+  req.sessionModel.unset(config.field);
+  if (config.noChangesPoint?.field) {
+    req.sessionModel.unset(config.noChangesPoint.field);
+  }
+  return state;
+};
+
 const multiSelectFollowUps = behaviourConfig => SuperClass =>
   class MultiSelectFollowUps extends SuperClass {
     getMultiSelectFollowUpsConfig() {
@@ -630,6 +646,11 @@ const multiSelectFollowUps = behaviourConfig => SuperClass =>
 
         if (this.options.route === config.entryPoint) {
           state = updateEntryState(req, config, previousState);
+        } else if (
+          this.options.route === config.deselectOn?.route &&
+          conditionsMet(config.deselectOn.condition, req)
+        ) {
+          state = clearAllSections(req, config, previousState);
         } else if (this.options.route === config.noChangesPoint?.route) {
           if (!previousState.noChangesSection) {
             callback(

@@ -96,6 +96,92 @@ const completeSelectedSections = req => {
   });
 };
 
+describe('declining personal details', () => {
+  const selections = config.options.map(option => option.value);
+  const staleValues = Object.fromEntries(
+    sections.flatMap(section => section.fieldsToUnset || []).map(field => [field, 'stale'])
+  );
+  const unrelated = {
+    'add-remove-dependant': 'yes',
+    addremovechildpartner: { aggregatedValues: [{ fields: [] }] },
+    'send-evidence-for-your-claim': 'yes',
+    'documents-help-your-claim': [{ id: 'supporting-evidence' }],
+    'someone-on-claim-died': 'yes',
+    reportadeath: { aggregatedValues: [{ fields: [] }] },
+    'something-else': 'yes'
+  };
+
+  test.each([undefined, '/confirm', '/information-given'])(
+    'parent No clears all dynamic sections and preserves unrelated data (return=%s)',
+    returnRoute => {
+      const req = buildRequest(selections, Boolean(returnRoute), {
+        ...staleValues,
+        ...unrelated,
+        steps: ['/who-are-you', config.entryPoint, ...sections.flatMap(section => section.routes)],
+        'edit-return-path': returnRoute ? `${app.baseUrl}${returnRoute}` : undefined,
+        'no-changes-made': 'no'
+      });
+      completeSelectedSections(req);
+
+      expect(post('/personal-details', req, { 'change-personal-details': 'no' }, true).url)
+        .toBe(`${app.baseUrl}${config.exitPoint}${returnRoute ? '/edit' : ''}`);
+      expect(req.sessionModel.get('change-personal-details')).toBe('no');
+      Object.keys(staleValues).forEach(field => expect(req.sessionModel.get(field)).toBeUndefined());
+      expect(req.sessionModel.get(config.field)).toBeUndefined();
+      expect(req.sessionModel.get('no-changes-made')).toBeUndefined();
+      expect(req.sessionModel.get(config.stateKey)).toMatchObject({
+        selections: [], activeSections: [], completedSections: [], sectionStartBackLinks: {}
+      });
+      sections.flatMap(section => section.routes)
+        .forEach(route => expect(req.sessionModel.get('steps')).not.toContain(route));
+      Object.entries(unrelated).forEach(([field, value]) => {
+        expect(req.sessionModel.get(field)).toEqual(value);
+      });
+
+      const Page = require('../../../../apps/saa/behaviours/summary-labels')(
+        require('hof').components.summary(class {})
+      );
+      req.form.options = { fieldsConfig: fields, steps: app.steps };
+      req.translate = keys => [].concat(keys)[0];
+      const summaries = require('../../../../apps/saa/sections/summary-data-sections');
+      ['name', 'someone-else-new-name', 'date-of-birth', 'someone-else-date-of-birth',
+        'email-address', 'phone-number', 'address-final'].forEach(section => {
+        if (summaries[section]) {
+          expect(new Page().getFieldsForRow(summaries[section].steps, req)).toEqual([]);
+        }
+      });
+    }
+  );
+
+  test('parent No clears stale values even without saved orchestration state', () => {
+    const req = buildRequest([], true, {
+      ...staleValues,
+      'edit-return-path': `${app.baseUrl}/confirm`,
+      'add-remove-dependant': 'yes',
+      steps: ['/who-are-you', config.entryPoint]
+    });
+    req.sessionModel.unset(config.stateKey);
+    post('/personal-details', req, { 'change-personal-details': 'no' }, true);
+    Object.keys(staleValues).forEach(field => expect(req.sessionModel.get(field)).toBeUndefined());
+  });
+
+  test('parent Yes preserves existing selected sections and their saved data', () => {
+    const req = buildRequest(selections, true, {
+      ...staleValues,
+      steps: ['/who-are-you', config.entryPoint],
+      'edit-return-path': `${app.baseUrl}/confirm`
+    });
+    completeSelectedSections(req);
+    expect(post('/personal-details', req, { 'change-personal-details': 'yes' }, true).url)
+      .toBe(`${app.baseUrl}${config.entryPoint}/edit`);
+    Object.entries(staleValues).forEach(([field, value]) => expect(req.sessionModel.get(field)).toEqual(value));
+    expect(req.sessionModel.get(config.field)).toEqual(selections);
+    expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(
+      sections.map(section => section.id)
+    );
+  });
+});
+
 describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
   const suffix = edit ? '/edit' : '';
 

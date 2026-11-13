@@ -29,6 +29,7 @@
  * - `editReturnUrl` is where edit journeys go once no selected section is left.
  * - section `noChanges.editRoute` optionally reports the same rule from an edit-only page.
  * - completion `reopenOnChange` limits reopening at that boundary to changes in the named field.
+ * - `deselectOn` clears all configured sections when its parent-page condition matches.
  */
 const SAA_NO_CHANGES_HEADER = 'pages.no-changes-made.headers';
 const CONTACT_DETAIL_UPDATES_STATE_KEY = 'contact-detail-updates';
@@ -62,6 +63,10 @@ module.exports = {
   entryPoint: '/changes-to-contact-details',
   exitPoint: '/do-you-need-add-remove-dependant',
   stateKey: CONTACT_DETAIL_UPDATES_STATE_KEY,
+  deselectOn: {
+    route: '/personal-details',
+    condition: { field: 'change-personal-details', value: 'no' }
+  },
   noChangesPoint: {
     route: '/no-changes-made',
     field: 'no-changes-made',
