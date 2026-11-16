@@ -447,14 +447,12 @@ describe('address rows on the check-your-answers page', () => {
 
     expect(finalRows.map(({ field, label, value }) => ({ field, label, value })))
       .toEqual(miniRows.map(({ field, label, value }) => ({ field, label, value })));
-    expect(finalRows.map(row => [row.field, row.changeLink])).toEqual(
-      finalRows.map(row => [
-        row.field,
-        row.field === 'change-uk-address'
-          ? '/changes/change-uk-address/edit'
-          : '/changes/check-your-answers-address'
-      ])
-    );
+    expect(finalRows.find(row => row.field === 'change-uk-address')).toMatchObject({
+      changeLink: '/changes/check-your-answers-address'
+    });
+    finalRows
+      .filter(row => row.field !== 'change-uk-address')
+      .forEach(row => expect(row.omitChangeLink).toBe(true));
     expect(pages.confirm.sections['address-final'].header).toBe('Address');
   });
 
@@ -478,8 +476,11 @@ describe('address rows on the check-your-answers page', () => {
     expect(rows).toHaveLength(1);
     expect(html).toContain('<h2 class="section-header">Address</h2>');
     expect(html).toContain('>21 Elmhurst Lane\nLondon\nSE25 6RJ</dd>');
-    expect(html).toContain('href="/changes/change-uk-address/edit"');
-    expect(html).toContain('href="/changes/check-your-answers-address"');
+    expect(html).not.toContain('href="/changes/change-uk-address/edit"');
+    expect(html.match(/href="\/changes\/check-your-answers-address"/g)).toHaveLength(1);
+    expect(html).toContain('id="change-uk-address-change-');
+    expect(html.match(/class="govuk-link"/g)).toHaveLength(1);
+    expect(html).not.toContain('href="/changes/home-address');
   });
 });
 

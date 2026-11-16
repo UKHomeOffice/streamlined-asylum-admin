@@ -42,12 +42,12 @@ const phoneNumberRows = phoneNumberSummary['phone-number'].steps.map(row => ({
   dependsOn: 'change-personal-details'
 }));
 
-const addressRows = addressSummary.address.steps.map(row => ({
-  ...row,
-  changeLink: row.field === 'change-uk-address'
-    ? `${SAA_BASE_URL}/change-uk-address/edit`
-    : `${SAA_BASE_URL}/check-your-answers-address`
-}));
+// Same rows as /check-your-answers-address; only the first row has a Change link, back to that page.
+const addressRows = addressSummary.address.steps.map(row => (
+  row.field === 'change-uk-address'
+    ? { ...row, changeLink: `${SAA_BASE_URL}/check-your-answers-address` }
+    : { ...row, omitChangeLink: true }
+));
 
 // Read-only rows for every item of an aggregate; Change goes to that aggregate's summary page.
 const aggregateSummaryRow = name => {
