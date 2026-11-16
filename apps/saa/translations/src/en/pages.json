@@ -120,10 +120,11 @@
     "header": "Provide a photo identity document to update your contact details"
   },
   "change-uk-address": {
-    "header": "Have you moved to a new address in the UK?"
+    "captionHeading": "Update personal details"
   },
   "home-address": {
-    "header": "UK address where you live now"
+    "header": "UK address where you live now",
+    "captionHeading": "Update personal details"
   },
   "new-email-address": {
     "header": "Change your email address",
@@ -154,7 +155,8 @@
     "header": "Completing the form for someone else"
   },
   "change-contact-address": {
-    "header": "Do you need to change the address we send your letters to?"
+    "header": "Do you need to change the address we send your letters to?",
+    "captionHeading": "Update personal details"
   },
   "no-changes-made": {
     "headers": {
@@ -165,10 +167,11 @@
     }
   },
   "reason-contact-address-change": {
-    "header": "Why do you need us to send letters to a different address?"
+    "captionHeading": "Update personal details"
   },
   "contact-address": {
-    "header": "Where should we send letters?"
+    "header": "Where should we send letters?",
+    "captionHeading": "Update personal details"
   },
   "check-your-answers-address": {
     "header": "Check your answers"
@@ -313,6 +316,12 @@
       },
       "email-address": {
         "header": "Change your email address"
+      },
+      "address": {
+        "header": "Change your address"
+      },
+      "address-final": {
+        "header": "Address"
       },
       "phone-number": {
         "header": "Change your phone number"
