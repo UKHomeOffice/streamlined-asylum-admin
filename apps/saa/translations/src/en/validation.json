@@ -331,5 +331,10 @@
   },
   "correct-nationality": {
     "required": "Select your country of nationality"
+  },
+  "reason-nationality-change": {
+    "required": "Enter why you need to change your nationality",
+    "maxlength": "Reason must be between 1 and 500  characters",
+    "notUrl": "Reason must not contain a URL"
   }
 }

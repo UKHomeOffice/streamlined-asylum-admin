@@ -97,7 +97,7 @@
     "header": "What is your country of nationality?"
   },
   "reason-nationality-change": {
-    "header": "Why are you changing the nationality?"
+    "captionHeading": "Update personal details"
   },
   "upload-nationality-evidence": {
     "header": "Upload evidence to support this change"
