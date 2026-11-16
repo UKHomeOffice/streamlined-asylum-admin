@@ -319,7 +319,8 @@ const steps = {
     next: '/upload-nationality-evidence'
   },
   '/upload-nationality-evidence': {
-    // Upload (documents-nationality) to be added in its story.
+    ...documentUploadStep('documents-nationality'),
+    template: 'upload-nationality-evidence',
     next: '/check-your-answers-nationality'
   },
   '/check-your-answers-nationality': {
