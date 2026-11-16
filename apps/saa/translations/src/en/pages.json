@@ -113,6 +113,9 @@
   "relationship-nationality-change": {
     "header": "How are they related to you?"
   },
+  "change-someone-else-nationality": {
+    "captionHeading": "Update personal details"
+  },
   "someone-else-correct-nationality": {
     "header": "Change someone else’s nationality"
   },

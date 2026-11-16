@@ -34,6 +34,7 @@ const configureMultiSelectFollowUps = (steps, config) => {
 
   uniqueRoutes([
     config.entryPoint,
+    config.deselectOn?.route,
     ...starts,
     ...completions,
     ...noChangesRoutes,
