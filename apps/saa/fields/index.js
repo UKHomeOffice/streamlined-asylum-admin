@@ -69,6 +69,12 @@ module.exports = {
     validate: ['required'],
     isPageHeading: true
   },
+  'relationship-nationality-change': {
+    mixin: 'radio-group',
+    options: ['my-child', 'spouse-or-partner'],
+    validate: ['required'],
+    isPageHeading: true
+  },
   'reason-someone-else-name-change': {
     mixin: 'radio-group',
     options: ['error', 'marriage-or-divorce', 'deed-poll'],

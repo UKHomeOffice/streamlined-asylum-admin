@@ -111,7 +111,8 @@
     "header": "Claimant's main language"
   },
   "relationship-nationality-change": {
-    "header": "How are they related to you?"
+    "title": "How are they related to you - nationality change",
+    "captionHeading": "Update personal details"
   },
   "someone-else-correct-nationality": {
     "header": "Change someone else’s nationality"

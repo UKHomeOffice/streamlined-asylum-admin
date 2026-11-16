@@ -81,6 +81,44 @@ const buildController = (route, req) => {
   return new Composed(options);
 };
 
+test('nationality change relationship question is required and has the requested content', () => {
+  const field = 'relationship-nationality-change';
+  expect(app.steps[`/${field}`].fields).toEqual([field]);
+  expect(fields[field]).toMatchObject({
+    mixin: 'radio-group',
+    options: ['my-child', 'spouse-or-partner'],
+    validate: ['required'],
+    isPageHeading: true
+  });
+  expect(fieldTranslations[field]).toEqual({
+    legend: 'How are they related to you?',
+    options: {
+      'my-child': { label: 'My child' },
+      'spouse-or-partner': {
+        label:
+          'My husband, wife, civil partner, or unmarried partner that I have lived with for 2 years or more'
+      }
+    }
+  });
+  expect(pages[field]).toMatchObject({
+    title: 'How are they related to you - nationality change',
+    header: 'How are they related to you?',
+    captionHeading: 'Update personal details'
+  });
+  expect(validationTranslations[field].required).toBe(
+    'Select how they are related to you'
+  );
+
+  const req = buildRequest(['nationality']);
+  req.form.values = { [field]: '' };
+  expect(
+    buildController(`/${field}`, req).validateField(field, req)
+  ).toMatchObject({
+    key: field,
+    type: 'required'
+  });
+});
+
 describe('change UK address question', () => {
   test('includes a Yes/No radio question and personal details caption', () => {
     expect(app.steps['/change-uk-address'].fields).toEqual(['change-uk-address']);

@@ -341,7 +341,7 @@ const steps = {
     next: '/relationship-nationality-change'
   },
   '/relationship-nationality-change': {
-    // Page fields to be added in its story.
+    fields: ['relationship-nationality-change'],
     next: '/someone-else-correct-nationality'
   },
   '/someone-else-correct-nationality': {
