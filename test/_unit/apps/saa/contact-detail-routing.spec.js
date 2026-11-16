@@ -15,6 +15,7 @@ const followUps = require('../../../../apps/saa/behaviours/multi-select-follow-u
 const config = require('../../../../apps/saa/config/multi-select-follow-ups-config');
 const pages = require('../../../../apps/saa/translations/src/en/pages.json');
 const fieldTranslations = require('../../../../apps/saa/translations/src/en/fields.json');
+const validationTranslations = require('../../../../apps/saa/translations/src/en/validation.json');
 const nameSummary =
   require('../../../../apps/saa/sections/summary-data-sections').name.steps;
 const Summary = require('hof').components.summary(class {});
@@ -281,6 +282,72 @@ describe('contact address fields', () => {
       });
     }
   );
+});
+
+describe('address postcode validation', () => {
+  test.each(['contact-address-postcode', 'home-address-postcode'])('%s has no URL or length validators', field => {
+    expect(fields[field].validate).toEqual(['required', 'postcode']);
+    expect(validationTranslations[field].notUrl).toBeUndefined();
+    expect(validationTranslations[field].maxlength).toBeUndefined();
+  });
+});
+
+describe('address page free-text validation', () => {
+  const routes = ['/home-address', '/reason-contact-address-change', '/contact-address'];
+  const textFields = routes.flatMap(route =>
+    app.steps[route].fields
+      .filter(field => ['input-text', 'textarea'].includes(fields[field].mixin))
+      .filter(field => !field.endsWith('-postcode'))
+      .map(field => {
+        let limit = 60;
+        if (field === 'contact-address-full-name') {
+          limit = 255;
+        } else if (field === 'reason-contact-address-change') {
+          limit = 500;
+        }
+        return { route, field, limit };
+      })
+  );
+
+  test.each(textFields)('$field has URL and length validators with messages', ({ field, limit }) => {
+    expect(fields[field].validate).toContain('notUrl');
+    expect(validationTranslations[field].notUrl).toContain('URL');
+    const lengthRule = fields[field].validate.find(rule => rule.type === 'maxlength');
+    expect([].concat(lengthRule.arguments)).toEqual([limit]);
+    expect(validationTranslations[field].maxlength).toContain(String(limit));
+  });
+
+  describe.each(textFields)('$field input', ({ route, field, limit }) => {
+    const validate = value => {
+      const req = buildRequest(['address']);
+      req.form.values = { [field]: value };
+      return buildController(route, req).validateField(field, req);
+    };
+
+    test.each(['https://example.com', 'www.example.com'])('rejects URL %s', value => {
+      expect(validate(value)).toMatchObject({ key: field, type: 'notUrl' });
+    });
+
+    test('accepts the maximum length', () => {
+      expect(validate('a'.repeat(limit))).toBeFalsy();
+    });
+
+    test('rejects one character beyond the maximum length, including spaces', () => {
+      expect(validate(`${'a'.repeat(limit)} `)).toMatchObject({
+        key: field,
+        type: 'maxlength'
+      });
+    });
+
+    test('preserves required and optional field behaviour', () => {
+      const error = validate('');
+      if (fields[field].validate.includes('required')) {
+        expect(error).toMatchObject({ key: field, type: 'required' });
+      } else {
+        expect(error).toBeFalsy();
+      }
+    });
+  });
 });
 
 describe.each([

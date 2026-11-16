@@ -326,7 +326,7 @@ module.exports = {
   },
   'contact-address-full-name': {
     mixin: 'input-text',
-    validate: ['required'],
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
     labelClassName: 'govuk-label--s'
   },
   'contact-address-line-1': {
@@ -367,11 +367,12 @@ module.exports = {
   },
   'home-address-line-1': {
     mixin: 'input-text',
-    validate: ['required'],
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 60 }],
     labelClassName: 'govuk-label--s'
   },
   'home-address-line-2': {
     mixin: 'input-text',
+    validate: ['notUrl', { type: 'maxlength', arguments: 60 }],
     labelClassName: 'govuk-label--s'
   },
   'home-address-town-or-city': {
