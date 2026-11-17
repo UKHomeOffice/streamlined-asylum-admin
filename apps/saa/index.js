@@ -295,6 +295,7 @@ const steps = {
     next: '/do-you-need-add-remove-dependant'
   },
   '/nationality-change': {
+    continueOnEdit: true,
     // Page fields and validation belong to its Nationality story.
     forks: [
       {
@@ -321,6 +322,7 @@ const steps = {
     next: '/check-your-answers-nationality'
   },
   '/check-your-answers-nationality': {
+    continueOnEdit: true,
     // Summary to be added in its story.
     next: '/change-someone-else-nationality'
   },
@@ -329,6 +331,7 @@ const steps = {
       ResetSectionSummary(['someoneelsenewnationality'], 'change-someone-else-nationality')
     ],
     // Page fields and validation belong to its Nationality story.
+    fields: ['change-someone-else-nationality'],
     forks: [
       {
         target: '/relationship-nationality-change',
@@ -339,8 +342,7 @@ const steps = {
         }
       }
     ],
-    // Keep unanswered placeholders inside the section until the decision field is implemented.
-    next: '/relationship-nationality-change'
+    next: '/do-you-need-add-remove-dependant'
   },
   '/relationship-nationality-change': {
     fields: ['relationship-nationality-change'],

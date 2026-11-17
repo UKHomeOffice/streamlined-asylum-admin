@@ -215,7 +215,10 @@ module.exports = {
       {
         step: '/change-someone-else-nationality',
         field: 'change-someone-else-nationality',
-        parse: value => value ? value.charAt(0).toUpperCase() + value.slice(1) : null
+        useOriginalValue: true,
+        parse: (value, req) => value
+          ? req.translate(`fields.change-someone-else-nationality.options.${value}.label`)
+          : null
       },
       aggregateSummaryRow('someoneelsenewnationality')
     ]

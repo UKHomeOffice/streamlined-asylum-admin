@@ -116,7 +116,15 @@
     }
   },
   "change-someone-else-nationality": {
-    "label": "Do you need to change someone else's nationality?"
+    "legend": "Do you need to change someone else’s nationality?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
   },
   "reason-someone-else-name-change": {
     "legend": "Why do you need to change their name?",
