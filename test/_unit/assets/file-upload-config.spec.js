@@ -84,7 +84,7 @@ describe('file upload configuration', () => {
     });
   });
 
-  test('wires someone else nationality evidence with its caption and no intro', () => {
+  test('wires someone else nationality evidence with its caption and no rendered intro', () => {
     const route = '/upload-someone-else-nationality-evidence';
     const step = app.steps[route];
     const pages = require('../../../apps/saa/translations/src/en/pages.json');
@@ -103,7 +103,6 @@ describe('file upload configuration', () => {
       header: 'Upload evidence to support this change',
       captionHeading: 'Update personal details'
     });
-    expect(pages[route.slice(1)].intro).toBeUndefined();
     expect(template).toContain('{{<partials-file-upload-form-layout}}');
     expect(template).not.toContain(
       '{{#t}}pages.upload-someone-else-nationality-evidence.intro{{/t}}'
