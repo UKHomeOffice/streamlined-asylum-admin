@@ -10,7 +10,7 @@ Feature: Something else validations
 		And I complete RAD claimant setup with a random date of birth between 01/01/1990 and 01/01/2015
 
 	Scenario: The page displays its content and validates an unanswered question
-		When I reach something else without supporting evidence or reporting a death
+		When I reach something else for the "No evidence or reported death" journey
 		Then the something else page matches the design
 		And a back link is available
 		And the feedback banner is displayed
@@ -26,7 +26,7 @@ Feature: Something else validations
 		Then I reach the "No options" page
 
 	Scenario: The answer is shown and can be changed on check your answers
-		When I reach something else with supporting evidence and without reporting a death
+		When I reach something else for the "Supporting evidence only" journey
 		And I answer "Yes" to needing to do something else
 		Then I see the Home Office contact details with a Continue button
 		When I continue
@@ -41,7 +41,7 @@ Feature: Something else validations
 		And the something else page matches the design
 
 	Scenario: Contact page without another journey shows its content and links
-		When I reach something else without supporting evidence or reporting a death
+		When I reach something else for the "No evidence or reported death" journey
 		And I answer "Yes" to needing to do something else
 		Then I see the Home Office contact details without a Continue button
 		And the contact page matches the design
@@ -55,7 +55,7 @@ Feature: Something else validations
 		Then the ARC enquiry form opens in the same tab
 
 	Scenario: Contact page with another journey continues and can be revisited from check your answers
-		When I reach something else with supporting evidence and without reporting a death
+		When I reach something else for the "Supporting evidence only" journey
 		And I answer "Yes" to needing to do something else
 		Then I see the Home Office contact details with a Continue button
 		And the contact page matches the design
@@ -71,7 +71,7 @@ Feature: Something else validations
 		Then the "Back to my applications" link is shown when I have more than one ongoing and active application
 
 	Scenario: No options displays standard content and opens personal details
-		When I reach something else without supporting evidence or reporting a death
+		When I reach something else for the "No evidence or reported death" journey
 		And I answer "No" to needing to do something else
 		Then the no options page matches the design
 		And a back link is available
@@ -84,7 +84,7 @@ Feature: Something else validations
 		Then I reach the "Personal details" page
 
 	Scenario: Removing the last selected section from check your answers leads to no options
-		When I reach something else with supporting evidence and without reporting a death
+		When I reach something else for the "Supporting evidence only" journey
 		And I answer "No" to needing to do something else
 		Then I reach the "Check your answers" page
 		When I remove supporting evidence from check your answers

@@ -5,21 +5,30 @@ import { ConstantsLib as c } from '../utility-helper/constants-lib';
 
 const { When, Then } = createBdd(test);
 
-const reachSomethingElse = async (pages: Pages, withEvidence: boolean) => {
-  await pages.sendEvidencePage.assertOnPage();
-  await pages.sendEvidencePage.answer(withEvidence ? 'Yes' : 'No');
-  await pages.sendEvidencePage.continueToNextPage();
-  if (withEvidence) {
-    await pages.prepareYourEvidencePage.assertOnPage();
-    await pages.prepareYourEvidencePage.continueToNextPage();
-    await pages.uploadSupportingEvidencePage.assertOnPage();
-    await pages.uploadSupportingEvidencePage.uploadEvidenceForJourney();
-    await pages.uploadSupportingEvidencePage.continueToNextPage();
-    await pages.violentUpsettingImagesPage.assertOnPage();
-    await pages.violentUpsettingImagesPage.answer('No');
-    await pages.violentUpsettingImagesPage.continueToNextPage();
-    await pages.evidenceCheckYourAnswersPage.assertOnPage();
-    await pages.evidenceCheckYourAnswersPage.continueToNextPage();
+const reachSomethingElse = async (pages: Pages, journey: string) => {
+  switch (journey.toLowerCase()) {
+    case 'no evidence or reported death':
+      await pages.sendEvidencePage.assertOnPage();
+      await pages.sendEvidencePage.answer('No');
+      await pages.sendEvidencePage.continueToNextPage();
+      break;
+    case 'supporting evidence only':
+      await pages.sendEvidencePage.assertOnPage();
+      await pages.sendEvidencePage.answer('Yes');
+      await pages.sendEvidencePage.continueToNextPage();
+      await pages.prepareYourEvidencePage.assertOnPage();
+      await pages.prepareYourEvidencePage.continueToNextPage();
+      await pages.uploadSupportingEvidencePage.assertOnPage();
+      await pages.uploadSupportingEvidencePage.uploadEvidenceForJourney();
+      await pages.uploadSupportingEvidencePage.continueToNextPage();
+      await pages.violentUpsettingImagesPage.assertOnPage();
+      await pages.violentUpsettingImagesPage.answer('No');
+      await pages.violentUpsettingImagesPage.continueToNextPage();
+      await pages.evidenceCheckYourAnswersPage.assertOnPage();
+      await pages.evidenceCheckYourAnswersPage.continueToNextPage();
+      break;
+    default:
+      throw new Error(`Unknown Something Else journey: ${journey}`);
   }
   await pages.radSomeoneOnClaimDiedPage.assertOnPage();
   await pages.radSomeoneOnClaimDiedPage.answer('No');
@@ -27,12 +36,8 @@ const reachSomethingElse = async (pages: Pages, withEvidence: boolean) => {
   await pages.somethingElsePage.assertOnPage();
 };
 
-When('I reach something else without supporting evidence or reporting a death', async ({ pages }) => {
-  await reachSomethingElse(pages, false);
-});
-
-When('I reach something else with supporting evidence and without reporting a death', async ({ pages }) => {
-  await reachSomethingElse(pages, true);
+When('I reach something else for the {string} journey', async ({ pages }, journey: string) => {
+  await reachSomethingElse(pages, journey);
 });
 
 When('I answer {string} to needing to do something else', async ({ pages }, answer: string) => {

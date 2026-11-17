@@ -9,17 +9,17 @@ Feature: Something else end-to-end journeys
 		And I complete RAD claimant setup with a random date of birth between 01/01/1990 and 01/01/2015
 
 	Scenario: An additional request without another selected section shows contact details
-		When I reach something else without supporting evidence or reporting a death
+		When I reach something else for the "No evidence or reported death" journey
 		And I answer "Yes" to needing to do something else
 		Then I see the Home Office contact details without a Continue button
 
 	Scenario: No additional request or selected section leads to no options
-		When I reach something else without supporting evidence or reporting a death
+		When I reach something else for the "No evidence or reported death" journey
 		And I answer "No" to needing to do something else
 		Then I reach the "No options" page
 
 	Scenario: An additional request with supporting evidence continues to check your answers
-		When I reach something else with supporting evidence and without reporting a death
+		When I reach something else for the "Supporting evidence only" journey
 		And I answer "Yes" to needing to do something else
 		Then I see the Home Office contact details with a Continue button
 		When I continue
@@ -27,7 +27,7 @@ Feature: Something else end-to-end journeys
 		And the final answers show supporting evidence and no reported death
 
 	Scenario: No additional request with supporting evidence continues to check your answers
-		When I reach something else with supporting evidence and without reporting a death
+		When I reach something else for the "Supporting evidence only" journey
 		And I answer "No" to needing to do something else
 		Then I reach the "Check your answers" page
 		And the final answers show supporting evidence and no reported death
