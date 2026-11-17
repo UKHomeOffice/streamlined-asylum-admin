@@ -9,6 +9,7 @@ const emailAddressSummary = require('./summary-data-email-address');
 const dateOfBirthSummary = require('./summary-data-date-of-birth');
 const phoneNumberSummary = require('./summary-data-phone-number');
 const addressSummary = require('./summary-data-address');
+const nationalitySummary = require('./summary-data-nationality');
 const nameSummary = require('./summary-data-name');
 const { formatDate, formatUanForDisplay } = require('../../../utils');
 
@@ -24,6 +25,14 @@ const emailAddressRows = emailAddressSummary['email-address'].steps.map(
   row => ({
     ...row,
     changeLink: `${SAA_BASE_URL}/check-your-answers-email`,
+    dependsOn: 'change-personal-details'
+  })
+);
+
+const nationalityRows = nationalitySummary.nationality.steps.map(
+  row => ({
+    ...row,
+    changeLink: `${SAA_BASE_URL}/check-your-answers-nationality`,
     dependsOn: 'change-personal-details'
   })
 );
@@ -230,6 +239,9 @@ module.exports = {
   },
   'address-final': {
     steps: addressRows
+  },
+  nationality: {
+    steps: nationalityRows
   },
   'email-address': {
     steps: emailAddressRows

@@ -326,6 +326,8 @@ const steps = {
   '/check-your-answers-nationality': {
     continueOnEdit: true,
     // Summary to be added in its story.
+    behaviours: [Summary, SummaryLabels, EditRouteReturn],
+    sections: require('./sections/summary-data-nationality'),
     next: '/change-someone-else-nationality'
   },
   '/change-someone-else-nationality': {

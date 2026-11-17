@@ -104,6 +104,7 @@
     "header": "Upload evidence to support this change"
   },
   "check-your-answers-nationality": {
+    "captionHeading": "Update personal details",
     "header": "Check your answers"
   },
   "claimants-name": {
@@ -319,6 +320,9 @@
       "evidence": {
         "header": "Evidence"
       },
+      "nationality": {
+        "header": "Change your nationality"
+      },
       "email-address": {
         "header": "Change your email address"
       },
@@ -352,6 +356,9 @@
         "label": "Add or remove a child or partner"
       },
       "documents-new-name": {
+        "label": "Files uploaded"
+      },
+      "documents-nationality": {
         "label": "Files uploaded"
       }
     }

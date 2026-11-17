@@ -554,7 +554,8 @@
     }
   },
   "correct-nationality": {
-    "label": "Select a country"
+    "label": "Select a country",
+    "summary-label": "What is your country of nationality?"
   },
   "reason-nationality-change": {
     "label": "Why are you changing your nationality?"
