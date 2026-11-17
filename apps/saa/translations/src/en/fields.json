@@ -539,7 +539,7 @@
   "documents-someone-else-new-dob": {
     "summary-label": "Files uploaded"
   },
-  "change-someone-else-nationality" : {
+  "change-someone-else-nationality": {
     "legend": "Do you need to change someone else’s nationality?"
   },
   "nationality-change": {
@@ -555,7 +555,10 @@
   },
   "correct-nationality": {
     "label": "Select a country",
-    "summary-label": "What is your country of nationality?"
+    "summary-label": "What is your country of nationality?",
+    "options": {
+      "none_selected": "Select a country"
+    }
   },
   "reason-nationality-change": {
     "label": "Why are you changing your nationality?"

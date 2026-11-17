@@ -290,7 +290,7 @@ module.exports = {
           // Add the page fields and loop key as the nationality page stories are built.
           fieldsToUnset: [
             OWN_NATIONALITY_FIELD,
-            'nationality-change',
+            'documents-nationality',
             'correct-nationality',
             'reason-nationality-change',
             SOMEONE_ELSE_NATIONALITY_FIELD

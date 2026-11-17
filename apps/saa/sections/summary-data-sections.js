@@ -33,7 +33,7 @@ const nationalityRows = nationalitySummary.nationality.steps.map(
   row => ({
     ...row,
     changeLink: `${SAA_BASE_URL}/check-your-answers-nationality`,
-    dependsOn: 'change-personal-details'
+    dependsOn: 'nationality-change'
   })
 );
 
