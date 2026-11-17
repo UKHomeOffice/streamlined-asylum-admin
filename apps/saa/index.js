@@ -358,7 +358,7 @@ const steps = {
     next: '/upload-someone-else-nationality-evidence'
   },
   '/upload-someone-else-nationality-evidence': {
-    // Upload (documents-someone-else-nationality) to be added in its story.
+    ...documentUploadStep('documents-someone-else-nationality'),
     next: '/check-your-answers-someone-else-nationality'
   },
   '/check-your-answers-someone-else-nationality': {

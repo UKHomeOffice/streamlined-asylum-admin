@@ -25,7 +25,7 @@ describe('file upload configuration', () => {
     expect(uploadConfig.limitValidationError).toBe('fileCountLimit');
   });
 
-  test('only requires the photo identity and supporting evidence categories', () => {
+  test('requires photo identity, supporting evidence and someone else nationality evidence', () => {
     const requiredCategories = [
       ...Object.keys(uploadConfig.documentCategories),
       'documents-update-contact',
@@ -35,6 +35,7 @@ describe('file upload configuration', () => {
     );
 
     expect(requiredCategories).toEqual([
+      'documents-someone-else-nationality',
       'documents-update-contact',
       'documents-help-your-claim'
     ]);
@@ -54,6 +55,11 @@ describe('file upload configuration', () => {
       false
     ],
     ['/evidence-child-partner', 'documents-child-partner', false],
+    [
+      '/upload-someone-else-nationality-evidence',
+      'documents-someone-else-nationality',
+      true
+    ],
     ['/upload-death-certificate', 'documents-death-certificate', false],
     ['/upload-supporting-evidence', 'documents-help-your-claim', true]
   ])('exposes the upload requirement for %s', (route, category, required) => {
@@ -77,6 +83,32 @@ describe('file upload configuration', () => {
       limit: 6,
       limitValidationError: 'fileCountLimit'
     });
+  });
+
+  test('wires someone else nationality evidence with its caption and no intro', () => {
+    const route = '/upload-someone-else-nationality-evidence';
+    const step = app.steps[route];
+    const pages = require('../../../apps/saa/translations/src/en/pages.json');
+    const template = fs.readFileSync(
+      path.resolve(__dirname, `../../../apps/saa/views${route}.html`),
+      'utf8'
+    );
+
+    expect(step.fields).toEqual(['file-upload']);
+    expect(step.behaviours).toEqual([
+      'save:documents-someone-else-nationality:file-upload',
+      'remove:documents-someone-else-nationality'
+    ]);
+    expect(step.next).toBe('/check-your-answers-someone-else-nationality');
+    expect(pages[route.slice(1)]).toMatchObject({
+      header: 'Upload evidence to support this change',
+      captionHeading: 'Update personal details'
+    });
+    expect(pages[route.slice(1)].intro).toBeUndefined();
+    expect(template).toContain('{{<partials-file-upload-form-layout}}');
+    expect(template).not.toContain(
+      '{{#t}}pages.upload-someone-else-nationality-evidence.intro{{/t}}'
+    );
   });
 
   test('keeps the file-vault extension whitelist aligned with the application', () => {
