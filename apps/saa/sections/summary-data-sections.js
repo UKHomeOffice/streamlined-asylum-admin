@@ -241,7 +241,13 @@ module.exports = {
     steps: addressRows
   },
   nationality: {
-    steps: nationalityRows
+    steps: [
+      {
+        step: '/nationality-change',
+        field: 'nationality-change'
+      },
+      ...nationalityRows
+    ]
   },
   'email-address': {
     steps: emailAddressRows
