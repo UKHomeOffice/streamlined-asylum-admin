@@ -74,6 +74,11 @@
   "someone-else-correct-nationality": {
     "required": "Enter their nationality"
   },
+  "reason-someone-else-nationality-change": {
+    "required": "Enter why you need to change their nationality",
+    "maxlength": "Reason must be between 1 and 500 characters",
+    "notUrl": "Reason must not contain a URL"
+  },
   "given-name": {
     "required": "Enter your new given name",
     "notUrl": "Given name must not contain a URL",

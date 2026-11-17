@@ -262,6 +262,48 @@ describe('change contact address question', () => {
   });
 });
 
+describe('someone else nationality change reason', () => {
+  const field = 'reason-someone-else-nationality-change';
+
+  test('includes a textarea heading, caption and validation messages', () => {
+    expect(app.steps[`/${field}`].fields).toEqual([field]);
+    expect(fields[field]).toMatchObject({
+      mixin: 'textarea',
+      validate: ['required', 'notUrl', { type: 'maxlength', arguments: 500 }],
+      attributes: [{ attribute: 'rows', value: 5 }],
+      isPageHeading: true
+    });
+    expect(pages[field].captionHeading).toBe('Update personal details');
+    expect(fieldTranslations[field].label)
+      .toBe('Why do you need to change their nationality?');
+    expect(validationTranslations[field]).toEqual({
+      required: 'Enter why you need to change their nationality',
+      maxlength: 'Reason must be between 1 and 500 characters',
+      notUrl: 'Reason must not contain a URL'
+    });
+  });
+
+  test.each([
+    ['', 'required'],
+    ['a', undefined],
+    ['Their nationality was recorded incorrectly.', undefined],
+    ['a'.repeat(500), undefined],
+    ['a'.repeat(501), 'maxlength'],
+    ['https://example.com', 'notUrl'],
+    ['Please use www.example.com', 'notUrl']
+  ])('validates "%s" with error %s', (value, errorType) => {
+    const req = buildRequest(['nationality']);
+    req.form.values = { [field]: value };
+    const error = buildController(`/${field}`, req).validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeUndefined();
+    }
+  });
+});
+
 describe('contact address change reason', () => {
   const field = 'reason-contact-address-change';
 

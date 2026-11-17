@@ -171,6 +171,9 @@
       "none_selected": "Select a country"
     }
   },
+  "reason-someone-else-nationality-change": {
+    "label": "Why do you need to change their nationality?"
+  },
   "documents-someone-else-new-name": {
     "summary-label": "Files uploaded"
   },

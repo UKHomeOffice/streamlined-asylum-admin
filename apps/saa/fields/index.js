@@ -129,6 +129,12 @@ module.exports = {
     ].concat(countries),
     labelClassName: 'govuk-label--s'
   },
+  'reason-someone-else-nationality-change': {
+    mixin: 'textarea',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 500 }],
+    attributes: [{ attribute: 'rows', value: 5 }],
+    isPageHeading: true
+  },
   'given-name': {
     mixin: 'input-text',
     validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],

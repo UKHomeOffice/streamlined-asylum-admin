@@ -354,7 +354,7 @@ const steps = {
     next: '/reason-someone-else-nationality-change'
   },
   '/reason-someone-else-nationality-change': {
-    // Page fields to be added in its story.
+    fields: ['reason-someone-else-nationality-change'],
     next: '/upload-someone-else-nationality-evidence'
   },
   '/upload-someone-else-nationality-evidence': {

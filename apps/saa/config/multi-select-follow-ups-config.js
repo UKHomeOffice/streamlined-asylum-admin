@@ -261,7 +261,8 @@ module.exports = {
             'relationship-nationality-change',
             'someone-else-correct-nationality-given-name',
             'someone-else-correct-nationality-family-name',
-            'someone-else-correct-nationality'
+            'someone-else-correct-nationality',
+            'reason-someone-else-nationality-change'
           ]
         }
       ]
