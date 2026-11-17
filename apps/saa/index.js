@@ -325,7 +325,9 @@ const steps = {
     next: '/change-someone-else-nationality'
   },
   '/change-someone-else-nationality': {
-    // Add ResetSectionSummary for the nationality loop when its add-another story is built.
+    behaviours: [
+      ResetSectionSummary(['someoneelsenewnationality'], 'change-someone-else-nationality')
+    ],
     // Page fields and validation belong to its Nationality story.
     forks: [
       {
@@ -362,7 +364,24 @@ const steps = {
     next: '/check-your-answers-someone-else-nationality'
   },
   '/check-your-answers-someone-else-nationality': {
-    // Add-another loop to be added in its story; Continue completes the nationality section.
+    backLink: false,
+    behaviours: [
+      AggregateSaveUpdate,
+      LimitAggregateItems,
+      ParseSummaryFields(aggregatorSummaries.someoneelsenewnationality),
+      EditRouteReturn
+    ],
+    aggregateTo: 'someoneelsenewnationality',
+    aggregateFrom: [
+      'relationship-nationality-change',
+      'someone-else-correct-nationality-given-name',
+      'someone-else-correct-nationality-family-name',
+      'someone-else-correct-nationality',
+      'reason-someone-else-nationality-change',
+      'documents-someone-else-nationality'
+    ],
+    aggregateLimit: config.aggregateLimits.someoneElseNewNationality,
+    addStep: 'relationship-nationality-change',
     next: '/do-you-need-add-remove-dependant'
   },
   '/change-uk-address': {

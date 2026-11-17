@@ -25,7 +25,7 @@ describe('file upload configuration', () => {
     expect(uploadConfig.limitValidationError).toBe('fileCountLimit');
   });
 
-  test('requires photo identity, supporting evidence and someone else nationality evidence', () => {
+  test('only requires photo identity and supporting evidence', () => {
     const requiredCategories = [
       ...Object.keys(uploadConfig.documentCategories),
       'documents-update-contact',
@@ -35,7 +35,6 @@ describe('file upload configuration', () => {
     );
 
     expect(requiredCategories).toEqual([
-      'documents-someone-else-nationality',
       'documents-update-contact',
       'documents-help-your-claim'
     ]);
@@ -58,7 +57,7 @@ describe('file upload configuration', () => {
     [
       '/upload-someone-else-nationality-evidence',
       'documents-someone-else-nationality',
-      true
+      false
     ],
     ['/upload-death-certificate', 'documents-death-certificate', false],
     ['/upload-supporting-evidence', 'documents-help-your-claim', true]

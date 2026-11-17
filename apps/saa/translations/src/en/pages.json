@@ -104,6 +104,13 @@
   "check-your-answers-nationality": {
     "header": "Check your answers"
   },
+  "check-your-answers-someone-else-nationality": {
+    "header": "Check your answers",
+    "captionHeading": "Update personal details",
+    "item-title": "Change someone else's nationality",
+    "add-another-nationality": "Change another nationality",
+    "limit-exceeded": "You have changed the maximum number of {{maxItems}} nationalities. You cannot add any more."
+  },
   "claimants-name": {
     "header": "Claimant’s name"
   },
@@ -321,6 +328,9 @@
       },
       "someone-else-new-name": {
         "header": "Change someone else's name"
+      },
+      "someone-else-nationality": {
+        "header": "Nationality"
       },
       "evidence": {
         "header": "Evidence"

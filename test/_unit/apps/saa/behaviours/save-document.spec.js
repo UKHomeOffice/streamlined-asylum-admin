@@ -77,7 +77,7 @@ describe.each([
   [
     'documents-someone-else-nationality',
     '/upload-someone-else-nationality-evidence',
-    true
+    false
   ],
   [
     'documents-someone-else-new-dob',

@@ -34,6 +34,12 @@ module.exports = {
     itemTitle: 'pages.check-your-answers-someone-else-date-of-birth.item-title',
     addIncrement: true
   },
+  someoneelsenewnationality: {
+    route: '/check-your-answers-someone-else-nationality',
+    documentFields: ['documents-someone-else-nationality'],
+    itemTitle: 'pages.check-your-answers-someone-else-nationality.item-title',
+    addIncrement: true
+  },
   someoneelsenewname: {
     route: '/check-your-answers-someone-else-name',
     dependsOn: 'change-someone-elses-name',

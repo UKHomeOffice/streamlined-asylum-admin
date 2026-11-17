@@ -263,7 +263,8 @@ module.exports = {
             'someone-else-correct-nationality-family-name',
             'someone-else-correct-nationality',
             'reason-someone-else-nationality-change',
-            'documents-someone-else-nationality'
+            'documents-someone-else-nationality',
+            'someoneelsenewnationality'
           ]
         }
       ]

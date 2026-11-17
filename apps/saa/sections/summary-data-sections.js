@@ -210,6 +210,16 @@ module.exports = {
       aggregateSummaryRow('someoneelsenewname')
     ]
   },
+  'someone-else-nationality': {
+    steps: [
+      {
+        step: '/change-someone-else-nationality',
+        field: 'change-someone-else-nationality',
+        parse: value => value ? value.charAt(0).toUpperCase() + value.slice(1) : null
+      },
+      aggregateSummaryRow('someoneelsenewnationality')
+    ]
+  },
   'date-of-birth': {
     steps: [
       {

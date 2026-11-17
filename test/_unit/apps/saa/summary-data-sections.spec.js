@@ -484,6 +484,99 @@ describe('address rows on the check-your-answers page', () => {
   });
 });
 
+describe('nationality rows on final summary pages', () => {
+  const pages = require('../../../../apps/saa/translations/src/en/pages.json');
+  const fields = require('../../../../apps/saa/translations/src/en/fields.json');
+  const fieldsConfig = require('../../../../apps/saa/fields');
+  const SummaryPage = SummaryLabels(Summary(class {}));
+  const values = {
+    'relationship-nationality-change': 'my-child',
+    'someone-else-correct-nationality-given-name': 'Alex',
+    'someone-else-correct-nationality-family-name': 'Smith',
+    'someone-else-correct-nationality': 'France',
+    'reason-someone-else-nationality-change': 'Recorded incorrectly',
+    'documents-someone-else-nationality': [{ name: 'passport.pdf' }]
+  };
+  const item = nationality => ({
+    fields: Object.entries({ ...values, 'someone-else-correct-nationality': nationality })
+      .map(([field, value]) => ({ field, value, parsed: value }))
+  });
+  const createRequest = (aggregate, answer) => ({
+    baseUrl: '/changes',
+    sessionModel: {
+      get: key => ({
+        someoneelsenewnationality: aggregate,
+        'change-someone-else-nationality': answer
+      })[key]
+    },
+    translate: keys => {
+      const list = [].concat(keys);
+      return list.map(key => key.split('.').reduce(
+        (value, part) => value?.[part], { pages, fields }
+      )).find(value => value !== undefined) || list[list.length - 1];
+    },
+    form: {
+      options: {
+        fieldsConfig,
+        sections: { 'someone-else-nationality': sections['someone-else-nationality'] },
+        steps: {}
+      }
+    }
+  });
+
+  test.each(['/confirm', '/information-given'])(
+    '%s shows Nationality with numbered titles and only title Change links',
+    route => {
+      const req = createRequest({ aggregatedValues: [item('France'), item('Germany')] });
+      req.path = route;
+      const row = new SummaryPage().getRowsForSummarySections(req)
+        .find(section => section.section === 'Nationality');
+      expect(row).toBeDefined();
+      const titles = row.fields.filter(field => field.isAggregatorTitle);
+      expect(titles.map(field => field.value)).toEqual([
+        "Change someone else's nationality",
+        "Change someone else's nationality 2"
+      ]);
+      expect(titles.every(field => field.aggregatorTitleChangeLink ===
+        '/changes/check-your-answers-someone-else-nationality')).toBe(true);
+      const details = row.fields.filter(field => !field.isAggregatorTitle && !field.isSeparator);
+      expect(details).toHaveLength(12);
+      expect(details.every(field => field.omitChangeLink)).toBe(true);
+      expect(details.slice(0, 6).map(field => field.value)).toEqual([
+        'My child', 'Alex', 'Smith', 'France', 'Recorded incorrectly', 'passport.pdf'
+      ]);
+      const template = Hogan.compile(fs.readFileSync(
+        path.resolve(__dirname, '../../../../apps/saa/views/partials/summary-table.html'),
+        'utf8'
+      ));
+      const html = template.render(row);
+      expect(html).toContain('Nationality');
+      expect(html.match(/<a /g)).toHaveLength(2);
+      expect(html).toContain('Change someone else&#39;s nationality 2');
+    }
+  );
+
+  test('hides the nationality section when there are no saved entries', () => {
+    for (const aggregate of [undefined, { aggregatedValues: [] }]) {
+      expect(new SummaryPage().getRowsForSummarySections(createRequest(aggregate))
+        .some(row => row.section === 'Nationality')).toBe(false);
+    }
+  });
+
+  test.each(['yes', 'no'])('shows the nationality decision answer %s before saved entries', answer => {
+    const req = createRequest({ aggregatedValues: [item('France')] }, answer);
+    const row = new SummaryPage().getRowsForSummarySections(req)
+      .find(section => section.section === 'Nationality');
+    expect(row.fields[0]).toMatchObject({
+      field: 'change-someone-else-nationality',
+      label: "Do you need to change someone else's nationality?",
+      value: answer === 'yes' ? 'Yes' : 'No',
+      step: '/change-someone-else-nationality'
+    });
+    expect(row.fields[1].isAggregatorTitle).toBe(true);
+  });
+});
+
 describe('name rows on the confirm page', () => {
   const ConfirmPage = SummaryLabels(Summary(class {}));
   const pages = require('../../../../apps/saa/translations/src/en/pages.json');

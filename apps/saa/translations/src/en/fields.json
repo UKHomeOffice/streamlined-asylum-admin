@@ -115,6 +115,9 @@
       }
     }
   },
+  "change-someone-else-nationality": {
+    "label": "Do you need to change someone else's nationality?"
+  },
   "reason-someone-else-name-change": {
     "legend": "Why do you need to change their name?",
     "options": {
@@ -175,6 +178,9 @@
     "label": "Why do you need to change their nationality?"
   },
   "documents-someone-else-new-name": {
+    "summary-label": "Files uploaded"
+  },
+  "documents-someone-else-nationality": {
     "summary-label": "Files uploaded"
   },
   "given-name": {
