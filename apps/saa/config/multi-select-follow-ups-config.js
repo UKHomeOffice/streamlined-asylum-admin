@@ -258,7 +258,10 @@ module.exports = {
           fieldsToUnset: [
             'change-your-nationality',
             SOMEONE_ELSE_NATIONALITY_FIELD,
-            'relationship-nationality-change'
+            'relationship-nationality-change',
+            'someone-else-correct-nationality-given-name',
+            'someone-else-correct-nationality-family-name',
+            'someone-else-correct-nationality'
           ]
         }
       ]

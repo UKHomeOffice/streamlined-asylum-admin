@@ -345,7 +345,12 @@ const steps = {
     next: '/someone-else-correct-nationality'
   },
   '/someone-else-correct-nationality': {
-    // Page fields to be added in its story.
+    behaviours: [CustomValidation],
+    fields: [
+      'someone-else-correct-nationality-given-name',
+      'someone-else-correct-nationality-family-name',
+      'someone-else-correct-nationality'
+    ],
     next: '/reason-someone-else-nationality-change'
   },
   '/reason-someone-else-nationality-change': {

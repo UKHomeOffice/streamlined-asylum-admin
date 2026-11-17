@@ -107,6 +107,28 @@ module.exports = {
     validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
     labelClassName: 'govuk-label--s'
   },
+  'someone-else-correct-nationality-given-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'someone-else-correct-nationality-family-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'someone-else-correct-nationality': {
+    mixin: 'select',
+    className: ['typeahead'],
+    validate: ['required'],
+    options: [
+      {
+        value: '',
+        label: 'fields.someone-else-correct-nationality.options.none_selected'
+      }
+    ].concat(countries),
+    labelClassName: 'govuk-label--s'
+  },
   'given-name': {
     mixin: 'input-text',
     validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],

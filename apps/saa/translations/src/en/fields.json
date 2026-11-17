@@ -159,6 +159,18 @@
     "label": "Family name",
     "summary-label": "New name"
   },
+  "someone-else-correct-nationality-given-name": {
+    "label": "Given name"
+  },
+  "someone-else-correct-nationality-family-name": {
+    "label": "Family name"
+  },
+  "someone-else-correct-nationality": {
+    "label": "Country of nationality",
+    "options": {
+      "none_selected": "Select a country"
+    }
+  },
   "documents-someone-else-new-name": {
     "summary-label": "Files uploaded"
   },

@@ -115,7 +115,8 @@
     "captionHeading": "Update personal details"
   },
   "someone-else-correct-nationality": {
-    "header": "Change someone else’s nationality"
+    "header": "Change someone else’s nationality",
+    "captionHeading": "Update personal details"
   },
   "provide-photo-identity": {
     "header": "Provide a photo identity document to update your contact details"

@@ -102,7 +102,6 @@ test('nationality change relationship question is required and has the requested
   });
   expect(pages[field]).toMatchObject({
     title: 'How are they related to you - nationality change',
-    header: 'How are they related to you?',
     captionHeading: 'Update personal details'
   });
   expect(validationTranslations[field].required).toBe(
@@ -116,6 +115,73 @@ test('nationality change relationship question is required and has the requested
   ).toMatchObject({
     key: field,
     type: 'required'
+  });
+});
+
+test('someone else nationality page collects required personal details', () => {
+  const route = '/someone-else-correct-nationality';
+  const givenName = 'someone-else-correct-nationality-given-name';
+  const familyName = 'someone-else-correct-nationality-family-name';
+  const nationality = 'someone-else-correct-nationality';
+  const nameFields = [givenName, familyName];
+
+  expect(app.steps[route].fields).toEqual([givenName, familyName, nationality]);
+  expect(pages[route.slice(1)].captionHeading).toBe('Update personal details');
+
+  nameFields.forEach(field => {
+    expect(fields[field]).toMatchObject({
+      mixin: 'input-text',
+      validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+      labelClassName: 'govuk-label--s'
+    });
+  });
+  expect(fields[nationality]).toMatchObject({
+    mixin: 'select',
+    className: ['typeahead'],
+    validate: ['required'],
+    labelClassName: 'govuk-label--s'
+  });
+  expect(fields[nationality].options.length).toBeGreaterThan(1);
+  expect(fieldTranslations[givenName].label).toBe('Given name');
+  expect(fieldTranslations[familyName].label).toBe('Family name');
+  expect(fieldTranslations[nationality]).toMatchObject({
+    label: 'Country of nationality',
+    options: { none_selected: 'Select a country' }
+  });
+  expect(validationTranslations[givenName]).toEqual({
+    required: 'Enter their given name',
+    noDigits: 'Given name must not contain numbers',
+    maxlength: 'Given name must be between 1 and 255 characters',
+    notUrl: 'Given name must not contain a URL'
+  });
+  expect(validationTranslations[familyName]).toEqual({
+    required: 'Enter their family name',
+    noDigits: 'Family name must not contain numbers',
+    maxlength: 'Family name must be between 1 and 255 characters',
+    notUrl: 'Family name must not contain a URL'
+  });
+  expect(validationTranslations[nationality].required).toBe(
+    'Enter their nationality'
+  );
+
+  const req = buildRequest(['nationality']);
+  const controller = buildController(route, req);
+  [givenName, familyName, nationality].forEach(field => {
+    req.form.values = { [field]: '' };
+    expect(controller.validateField(field, req)).toMatchObject({
+      key: field,
+      type: 'required'
+    });
+  });
+  req.form.values = { [givenName]: 'Alex2' };
+  expect(controller.validateField(givenName, req)).toMatchObject({
+    key: givenName,
+    type: 'noDigits'
+  });
+  req.form.values = { [familyName]: 'Alex2' };
+  expect(controller.validateField(familyName, req)).toMatchObject({
+    key: familyName,
+    type: 'noDigits'
   });
 });
 
