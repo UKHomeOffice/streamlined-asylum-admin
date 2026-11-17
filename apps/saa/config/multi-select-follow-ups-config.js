@@ -47,7 +47,7 @@ const SOMEONE_ELSE_NATIONALITY_ROUTE = '/change-someone-else-nationality';
 const OWN_NAME_FIELD = 'do-you-need-to-change-your-name';
 const SOMEONE_ELSE_NAME_FIELD = 'change-someone-elses-name';
 const OWN_DOB_FIELD = 'change-your-date-of-birth';
-const OWN_NATIONALITY_FIELD = 'change-your-nationality';
+const OWN_NATIONALITY_FIELD = 'nationality-change';
 const SOMEONE_ELSE_DOB_FIELD = 'change-someone-else-date-of-birth';
 const SOMEONE_ELSE_NATIONALITY_FIELD = 'change-someone-else-nationality';
 

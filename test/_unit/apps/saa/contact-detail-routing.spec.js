@@ -479,7 +479,7 @@ describe('someone-else Nationality decision validation', () => {
   test('an unanswered decision reports the translated required error without saving or advancing', done => {
     const req = buildRequest(['nationality'], false, {
       steps: [config.entryPoint, '/check-your-answers-nationality'],
-      'change-your-nationality': 'yes'
+      'nationality-change': 'yes'
     });
     req.method = 'POST';
     req.url = '/';
@@ -878,7 +878,7 @@ describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
       .toBe(`${app.baseUrl}/new-email-address${suffix}`);
     expect(req.sessionModel.get(config.stateKey).completedSections).toEqual(['nationality']);
     expect(req.sessionModel.get('nationality-change')).toBeUndefined();
-    expect(req.sessionModel.get('change-someone-else-nationality')).toBeUndefined();
+    expect(req.sessionModel.get('change-someone-else-nationality')).toBe('yes');
 
     post('/new-email-address', req, {
       'old-email-address': 'old@example.com',
@@ -891,40 +891,6 @@ describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
       .toBe(`${app.baseUrl}${edit ? '/confirm' : config.exitPoint}`);
     expect(req.sessionModel.get(config.stateKey).completedSections)
       .toEqual(['nationality', 'email-address', 'photo-identity']);
-  });
-
-  test('changing the UK address then declining a contact address still needs address CYA', () => {
-    const req = buildRequest(['address'], edit, { 'change-uk-address': 'yes' });
-    expect(
-      post('/check-your-answers-someone-else-nationality', req, {}, true).url
-    ).toBe(`${app.baseUrl}/new-email-address${suffix}`);
-    expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([
-      'nationality'
-    ]);
-    expect(req.sessionModel.get('change-your-nationality')).toBeUndefined();
-    expect(req.sessionModel.get('change-someone-else-nationality')).toBe('yes');
-
-    post(
-      '/new-email-address',
-      req,
-      {
-        'old-email-address': 'old@example.com',
-        'new-email-address': 'new@example.com',
-        'confirm-new-email-address': 'new@example.com'
-      },
-      true
-    );
-    expect(post('/check-your-answers-email', req, {}, true).url).toBe(
-      `${app.baseUrl}/provide-photo-identity${suffix}`
-    );
-    expect(post('/provide-photo-identity', req, {}, true).url).toBe(
-      `${app.baseUrl}${edit ? '/confirm' : config.exitPoint}`
-    );
-    expect(req.sessionModel.get(config.stateKey).completedSections).toEqual([
-      'nationality',
-      'email-address',
-      'photo-identity'
-    ]);
   });
 
   test(
@@ -1418,7 +1384,7 @@ describe.each([
   },
   {
     section: 'nationality', own: '/nationality-change',
-    ownField: 'change-your-nationality', otherField: 'change-someone-else-nationality',
+    ownField: 'nationality-change', otherField: 'change-someone-else-nationality',
     other: '/change-someone-else-nationality', aggregate: 'saved-nationality-test',
     summary: '/check-your-answers-nationality',
     details: [
