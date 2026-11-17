@@ -47,6 +47,12 @@ export default defineConfig({
     ? undefined
     : {
       command: 'yarn start',
+      env: {
+        ALLOW_SKIP: 'true',
+        SKIP_EMAIL: process.env.SAA_TEST_EMAIL ||
+          process.env.SKIP_EMAIL ||
+          'sas-hof-test@digital.homeoffice.gov.uk',
+      },
       port,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000
