@@ -50,8 +50,9 @@ export default defineConfig({
       env: {
         ALLOW_SKIP: 'true',
         SKIP_EMAIL: process.env.SAA_TEST_EMAIL ||
+          process.env.SAS_HOF_EMAIL ||
           process.env.SKIP_EMAIL ||
-          'sas-hof-test@digital.homeoffice.gov.uk',
+          '',
       },
       port,
       reuseExistingServer: !process.env.CI,

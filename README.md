@@ -93,8 +93,12 @@ summary (`/changes/check-your-answers-evidence`) and final application summary
 
 Validate step bindings with `yarn test:e2e:generate`, then run journeys with
 `yarn test:e2e`. Local runs require the service's normal HOF/Redis setup, including
-a 32-byte `SESSION_SECRET`. Set `PLAYWRIGHT_BASE_URL` to test an already running
-service instead of starting one through Playwright.
+a 32-byte `SESSION_SECRET`. The managed Playwright server enables the skip-token
+flow and sets `SKIP_EMAIL` using the same `SAA_TEST_EMAIL`, `SAS_HOF_EMAIL`, then
+`SKIP_EMAIL` resolution as the tests. If `PLAYWRIGHT_BASE_URL` points to an
+existing service, or Playwright reuses an already running non-production server,
+that server itself must have `ALLOW_SKIP=true` and `SKIP_EMAIL` set to the
+resolved test email; Playwright only configures a server that it starts.
 
 Existing `fixme` steps remain in place for upload controls, evidence summary
 editing and other service behaviour that is not implemented yet. The refactor
