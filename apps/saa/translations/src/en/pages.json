@@ -90,18 +90,21 @@
     "add-another-name": "Change another name"
   },
   "nationality-change": {
-    "header": "Do you need to change your nationality?"
+    "captionHeading": "Update personal details"
   },
   "correct-nationality": {
+    "captionHeading": "Update personal details",
     "header": "What is your country of nationality?"
   },
   "reason-nationality-change": {
-    "header": "Why are you changing the nationality?"
+    "captionHeading": "Update personal details"
   },
   "upload-nationality-evidence": {
+    "captionHeading": "Update personal details",
     "header": "Upload evidence to support this change"
   },
   "check-your-answers-nationality": {
+    "captionHeading": "Update personal details",
     "header": "Check your answers"
   },
   "check-your-answers-someone-else-nationality": {
@@ -338,6 +341,9 @@
       "evidence": {
         "header": "Evidence"
       },
+      "nationality": {
+        "header": "Change your nationality"
+      },
       "email-address": {
         "header": "Change your email address"
       },
@@ -371,6 +377,9 @@
         "label": "Add or remove a child or partner"
       },
       "documents-new-name": {
+        "label": "Files uploaded"
+      },
+      "documents-nationality": {
         "label": "Files uploaded"
       }
     }

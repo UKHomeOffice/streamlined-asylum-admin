@@ -569,7 +569,7 @@ describe('nationality rows on final summary pages', () => {
       .find(section => section.section === 'Nationality');
     expect(row.fields[0]).toMatchObject({
       field: 'change-someone-else-nationality',
-      label: 'Do you need to change someone else’s nationality?',
+      label: "Do you need to change someone else's nationality?",
       value: answer === 'yes' ? 'Yes' : 'No',
       step: '/change-someone-else-nationality'
     });

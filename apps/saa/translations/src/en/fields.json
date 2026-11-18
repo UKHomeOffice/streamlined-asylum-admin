@@ -115,17 +115,6 @@
       }
     }
   },
-  "change-someone-else-nationality": {
-    "legend": "Do you need to change someone else’s nationality?",
-    "options": {
-      "yes": {
-        "label": "Yes"
-      },
-      "no": {
-        "label": "No"
-      }
-    }
-  },
   "reason-someone-else-name-change": {
     "legend": "Why do you need to change their name?",
     "options": {
@@ -578,5 +567,37 @@
   },
   "documents-someone-else-new-dob": {
     "summary-label": "Files uploaded"
+  },
+  "change-someone-else-nationality": {
+    "legend": "Do you need to change someone else's nationality?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
+  "nationality-change": {
+    "legend": "Do you need to change your nationality?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
+  "correct-nationality": {
+    "label": "Select a country",
+    "summary-label": "What is your country of nationality?",
+    "options": {
+      "none_selected": "Select a country"
+    }
+  },
+  "reason-nationality-change": {
+    "label": "Why are you changing your nationality?"
   }
 }
