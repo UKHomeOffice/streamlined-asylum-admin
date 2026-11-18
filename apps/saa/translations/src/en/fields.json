@@ -539,6 +539,17 @@
   "documents-someone-else-new-dob": {
     "summary-label": "Files uploaded"
   },
+  "change-someone-else-nationality": {
+    "legend": "Do you need to change someone else's nationality?",
+    "options": {
+      "yes": {
+        "label": "Yes"
+      },
+      "no": {
+        "label": "No"
+      }
+    }
+  },
   "nationality-change": {
     "legend": "Do you need to change your nationality?",
     "options": {
