@@ -287,13 +287,21 @@ module.exports = {
             '/upload-someone-else-nationality-evidence',
             '/check-your-answers-someone-else-nationality'
           ],
-          // Add the page fields and loop key as the nationality page stories are built.
+          // Add remaining page fields and the loop key as their stories are built.
           fieldsToUnset: [
             OWN_NATIONALITY_FIELD,
+            'change-your-nationality',
+            SOMEONE_ELSE_NATIONALITY_FIELD,
+            'relationship-nationality-change',
+            'someone-else-correct-nationality-given-name',
+            'someone-else-correct-nationality-family-name',
+            'someone-else-correct-nationality',
+            'reason-someone-else-nationality-change',
+            'documents-someone-else-nationality',
+            'someoneelsenewnationality',
             'documents-nationality',
             'correct-nationality',
-            'reason-nationality-change',
-            SOMEONE_ELSE_NATIONALITY_FIELD
+            'reason-nationality-change'
           ]
         }
       ]
