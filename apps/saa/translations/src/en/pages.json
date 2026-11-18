@@ -136,7 +136,6 @@
   },
   "upload-someone-else-nationality-evidence": {
     "title": "Upload evidence - someone else’s nationality",
-    "intro": "This should be an official document showing the correct nationality.",
     "header": "Upload evidence to support this change",
     "captionHeading": "Update personal details"
   },

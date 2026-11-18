@@ -84,7 +84,7 @@ describe('file upload configuration', () => {
     });
   });
 
-  test('wires someone else nationality evidence with its caption and translated intro', () => {
+  test('wires someone else nationality evidence with its caption and shared markdown intro', () => {
     const route = '/upload-someone-else-nationality-evidence';
     const step = app.steps[route];
     const pages = require('../../../apps/saa/translations/src/en/pages.json');
@@ -101,10 +101,11 @@ describe('file upload configuration', () => {
     expect(step.next).toBe('/check-your-answers-someone-else-nationality');
     expect(pages[route.slice(1)]).toMatchObject({
       header: 'Upload evidence to support this change',
-      intro: 'This should be an official document showing the correct nationality.',
       captionHeading: 'Update personal details'
     });
+    expect(pages[route.slice(1)]).not.toHaveProperty('intro');
     expect(template).toContain('{{<partials-file-upload-form-layout}}');
+    expect(template).toContain('{{#markdown}}upload-nationality-evidence{{/markdown}}');
   });
 
   test('keeps the file-vault extension whitelist aligned with the application', () => {
