@@ -301,7 +301,7 @@ module.exports = {
             'someoneelsenewnationality',
             'documents-nationality',
             'correct-nationality',
-            'reason-nationality-change',
+            'reason-nationality-change'
           ]
         }
       ]
