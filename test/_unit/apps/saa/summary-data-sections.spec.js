@@ -542,9 +542,17 @@ describe('nationality rows on final summary pages', () => {
       const details = row.fields.filter(field => !field.isAggregatorTitle && !field.isSeparator);
       expect(details).toHaveLength(12);
       expect(details.every(field => field.omitChangeLink)).toBe(true);
-      expect(details.slice(0, 6).map(field => field.value)).toEqual([
-        'My child', 'Alex', 'Smith', 'France', 'Recorded incorrectly', 'passport.pdf'
+      const visibleDetails = details.filter(field => !field.omitFromSummary);
+      expect(visibleDetails).toHaveLength(10);
+      expect(visibleDetails.slice(0, 5).map(field => field.value)).toEqual([
+        'My child', 'Alex Smith', 'France', 'Recorded incorrectly', 'passport.pdf'
       ]);
+      expect(visibleDetails[1].label).toBe('Name');
+      expect(
+        details.filter(field =>
+          field.field === 'someone-else-correct-nationality-family-name'
+        ).every(field => field.omitFromSummary)
+      ).toBe(true);
       const template = Hogan.compile(fs.readFileSync(
         path.resolve(__dirname, '../../../../apps/saa/views/partials/summary-table.html'),
         'utf8'

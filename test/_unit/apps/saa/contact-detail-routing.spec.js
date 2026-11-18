@@ -1141,7 +1141,17 @@ describe('someone-else nationality summary integration', () => {
       "Change someone else's nationality 2"
     ]);
     expect(locals.items[0].fields.map(field => field.field)).toEqual(Object.keys(answers));
-    expect(locals.items[0].fields.every(field => !field.omitFromSummary)).toBe(true);
+    const nameField = locals.items[0].fields.find(
+      field => field.field === 'someone-else-correct-nationality-given-name'
+    );
+    expect(nameField).toMatchObject({
+      label: 'Name',
+      parsed: 'Alex Smith',
+      omitFromSummary: false
+    });
+    expect(locals.items[0].fields.find(
+      field => field.field === 'someone-else-correct-nationality-family-name'
+    ).omitFromSummary).toBe(true);
     expect(locals.items[0].fields.at(-1).parsed).toBe('passport.pdf');
     expect(req.sessionModel.get(aggregate).aggregatedValues).toHaveLength(2);
     Object.keys(answers).forEach(field => expect(req.sessionModel.get(field)).toBeUndefined());
