@@ -511,15 +511,25 @@ describe('nationality rows on final summary pages', () => {
     },
     translate: keys => {
       const list = [].concat(keys);
-      return list.map(key => key.split('.').reduce(
-        (value, part) => value?.[part], { pages, fields }
-      )).find(value => value !== undefined) || list[list.length - 1];
+      return list.map(key => {
+        const optionKey = key.match(/^fields\[([^\]]+)\]\.options\.\[([^\]]+)\]$/);
+        if (optionKey) {
+          return fields[optionKey[1]]?.options?.[optionKey[2]]?.label;
+        }
+        return key.split('.').reduce(
+          (value, part) => value?.[part], { pages, fields }
+        );
+      }).find(value => value !== undefined) || list[list.length - 1];
     },
     form: {
       options: {
         fieldsConfig,
         sections: { 'someone-else-nationality': sections['someone-else-nationality'] },
-        steps: {}
+        steps: {
+          '/change-someone-else-nationality': {
+            fields: ['change-someone-else-nationality']
+          }
+        }
       }
     }
   });
@@ -527,7 +537,10 @@ describe('nationality rows on final summary pages', () => {
   test.each(['/confirm', '/information-given'])(
     '%s shows Nationality with numbered titles and only title Change links',
     route => {
-      const req = createRequest({ aggregatedValues: [item('France'), item('Germany')] });
+      const req = createRequest(
+        { aggregatedValues: [item('France'), item('Germany')] },
+        'yes'
+      );
       req.path = route;
       const row = new SummaryPage().getRowsForSummarySections(req)
         .find(section => section.section === 'Nationality');
@@ -539,7 +552,15 @@ describe('nationality rows on final summary pages', () => {
       ]);
       expect(titles.every(field => field.aggregatorTitleChangeLink ===
         '/changes/check-your-answers-someone-else-nationality')).toBe(true);
-      const details = row.fields.filter(field => !field.isAggregatorTitle && !field.isSeparator);
+      expect(row.fields[0]).toMatchObject({
+        field: 'change-someone-else-nationality',
+        value: 'Yes'
+      });
+      const details = row.fields.filter(field =>
+        !field.isAggregatorTitle &&
+        !field.isSeparator &&
+        field.field !== 'change-someone-else-nationality'
+      );
       expect(details).toHaveLength(12);
       expect(details.every(field => field.omitChangeLink)).toBe(true);
       const visibleDetails = details.filter(field => !field.omitFromSummary);
@@ -559,7 +580,7 @@ describe('nationality rows on final summary pages', () => {
       ));
       const html = template.render(row);
       expect(html).toContain('Nationality');
-      expect(html.match(/<a /g)).toHaveLength(2);
+      expect(html.match(/<a /g)).toHaveLength(3);
       expect(html).toContain('Change someone else&#39;s nationality 2');
     }
   );
@@ -581,7 +602,7 @@ describe('nationality rows on final summary pages', () => {
       value: answer === 'yes' ? 'Yes' : 'No',
       step: '/change-someone-else-nationality'
     });
-    expect(row.fields[1].isAggregatorTitle).toBe(true);
+    expect(row.fields.some(field => field.isAggregatorTitle)).toBe(answer === 'yes');
   });
 });
 

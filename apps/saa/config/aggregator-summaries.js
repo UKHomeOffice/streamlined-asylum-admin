@@ -36,6 +36,7 @@ module.exports = {
   },
   someoneelsenewnationality: {
     route: '/check-your-answers-someone-else-nationality',
+    dependsOn: 'change-someone-else-nationality',
     documentFields: ['documents-someone-else-nationality'],
     combineFields: {
       'someone-else-correct-nationality-given-name': [

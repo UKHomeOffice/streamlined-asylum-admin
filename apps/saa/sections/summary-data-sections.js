@@ -219,19 +219,6 @@ module.exports = {
       aggregateSummaryRow('someoneelsenewname')
     ]
   },
-  'someone-else-nationality': {
-    steps: [
-      {
-        step: '/change-someone-else-nationality',
-        field: 'change-someone-else-nationality',
-        useOriginalValue: true,
-        parse: (value, req) => value
-          ? req.translate(`fields.change-someone-else-nationality.options.${value}.label`)
-          : null
-      },
-      aggregateSummaryRow('someoneelsenewnationality')
-    ]
-  },
   'date-of-birth': {
     steps: [
       {
@@ -260,6 +247,15 @@ module.exports = {
         field: 'nationality-change'
       },
       ...nationalityRows
+    ]
+  },
+  'someone-else-nationality': {
+    steps: [
+      {
+        step: '/change-someone-else-nationality',
+        field: 'change-someone-else-nationality'
+      },
+      aggregateSummaryRow('someoneelsenewnationality')
     ]
   },
   'email-address': {

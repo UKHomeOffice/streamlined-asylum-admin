@@ -552,6 +552,7 @@ module.exports = {
   'change-someone-else-nationality': {
     mixin: 'radio-group',
     options: ['yes', 'no'],
+    invalidates: ['documents-someone-else-nationality'],
     validate: ['required'],
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
