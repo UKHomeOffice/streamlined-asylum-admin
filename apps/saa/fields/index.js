@@ -520,5 +520,30 @@ module.exports = {
     validate: ['required'],
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
+  },
+  'nationality-change': {
+    mixin: 'radio-group',
+    options: ['yes', 'no'],
+    invalidates: ['documents-nationality'],
+    validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
+    isPageHeading: true
+  },
+  'correct-nationality': {
+    mixin: 'select',
+    className: ['typeahead'],
+    validate: ['required'],
+    options: [
+      {
+        value: '',
+        label: 'fields.correct-nationality.options.none_selected'
+      }
+    ].concat(countries)
+  },
+  'reason-nationality-change': {
+    mixin: 'textarea',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 500 }],
+    attributes: [{ attribute: 'rows', value: 5 }],
+    isPageHeading: true
   }
 };
