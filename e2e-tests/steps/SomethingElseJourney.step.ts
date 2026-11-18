@@ -1,7 +1,8 @@
 import { expect } from '@playwright/test';
 import { createBdd } from 'playwright-bdd';
 import { test, type Pages } from '../fixtures/fixtures';
-import { ConstantsLib as c } from '../utility-helper/constants-lib';
+import { RAD_QUESTION } from '../pages/saa-someone-on-claim-died-page';
+import { RAD_SUMMARY_LABEL } from '../pages/saa-check-your-answers-page';
 
 const { When, Then } = createBdd(test);
 
@@ -66,5 +67,5 @@ Then('I see the Home Office contact details {word} a Continue button', async ({ 
 Then('the final answers show supporting evidence and no reported death', async ({ pages }) => {
   await pages.checkYourAnswersPage.assertOnPage();
   await pages.checkYourAnswersPage.assertAnswer('Do you need to send evidence to help your claim?', 'Yes');
-  await pages.checkYourAnswersPage.assertAnswer(c.RAD_QUESTION, 'No', c.RAD_SUMMARY_LABEL);
+  await pages.checkYourAnswersPage.assertAnswer(RAD_QUESTION, 'No', RAD_SUMMARY_LABEL);
 });

@@ -2,7 +2,8 @@ import { expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { createBdd, type DataTable } from 'playwright-bdd';
 import { test, type Pages } from '../fixtures/fixtures';
-import { ConstantsLib as c } from '../utility-helper/constants-lib';
+import { RAD_QUESTION } from '../pages/saa-someone-on-claim-died-page';
+import { RAD_SUMMARY_LABEL } from '../pages/saa-check-your-answers-page';
 import { completeDeceasedDetails } from './RADJourney.step';
 
 const { Given, When, Then, Before } = createBdd(test);
@@ -412,14 +413,14 @@ Then('these RAD navigation checks remain pending', async ({ $test }, table: Data
 });
 
 const changeLink = (pages: Pages, answer: string) =>
-  pages.checkYourAnswersPage.page.getByRole('link', { name: `Change ${c.RAD_QUESTION} from ${answer}`, exact: true });
+  pages.checkYourAnswersPage.page.getByRole('link', { name: `Change ${RAD_QUESTION} from ${answer}`, exact: true });
 
 Then('I land on the check your answers page', async ({ pages }) => {
   await pages.checkYourAnswersPage.assertOnPage();
 });
 
 Then('the check your answers page shows the report a death answer {string}', async ({ pages }, answer: string) => {
-  await pages.checkYourAnswersPage.assertAnswer(c.RAD_QUESTION, answer, c.RAD_SUMMARY_LABEL);
+  await pages.checkYourAnswersPage.assertAnswer(RAD_QUESTION, answer, RAD_SUMMARY_LABEL);
 });
 
 Given('I have not reported a death and am on the check your answers page', async ({ pages }) => {

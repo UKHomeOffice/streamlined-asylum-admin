@@ -1,6 +1,8 @@
 import { expect, type Page } from '@playwright/test';
 import { BasePage } from './saa-base-page';
-import { ConstantsLib as c } from '../utility-helper/constants-lib';
+
+export const VIOLENT_IMAGES_QUESTION = 'Does your evidence include violent or upsetting images?';
+export const VIOLENT_IMAGES_REQUIRED_ERROR = 'Select if the evidence contains violent or upsetting images';
 
 export class ViolentUpsettingImagesPage extends BasePage {
   constructor(page: Page) {
@@ -18,11 +20,11 @@ export class ViolentUpsettingImagesPage extends BasePage {
     ]) {
       await expect(this.page.getByText(text, { exact: true })).toBeVisible();
     }
-    await this.assertUnansweredQuestion(c.VIOLENT_IMAGES_QUESTION);
+    await this.assertUnansweredQuestion(VIOLENT_IMAGES_QUESTION);
   }
 
   async answer(answer: string) {
-    await this.answerQuestion(answer, c.VIOLENT_IMAGES_QUESTION);
+    await this.answerQuestion(answer, VIOLENT_IMAGES_QUESTION);
   }
 
   async continueWithoutSelectingAnswer() {
@@ -31,6 +33,6 @@ export class ViolentUpsettingImagesPage extends BasePage {
   }
 
   async assertRequiredError() {
-    await this.assertError(c.VIOLENT_IMAGES_REQUIRED_ERROR);
+    await this.assertError(VIOLENT_IMAGES_REQUIRED_ERROR);
   }
 }

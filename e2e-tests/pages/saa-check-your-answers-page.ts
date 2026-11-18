@@ -1,6 +1,8 @@
 import { expect, type Page } from '@playwright/test';
 import { BasePage } from './saa-base-page';
 
+export const RAD_SUMMARY_LABEL = 'Someone on the claim has died';
+
 export class CheckYourAnswersPage extends BasePage {
   constructor(page: Page) {
     super(page, { path: '/changes/confirm', heading: 'Check your answers' });

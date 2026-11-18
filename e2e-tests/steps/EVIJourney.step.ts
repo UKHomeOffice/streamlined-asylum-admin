@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test';
 import { createBdd } from 'playwright-bdd';
 import { BasePage } from '../pages/saa-base-page';
+import { VIOLENT_IMAGES_QUESTION } from '../pages/saa-EVI-violent-upsetting-images-page';
 import { test, type Pages } from '../fixtures/fixtures';
 import { ConstantsLib as c } from '../utility-helper/constants-lib';
 
@@ -158,7 +159,7 @@ When('I complete the supporting evidence journey pertaining to {string}', async 
       await pages.violentUpsettingImagesPage.answer('No');
       await pages.violentUpsettingImagesPage.continueToNextPage();
       await pages.evidenceCheckYourAnswersPage.assertAnswer('Files uploaded', 'test-evidence.txt');
-      await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', 'No', c.VIOLENT_IMAGES_QUESTION);
+      await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', 'No', VIOLENT_IMAGES_QUESTION);
       await continueToCheckYourAnswers(pages);
       await pages.checkYourAnswersPage.assertAnswer('Do you need to send evidence to help your claim?', 'Yes');
       break;
@@ -396,12 +397,12 @@ Given('I am on the evidence check your answers page with completed evidence answ
 
 Then('my answers from the evidence journey are shown correctly', async ({ pages }) => {
   await pages.evidenceCheckYourAnswersPage.assertAnswer('Files uploaded', 'test-evidence.txt');
-  await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', 'No', c.VIOLENT_IMAGES_QUESTION);
+  await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', 'No', VIOLENT_IMAGES_QUESTION);
 });
 
 Given('I have changed answers in the evidence journey', async ({ pages }) => {
   await navigateTo(pages, 'Evidence check your answers', c.E2E_EMAIL);
-  await pages.evidenceCheckYourAnswersPage.editAnswer(c.VIOLENT_IMAGES_QUESTION, 'No');
+  await pages.evidenceCheckYourAnswersPage.editAnswer(VIOLENT_IMAGES_QUESTION, 'No');
 });
 
 When('I review the evidence check your answers page', async ({ pages }) => {
@@ -410,7 +411,7 @@ When('I review the evidence check your answers page', async ({ pages }) => {
 });
 
 Then('my updated answers are shown', async ({ pages }) => {
-  await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', 'Yes', c.VIOLENT_IMAGES_QUESTION);
+  await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', 'Yes', VIOLENT_IMAGES_QUESTION);
 });
 
 Then('my original answers are not shown', async ({ pages }) => {
@@ -476,10 +477,10 @@ Then('I remain on the violent or upsetting images page', async ({ pages }) => {
 
 Given('I am editing my answer about violent or upsetting images', async ({ pages }) => {
   await navigateTo(pages, 'Evidence check your answers', c.E2E_EMAIL);
-  await pages.evidenceCheckYourAnswersPage.editAnswer(c.VIOLENT_IMAGES_QUESTION, 'No');
+  await pages.evidenceCheckYourAnswersPage.editAnswer(VIOLENT_IMAGES_QUESTION, 'No');
 });
 
 Then('the evidence check your answers page shows the violent images answer {string}', async ({ pages }, answer: string) => {
   await pages.evidenceCheckYourAnswersPage.assertOnPage();
-  await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', answer, c.VIOLENT_IMAGES_QUESTION);
+  await pages.evidenceCheckYourAnswersPage.assertAnswer('Violent or upsetting images', answer, VIOLENT_IMAGES_QUESTION);
 });
