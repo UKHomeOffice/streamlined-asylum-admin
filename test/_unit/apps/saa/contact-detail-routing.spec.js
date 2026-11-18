@@ -276,7 +276,7 @@ describe('someone else nationality change reason', () => {
     });
     expect(pages[field].captionHeading).toBe('Update personal details');
     expect(fieldTranslations[field].label)
-      .toBe('Why do you need to change their nationality?');
+      .toBe('Why are you changing someone else’s nationality?');
     expect(validationTranslations[field]).toEqual({
       required: 'Enter why you need to change their nationality',
       maxlength: 'Reason must be between 1 and 500 characters',
