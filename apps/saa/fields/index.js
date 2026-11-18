@@ -449,6 +449,7 @@ module.exports = {
     options: ['yes', 'no'],
     invalidates: ['documents-new-dob'],
     validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
   },
   'correct-date-of-birth': dateComponent('correct-date-of-birth', {
