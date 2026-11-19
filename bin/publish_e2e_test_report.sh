@@ -105,8 +105,10 @@ if [ -z "$DOWNLOAD_URL" ]; then
   exit 1
 fi
 
-# Post a comment to the PR with the report download link
+# Create or update a stable PR comment with the report download link
+COMMENT_MARKER="<!-- playwright-report-pr-${DRONE_PULL_REQUEST} -->"
 COMMENT_BODY=$(cat <<EOF
+${COMMENT_MARKER}
 Playwright HTML report for this PR build is available here:
 * ${DOWNLOAD_URL}
 
@@ -114,24 +116,80 @@ Drone build: ${DRONE_BUILD_LINK}
 EOF
 )
 
-GH_COMMENT_RESPONSE=$(curl -sS -X POST \
+COMMENT_ID=""
+COMMENTS_PAGE=1
+while [ -z "$COMMENT_ID" ]; do
+  COMMENTS_RESPONSE_FILE="$(mktemp)"
+  COMMENTS_HTTP_CODE="$(curl -sS -o "$COMMENTS_RESPONSE_FILE" -w "%{http_code}" \
+    -H "Authorization: Bearer ${GITHUB_APP_TOKEN}" \
+    -H "Accept: application/vnd.github+json" \
+    "${GH_API}/issues/${DRONE_PULL_REQUEST}/comments?per_page=100&page=${COMMENTS_PAGE}")"
+
+  if ! [[ "$COMMENTS_HTTP_CODE" =~ ^2 ]]; then
+    echo "Failed to fetch PR comments (HTTP ${COMMENTS_HTTP_CODE})"
+    sed -n '1,30p' "$COMMENTS_RESPONSE_FILE"
+    rm -f "$COMMENTS_RESPONSE_FILE"
+    exit 1
+  fi
+
+  if ! jq -e 'type == "array"' "$COMMENTS_RESPONSE_FILE" >/dev/null 2>&1; then
+    echo "PR comments API returned an unexpected response"
+    sed -n '1,30p' "$COMMENTS_RESPONSE_FILE"
+    rm -f "$COMMENTS_RESPONSE_FILE"
+    exit 1
+  fi
+
+  COMMENT_ID="$(jq -r --arg marker "$COMMENT_MARKER" \
+    '[.[] | select((.body // "") | contains($marker))] | .[0].id // empty' "$COMMENTS_RESPONSE_FILE")"
+  COMMENT_COUNT="$(jq 'length' "$COMMENTS_RESPONSE_FILE")"
+  rm -f "$COMMENTS_RESPONSE_FILE"
+
+  if [ -n "$COMMENT_ID" ] || [ "$COMMENT_COUNT" -lt 100 ]; then
+    break
+  fi
+  COMMENTS_PAGE=$((COMMENTS_PAGE + 1))
+done
+
+if [ -n "$COMMENT_ID" ]; then
+  COMMENT_METHOD="PATCH"
+  COMMENT_URL="${GH_API}/issues/comments/${COMMENT_ID}"
+else
+  COMMENT_METHOD="POST"
+  COMMENT_URL="${GH_API}/issues/${DRONE_PULL_REQUEST}/comments"
+fi
+
+GH_COMMENT_RESPONSE_FILE="$(mktemp)"
+GH_COMMENT_HTTP_CODE="$(curl -sS -o "$GH_COMMENT_RESPONSE_FILE" -w "%{http_code}" -X "$COMMENT_METHOD" \
   -H "Authorization: Bearer ${GITHUB_APP_TOKEN}" \
   -H "Accept: application/vnd.github+json" \
-  "${GH_API}/issues/${DRONE_PULL_REQUEST}/comments" \
-  -d "$(jq -n --arg body "$COMMENT_BODY" '{body: $body}')")
+  "${COMMENT_URL}" \
+  -d "$(jq -n --arg body "$COMMENT_BODY" '{body: $body}')")"
 
-if ! echo "$GH_COMMENT_RESPONSE" | jq -e . >/dev/null 2>&1; then
-  echo "GitHub comment API returned non-JSON response"
-  echo "$GH_COMMENT_RESPONSE"
+if ! [[ "$GH_COMMENT_HTTP_CODE" =~ ^2 ]]; then
+  echo "Failed to ${COMMENT_METHOD,,} GitHub PR comment (HTTP ${GH_COMMENT_HTTP_CODE})"
+  sed -n '1,30p' "$GH_COMMENT_RESPONSE_FILE"
+  rm -f "$GH_COMMENT_RESPONSE_FILE"
   exit 1
 fi
 
-GH_COMMENT_URL="$(echo "$GH_COMMENT_RESPONSE" | jq -r '.html_url // empty')"
-if [ -z "$GH_COMMENT_URL" ]; then
-  echo "Failed to create GitHub PR comment"
-  echo "$GH_COMMENT_RESPONSE"
+if ! jq -e . "$GH_COMMENT_RESPONSE_FILE" >/dev/null 2>&1; then
+  echo "GitHub comment API returned non-JSON response"
+  sed -n '1,30p' "$GH_COMMENT_RESPONSE_FILE"
+  rm -f "$GH_COMMENT_RESPONSE_FILE"
   exit 1
+fi
+
+GH_COMMENT_URL="$(jq -r '.html_url // empty' "$GH_COMMENT_RESPONSE_FILE")"
+rm -f "$GH_COMMENT_RESPONSE_FILE"
+if [ -z "$GH_COMMENT_URL" ]; then
+  echo "GitHub comment API response is missing html_url"
+  exit 1
+fi
+
+if [ "$COMMENT_METHOD" = "PATCH" ]; then
+  echo "Updated PR comment: ${GH_COMMENT_URL}"
+else
+  echo "Posted PR comment: ${GH_COMMENT_URL}"
 fi
 
 echo "Uploaded report asset: ${DOWNLOAD_URL}"
-echo "Posted PR comment: ${GH_COMMENT_URL}"
