@@ -116,7 +116,8 @@ module.exports = {
     addOrRemoveChildPartner: 15,
     reportADeath: 15,
     someoneElseNewDob: 15,
-    someoneElsesName: 15
+    someoneElsesName: 15,
+    someoneElseNewNationality: 15
   },
   feedbackUrl: process.env.FEEDBACK_URL,
   disallowIndexing: process.env.DISALLOW_INDEXING === 'true'
