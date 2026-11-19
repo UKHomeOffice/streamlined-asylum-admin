@@ -249,6 +249,15 @@ module.exports = {
       ...nationalityRows
     ]
   },
+  'someone-else-nationality': {
+    steps: [
+      {
+        step: '/change-someone-else-nationality',
+        field: 'change-someone-else-nationality'
+      },
+      aggregateSummaryRow('someoneelsenewnationality')
+    ]
+  },
   'email-address': {
     steps: emailAddressRows
   },

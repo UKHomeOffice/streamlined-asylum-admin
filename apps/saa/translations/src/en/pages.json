@@ -107,6 +107,13 @@
     "captionHeading": "Update personal details",
     "header": "Check your answers"
   },
+  "check-your-answers-someone-else-nationality": {
+    "header": "Check your answers",
+    "captionHeading": "Update personal details",
+    "item-title": "Change someone else's nationality",
+    "add-another-nationality": "Change another nationality",
+    "limit-exceeded": "You have changed the maximum number of {{maxItems}} nationalities. You cannot add any more."
+  },
   "claimants-name": {
     "header": "Claimant’s name"
   },
@@ -114,13 +121,23 @@
     "header": "Claimant's main language"
   },
   "relationship-nationality-change": {
-    "header": "How are they related to you?"
+    "title": "How are they related to you - nationality change",
+    "captionHeading": "Update personal details"
   },
   "change-someone-else-nationality": {
     "captionHeading": "Update personal details"
   },
   "someone-else-correct-nationality": {
-    "header": "Change someone else’s nationality"
+    "header": "Change someone else’s nationality",
+    "captionHeading": "Update personal details"
+  },
+  "reason-someone-else-nationality-change": {
+    "captionHeading": "Update personal details"
+  },
+  "upload-someone-else-nationality-evidence": {
+    "title": "Upload evidence - someone else’s nationality",
+    "header": "Upload evidence to support this change",
+    "captionHeading": "Update personal details"
   },
   "provide-photo-identity": {
     "header": "Provide a photo identity document to update your contact details"
@@ -316,6 +333,9 @@
       },
       "someone-else-new-name": {
         "header": "Change someone else's name"
+      },
+      "someone-else-nationality": {
+        "header": "Nationality"
       },
       "evidence": {
         "header": "Evidence"

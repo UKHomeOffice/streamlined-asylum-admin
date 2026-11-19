@@ -75,6 +75,11 @@ const createRequest = (overrides = {}) => ({
 describe.each([
   ['documents-help-your-claim', '/upload-supporting-evidence', true],
   [
+    'documents-someone-else-nationality',
+    '/upload-someone-else-nationality-evidence',
+    false
+  ],
+  [
     'documents-someone-else-new-dob',
     '/someone-else-new-date-of-birth-evidence',
     false

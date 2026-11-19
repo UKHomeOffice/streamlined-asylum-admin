@@ -26,6 +26,9 @@
   "relationship-name-change": {
     "required": "Select how they are related to you"
   },
+  "relationship-nationality-change": {
+    "required": "Select how they are related to you"
+  },
   "reason-someone-else-name-change": {
     "required": "Select why you need to change their name"
   },
@@ -55,6 +58,26 @@
     "noDigits": "Family name must not contain numbers",
     "maxlength": "Family name must be between 1 and 255 characters",
     "notUrl": "Family name must not contain a URL"
+  },
+  "someone-else-correct-nationality-given-name": {
+    "required": "Enter their given name",
+    "noDigits": "Given name must not contain numbers",
+    "maxlength": "Given name must be between 1 and 255 characters",
+    "notUrl": "Given name must not contain a URL"
+  },
+  "someone-else-correct-nationality-family-name": {
+    "required": "Enter their family name",
+    "noDigits": "Family name must not contain numbers",
+    "maxlength": "Family name must be between 1 and 255 characters",
+    "notUrl": "Family name must not contain a URL"
+  },
+  "someone-else-correct-nationality": {
+    "required": "Enter their nationality"
+  },
+  "reason-someone-else-nationality-change": {
+    "required": "Enter why you need to change their nationality",
+    "maxlength": "Reason must be between 1 and 500 characters",
+    "notUrl": "Reason must not contain a URL"
   },
   "given-name": {
     "required": "Enter your new given name",

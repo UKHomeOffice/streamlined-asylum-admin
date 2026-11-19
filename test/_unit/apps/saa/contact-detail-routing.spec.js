@@ -19,6 +19,9 @@ const validationTranslations = require('../../../../apps/saa/translations/src/en
 const nameSummary =
   require('../../../../apps/saa/sections/summary-data-sections').name.steps;
 const Summary = require('hof').components.summary(class {});
+const fs = require('node:fs');
+const path = require('node:path');
+const Hogan = require('hogan.js');
 
 const sections = followUps.getActiveSections(
   config,
@@ -78,6 +81,110 @@ const buildController = (route, req) => {
   );
   return new Composed(options);
 };
+
+test('nationality change relationship question is required and has the requested content', () => {
+  const field = 'relationship-nationality-change';
+  expect(app.steps[`/${field}`].fields).toEqual([field]);
+  expect(fields[field]).toMatchObject({
+    mixin: 'radio-group',
+    options: ['my-child', 'spouse-or-partner'],
+    validate: ['required'],
+    isPageHeading: true
+  });
+  expect(fieldTranslations[field]).toEqual({
+    legend: 'How are they related to you?',
+    options: {
+      'my-child': { label: 'My child' },
+      'spouse-or-partner': {
+        label:
+          'My husband, wife, civil partner, or unmarried partner that I have lived with for 2 years or more'
+      }
+    }
+  });
+  expect(pages[field]).toMatchObject({
+    title: 'How are they related to you - nationality change',
+    captionHeading: 'Update personal details'
+  });
+  expect(validationTranslations[field].required).toBe(
+    'Select how they are related to you'
+  );
+
+  const req = buildRequest(['nationality']);
+  req.form.values = { [field]: '' };
+  expect(
+    buildController(`/${field}`, req).validateField(field, req)
+  ).toMatchObject({
+    key: field,
+    type: 'required'
+  });
+});
+
+test('someone else nationality page collects required personal details', () => {
+  const route = '/someone-else-correct-nationality';
+  const givenName = 'someone-else-correct-nationality-given-name';
+  const familyName = 'someone-else-correct-nationality-family-name';
+  const nationality = 'someone-else-correct-nationality';
+  const nameFields = [givenName, familyName];
+
+  expect(app.steps[route].fields).toEqual([givenName, familyName, nationality]);
+  expect(pages[route.slice(1)].captionHeading).toBe('Update personal details');
+
+  nameFields.forEach(field => {
+    expect(fields[field]).toMatchObject({
+      mixin: 'input-text',
+      validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+      labelClassName: 'govuk-label--s'
+    });
+  });
+  expect(fields[nationality]).toMatchObject({
+    mixin: 'select',
+    className: ['typeahead'],
+    validate: ['required'],
+    labelClassName: 'govuk-label--s'
+  });
+  expect(fields[nationality].options.length).toBeGreaterThan(1);
+  expect(fieldTranslations[givenName].label).toBe('Given name');
+  expect(fieldTranslations[familyName].label).toBe('Family name');
+  expect(fieldTranslations[nationality]).toMatchObject({
+    label: 'Country of nationality',
+    options: { none_selected: 'Select a country' }
+  });
+  expect(validationTranslations[givenName]).toEqual({
+    required: 'Enter their given name',
+    noDigits: 'Given name must not contain numbers',
+    maxlength: 'Given name must be between 1 and 255 characters',
+    notUrl: 'Given name must not contain a URL'
+  });
+  expect(validationTranslations[familyName]).toEqual({
+    required: 'Enter their family name',
+    noDigits: 'Family name must not contain numbers',
+    maxlength: 'Family name must be between 1 and 255 characters',
+    notUrl: 'Family name must not contain a URL'
+  });
+  expect(validationTranslations[nationality].required).toBe(
+    'Enter their nationality'
+  );
+
+  const req = buildRequest(['nationality']);
+  const controller = buildController(route, req);
+  [givenName, familyName, nationality].forEach(field => {
+    req.form.values = { [field]: '' };
+    expect(controller.validateField(field, req)).toMatchObject({
+      key: field,
+      type: 'required'
+    });
+  });
+  req.form.values = { [givenName]: 'Alex2' };
+  expect(controller.validateField(givenName, req)).toMatchObject({
+    key: givenName,
+    type: 'noDigits'
+  });
+  req.form.values = { [familyName]: 'Alex2' };
+  expect(controller.validateField(familyName, req)).toMatchObject({
+    key: familyName,
+    type: 'noDigits'
+  });
+});
 
 describe('change UK address question', () => {
   test('includes a Yes/No radio question and personal details caption', () => {
@@ -147,6 +254,48 @@ describe('change contact address question', () => {
     const controller = buildController('/change-contact-address', req);
 
     const error = controller.validateField(field, req);
+
+    if (errorType) {
+      expect(error).toMatchObject({ key: field, type: errorType });
+    } else {
+      expect(error).toBeUndefined();
+    }
+  });
+});
+
+describe('someone else nationality change reason', () => {
+  const field = 'reason-someone-else-nationality-change';
+
+  test('includes a textarea heading, caption and validation messages', () => {
+    expect(app.steps[`/${field}`].fields).toEqual([field]);
+    expect(fields[field]).toMatchObject({
+      mixin: 'textarea',
+      validate: ['required', 'notUrl', { type: 'maxlength', arguments: 500 }],
+      attributes: [{ attribute: 'rows', value: 5 }],
+      isPageHeading: true
+    });
+    expect(pages[field].captionHeading).toBe('Update personal details');
+    expect(fieldTranslations[field].label)
+      .toBe('Why are you changing someone else’s nationality?');
+    expect(validationTranslations[field]).toEqual({
+      required: 'Enter why you need to change their nationality',
+      maxlength: 'Reason must be between 1 and 500 characters',
+      notUrl: 'Reason must not contain a URL'
+    });
+  });
+
+  test.each([
+    ['', 'required'],
+    ['a', undefined],
+    ['Their nationality was recorded incorrectly.', undefined],
+    ['a'.repeat(500), undefined],
+    ['a'.repeat(501), 'maxlength'],
+    ['https://example.com', 'notUrl'],
+    ['Please use www.example.com', 'notUrl']
+  ])('validates "%s" with error %s', (value, errorType) => {
+    const req = buildRequest(['nationality']);
+    req.form.values = { [field]: value };
+    const error = buildController(`/${field}`, req).validateField(field, req);
 
     if (errorType) {
       expect(error).toMatchObject({ key: field, type: errorType });
@@ -686,6 +835,7 @@ describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
         ),
         someoneelsenewdob: { aggregatedValues: [] },
         someoneelsenewname: { aggregatedValues: [] },
+        someoneelsenewnationality: { aggregatedValues: [] },
         'new-phone-number': '07700900001',
         steps: [section.start, section.noChanges.route, '/your-phone-number']
       });
@@ -948,6 +1098,142 @@ describe.each([false, true])('contact-detail routing (edit=%s)', edit => {
       expect(res.redirect).toHaveBeenCalledWith(url);
     }
   );
+});
+
+describe('someone-else nationality summary integration', () => {
+  const route = '/check-your-answers-someone-else-nationality';
+  const aggregate = 'someoneelsenewnationality';
+  const answers = {
+    'relationship-nationality-change': 'my-child',
+    'someone-else-correct-nationality-given-name': 'Alex',
+    'someone-else-correct-nationality-family-name': 'Smith',
+    'someone-else-correct-nationality': 'France',
+    'reason-someone-else-nationality-change': 'Recorded incorrectly',
+    'documents-someone-else-nationality': [{ id: 'one', name: 'passport.pdf' }]
+  };
+  const request = () => {
+    const req = buildRequest(['nationality'], false, answers);
+    req.translate = keys => {
+      const translations = { pages, fields: fieldTranslations };
+      const list = [].concat(keys);
+      return list.map(key => key.split('.').reduce(
+        (value, part) => value?.[part], translations
+      )).find(value => value !== undefined) || list[list.length - 1];
+    };
+    return req;
+  };
+  const visit = req => {
+    const controller = buildController(route, req);
+    const res = { locals: {}, redirect: jest.fn() };
+    controller.getValues(req, res, jest.fn());
+    return { controller, res };
+  };
+
+  test('saves all fields and renders numbered cards with only title-level actions', () => {
+    const req = request();
+    visit(req);
+    req.sessionModel.set({ ...answers, 'someone-else-correct-nationality': 'Germany' });
+    visit(req);
+    const { controller, res } = visit(req);
+    const locals = controller.locals(req, res);
+    expect(locals.items.map(item => item.joinTitle)).toEqual([
+      "Change someone else's nationality",
+      "Change someone else's nationality 2"
+    ]);
+    expect(locals.items[0].fields.map(field => field.field)).toEqual(Object.keys(answers));
+    const nameField = locals.items[0].fields.find(
+      field => field.field === 'someone-else-correct-nationality-given-name'
+    );
+    expect(nameField).toMatchObject({
+      label: 'Name',
+      parsed: 'Alex Smith',
+      omitFromSummary: false
+    });
+    expect(locals.items[0].fields.find(
+      field => field.field === 'someone-else-correct-nationality-family-name'
+    ).omitFromSummary).toBe(true);
+    expect(locals.items[0].fields.at(-1).parsed).toBe('passport.pdf');
+    expect(req.sessionModel.get(aggregate).aggregatedValues).toHaveLength(2);
+    Object.keys(answers).forEach(field => expect(req.sessionModel.get(field)).toBeUndefined());
+    const views = path.resolve(__dirname, '../../../../apps/saa/views');
+    const template = Hogan.compile(fs.readFileSync(`${views}${route}.html`, 'utf8'));
+    const html = template.render({
+      ...locals,
+      baseUrl: app.baseUrl,
+      route: route.slice(1),
+      t: () => key => req.translate(key)
+    }, {
+      'partials-page': '{{$page-content}}{{/page-content}}',
+      'partials-aggregator-summary-table': fs.readFileSync(
+        `${views}/partials/aggregator-summary-table.html`, 'utf8'
+      )
+    });
+    expect((html.match(/class="govuk-summary-card__title"/g) || [])).toHaveLength(2);
+    expect((html.match(/\/edit\/[01]/g) || [])).toHaveLength(2);
+    expect((html.match(/\/delete\/[01]/g) || [])).toHaveLength(2);
+    expect((html.match(/<a /g) || [])).toHaveLength(5);
+    expect(html).toContain('Change another nationality');
+    expect(html).toContain(`${app.baseUrl}/relationship-nationality-change`);
+    expect(html).toContain('passport.pdf');
+  });
+
+  test('edits an existing item in place and removes another item', () => {
+    const req = request();
+    visit(req);
+    req.sessionModel.set({ ...answers, 'someone-else-correct-nationality': 'Germany' });
+    visit(req);
+    req.params = { action: 'edit', id: '0' };
+    expect(visit(req).res.redirect).toHaveBeenCalledWith(
+      `${app.baseUrl}/relationship-nationality-change`
+    );
+    expect(req.sessionModel.get('documents-someone-else-nationality'))
+      .toEqual(answers['documents-someone-else-nationality']);
+    req.sessionModel.set('someone-else-correct-nationality', 'Italy');
+    req.params = {};
+    visit(req);
+    expect(req.sessionModel.get(aggregate).aggregatedValues.map(item =>
+      item.fields.find(field => field.field === 'someone-else-correct-nationality').value
+    )).toEqual(['Italy', 'Germany']);
+    req.params = { action: 'delete', id: '1' };
+    visit(req);
+    expect(req.sessionModel.get(aggregate).aggregatedValues).toHaveLength(1);
+  });
+
+  test('hides add-another at the configured limit and keeps saved items in final summaries', () => {
+    const req = request();
+    visit(req);
+    const item = req.sessionModel.get(aggregate).aggregatedValues[0];
+    const limit = app.steps[route].aggregateLimit;
+    expect(limit).toBe(15);
+    req.sessionModel.set(aggregate, { aggregatedValues: Array.from(
+      { length: limit }, () => structuredClone(item)
+    ) });
+    const { controller, res } = visit(req);
+    expect(controller.locals(req, res)).toMatchObject({ noMoreItems: true, maxItems: limit });
+    const row = require('../../../../apps/saa/sections/summary-data-sections')[
+      'someone-else-nationality'
+    ].steps.find(field => field.field === aggregate);
+    const summary = row.parse(req.sessionModel.get(aggregate), req);
+    expect(summary.aggregatedValues).toHaveLength(limit);
+    expect(summary.aggregatedValues[1].fields[0].parsed)
+      .toBe("Change someone else's nationality 2");
+    expect(summary.aggregatedValues[0].fields.slice(1).every(field => field.omitChangeLink))
+      .toBe(true);
+  });
+
+  test.each([false, true])('Continue completes the section without losing saved items (edit=%s)', edit => {
+    const req = request();
+    req.params = edit ? { action: 'edit' } : {};
+    req.sessionModel.set('steps', [config.entryPoint, '/upload-someone-else-nationality-evidence']);
+    req.sessionModel.set('edit-return-path', edit ? `${app.baseUrl}/confirm` : undefined);
+    visit(req);
+    const result = post(route, req, {}, true);
+    expect(result.url).toBe(
+      `${app.baseUrl}${edit ? '/confirm' : config.exitPoint}`
+    );
+    expect(req.sessionModel.get(aggregate).aggregatedValues).toHaveLength(1);
+    expect(req.sessionModel.get(config.stateKey).completedSections).toContain('nationality');
+  });
 });
 
 describe('someone-else name summary integration', () => {

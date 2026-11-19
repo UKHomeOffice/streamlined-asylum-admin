@@ -69,6 +69,12 @@ module.exports = {
     validate: ['required'],
     isPageHeading: true
   },
+  'relationship-nationality-change': {
+    mixin: 'radio-group',
+    options: ['my-child', 'spouse-or-partner'],
+    validate: ['required'],
+    isPageHeading: true
+  },
   'reason-someone-else-name-change': {
     mixin: 'radio-group',
     options: ['error', 'marriage-or-divorce', 'deed-poll'],
@@ -100,6 +106,34 @@ module.exports = {
     mixin: 'input-text',
     validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
     labelClassName: 'govuk-label--s'
+  },
+  'someone-else-correct-nationality-given-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'someone-else-correct-nationality-family-name': {
+    mixin: 'input-text',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 255 }],
+    labelClassName: 'govuk-label--s'
+  },
+  'someone-else-correct-nationality': {
+    mixin: 'select',
+    className: ['typeahead'],
+    validate: ['required'],
+    options: [
+      {
+        value: '',
+        label: 'fields.someone-else-correct-nationality.options.none_selected'
+      }
+    ].concat(countries),
+    labelClassName: 'govuk-label--s'
+  },
+  'reason-someone-else-nationality-change': {
+    mixin: 'textarea',
+    validate: ['required', 'notUrl', { type: 'maxlength', arguments: 500 }],
+    attributes: [{ attribute: 'rows', value: 5 }],
+    isPageHeading: true
   },
   'given-name': {
     mixin: 'input-text',
@@ -415,6 +449,7 @@ module.exports = {
     options: ['yes', 'no'],
     invalidates: ['documents-new-dob'],
     validate: ['required'],
+    className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true
   },
   'correct-date-of-birth': dateComponent('correct-date-of-birth', {
@@ -517,6 +552,7 @@ module.exports = {
   'change-someone-else-nationality': {
     mixin: 'radio-group',
     options: ['yes', 'no'],
+    invalidates: ['documents-someone-else-nationality'],
     validate: ['required'],
     className: ['govuk-radios', 'govuk-radios--inline'],
     isPageHeading: true

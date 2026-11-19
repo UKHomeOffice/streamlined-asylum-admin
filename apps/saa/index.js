@@ -330,8 +330,11 @@ const steps = {
     next: '/change-someone-else-nationality'
   },
   '/change-someone-else-nationality': {
+    behaviours: [
+      ResetSectionSummary(['someoneelsenewnationality'], 'change-someone-else-nationality')
+    ],
+    // Page fields and validation belong to its Nationality story.
     fields: ['change-someone-else-nationality'],
-    // Add ResetSectionSummary for the nationality loop when its add-another story is built.
     forks: [
       {
         target: '/relationship-nationality-change',
@@ -345,23 +348,45 @@ const steps = {
     next: '/do-you-need-add-remove-dependant'
   },
   '/relationship-nationality-change': {
-    // Page fields to be added in its story.
+    fields: ['relationship-nationality-change'],
     next: '/someone-else-correct-nationality'
   },
   '/someone-else-correct-nationality': {
-    // Page fields to be added in its story.
+    behaviours: [CustomValidation],
+    fields: [
+      'someone-else-correct-nationality-given-name',
+      'someone-else-correct-nationality-family-name',
+      'someone-else-correct-nationality'
+    ],
     next: '/reason-someone-else-nationality-change'
   },
   '/reason-someone-else-nationality-change': {
-    // Page fields to be added in its story.
+    fields: ['reason-someone-else-nationality-change'],
     next: '/upload-someone-else-nationality-evidence'
   },
   '/upload-someone-else-nationality-evidence': {
-    // Upload (documents-someone-else-nationality) to be added in its story.
+    ...documentUploadStep('documents-someone-else-nationality'),
     next: '/check-your-answers-someone-else-nationality'
   },
   '/check-your-answers-someone-else-nationality': {
-    // Add-another loop to be added in its story; Continue completes the nationality section.
+    backLink: false,
+    behaviours: [
+      AggregateSaveUpdate,
+      LimitAggregateItems,
+      ParseSummaryFields(aggregatorSummaries.someoneelsenewnationality),
+      EditRouteReturn
+    ],
+    aggregateTo: 'someoneelsenewnationality',
+    aggregateFrom: [
+      'relationship-nationality-change',
+      'someone-else-correct-nationality-given-name',
+      'someone-else-correct-nationality-family-name',
+      'someone-else-correct-nationality',
+      'reason-someone-else-nationality-change',
+      'documents-someone-else-nationality'
+    ],
+    aggregateLimit: config.aggregateLimits.someoneElseNewNationality,
+    addStep: 'relationship-nationality-change',
     next: '/do-you-need-add-remove-dependant'
   },
   '/change-uk-address': {

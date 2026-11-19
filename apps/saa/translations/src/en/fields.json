@@ -104,6 +104,17 @@
       }
     }
   },
+  "relationship-nationality-change": {
+    "legend": "How are they related to you?",
+    "options": {
+      "my-child": {
+        "label": "My child"
+      },
+      "spouse-or-partner": {
+        "label": "My husband, wife, civil partner, or unmarried partner that I have lived with for 2 years or more"
+      }
+    }
+  },
   "reason-someone-else-name-change": {
     "legend": "Why do you need to change their name?",
     "options": {
@@ -148,7 +159,26 @@
     "label": "Family name",
     "summary-label": "New name"
   },
+  "someone-else-correct-nationality-given-name": {
+    "label": "Given name",
+    "summary-label": "Name"
+  },
+  "someone-else-correct-nationality-family-name": {
+    "label": "Family name"
+  },
+  "someone-else-correct-nationality": {
+    "label": "Country of nationality",
+    "options": {
+      "none_selected": "Select a country"
+    }
+  },
+  "reason-someone-else-nationality-change": {
+    "label": "Why are you changing someone else’s nationality?"
+  },
   "documents-someone-else-new-name": {
+    "summary-label": "Files uploaded"
+  },
+  "documents-someone-else-nationality": {
     "summary-label": "Files uploaded"
   },
   "given-name": {
