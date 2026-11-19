@@ -1,8 +1,7 @@
-ARG NODE_IMAGE=quay.io/ukhomeofficedigital/hof-nodejs:24.22.2_4-alpine@sha256:2e3cebc9ed064487226c4b713b28bdd78b4d8bb0a840dfad4c3d17d41c339bb6
 # -----------------------------
 # Stage 1: Builder
 # -----------------------------
-FROM ${NODE_IMAGE} AS builder
+FROM quay.io/ukhomeofficedigital/hof-nodejs:24.22.2_3-alpine@sha256:ebf742568d6fa9505e5b8740dbb6bf7f4d38ea3a22fc2a940ee57cfa3a95a41e AS builder
 
 USER root
 WORKDIR /app
@@ -14,7 +13,7 @@ RUN yarn install --frozen-lockfile --production
 # -----------------------------
 # Stage 2: Runtime
 # -----------------------------
-FROM ${NODE_IMAGE}
+FROM quay.io/ukhomeofficedigital/hof-nodejs:24.22.2_3-alpine@sha256:ebf742568d6fa9505e5b8740dbb6bf7f4d38ea3a22fc2a940ee57cfa3a95a41e
 
 USER root
 
