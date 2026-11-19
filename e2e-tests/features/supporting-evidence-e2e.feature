@@ -8,7 +8,9 @@ Feature: Supporting evidence end-to-end journeys
     When I complete the supporting evidence journey pertaining to "<Journey>"
     Then I should be on "<Page Header>" page
     Examples:
-      | Journey                  | Page Header                       |
-      | T1: Evidence submitted   | Check your answers                |
-      | T2: No evidence required | You have not selected any options |
-    #   | T3: No evidence or other request |                                   |
+      | Journey                          | Page Header                                        |
+      | T1: Evidence submitted           | Check your answers                                 |
+      | T2: No evidence required         | You have not selected any options                  |
+      | T3: No evidence or other request | You should contact the Home Office a different way |
+      | T4: No other request             | You have not selected any options                  |
+                           

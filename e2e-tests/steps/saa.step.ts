@@ -37,7 +37,9 @@ When('I complete the supporting evidence journey pertaining to {string}', async 
       await pages.violentOrUpsettingImagesPage.completeViolentOrUpsettingImagesPage(c.OPTION_NO);
       break;
     }
-    case "t2: no evidence required": {
+    case "t2: no evidence required":
+    case "t3: no evidence or other request":
+    case "t4: no other request": {
       await pages.whatYouNeedBeforeYouStartPage.completeWhatYouNeedBeforeYouStartPage();
       const applicationNumber = pages.aboutThePersonWhoMadeTheClaimPage.getGeneratedUniqueApplicationNumber();
       await pages.aboutThePersonWhoMadeTheClaimPage.completeAboutThePersonWhoMadeTheClaimPage(applicationNumber, c.DOB_1990);
@@ -54,11 +56,9 @@ When('I complete the supporting evidence journey pertaining to {string}', async 
       await pages.doYouNeedToAddOrRemoveAChildOrPartnerAsADependantPage.completeDoYouNeedToAddOrRemoveAChildOrPartnerAsADependantPage(c.OPTION_NO);
       await pages.doYouNeedToSendEvidenceToHelpYourClaimPage.completeDoYouNeedToSendEvidenceToHelpYourClaimPage(c.OPTION_NO); // different scenario
       await pages.doYouNeedToTellUsSomeoneOnYourClaimHasDiedPage.completeDoYouNeedToTellUsSomeoneOnYourClaimHasDiedPage(c.OPTION_NO);
-      await pages.doYouNeedToDoSomethingElsePage.completeDoYouNeedToDoSomethingElsePage(c.OPTION_NO);
-      break;
-    }
-    case "t3: no evidence or other request": {
-
+      await pages.doYouNeedToDoSomethingElsePage.completeDoYouNeedToDoSomethingElsePage(
+        scenario.toLowerCase() === "t3: no evidence or other request" ? c.OPTION_YES : c.OPTION_NO
+      );
       break;
     }
     default:
@@ -124,4 +124,16 @@ Then('I should see {string} error summary', async ({ pages }, expectedErrorMessa
     .split(/\r?\n/);    // handle all newline types
 
   expect(actualErrorArray).toEqual(expectedErrorArray);
+});
+
+Then('I should see {string} text displayed', async ({ pages }, expectedText: string) => {
+  await pages.contactUsByEmailPage.assertTextDisplayed(expectedText);
+});
+
+Then('I should see {string} link to {string}', async ({ pages }, linkText: string, expectedUrl: string) => {
+  await pages.contactUsByEmailPage.assertLinkDisplayed(linkText, expectedUrl);
+});
+
+Then('I should not see the continue button', async ({ pages }) => {
+  await expect(pages.basePage.continueButton).not.toBeVisible();
 });
