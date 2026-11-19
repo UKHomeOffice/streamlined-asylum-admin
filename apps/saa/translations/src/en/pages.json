@@ -294,9 +294,6 @@
   "problem-with-service": {
     "header": "Sorry, there is a problem with the service"
   },
-  "session-ended": {
-    "header": "Your session has ended"
-  },
   "form-saved": {
     "header": "Your form has been saved",
     "intro": "Your information will be saved for 7 days."

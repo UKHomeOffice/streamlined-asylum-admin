@@ -777,6 +777,7 @@ configureMultiSelectFollowUps(steps, multiSelectFollowUpsConfig);
 module.exports = {
   name: 'saa',
   baseUrl,
+  exitStep: '/session-ended',
   params: '/:action?/:id?/:edit?',
   fields: 'apps/saa/fields',
   views: 'apps/saa/views',
