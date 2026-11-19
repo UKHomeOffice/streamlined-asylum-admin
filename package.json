@@ -14,8 +14,11 @@
     "test": "NODE_ENV=test yarn test:unit && yarn test:lint",
     "test:unit": "jest",
     "test:lint": "eslint . --config ./node_modules/eslint-config-hof/default.js",
-    "test:e2e:generate": "bddgen",
-    "test:e2e": "yarn test:e2e:generate && playwright test",
+    "bddgen": "bddgen",
+    "test:e2e": "bddgen && playwright test",
+    "test:e2e:headed": "bddgen && playwright test --headed",
+    "test:e2e:debug": "bddgen && playwright test --debug",
+    "test:e2e:report": "playwright show-report",
     "build": "hof-build",
     "postinstall": "hof-build"
   },
@@ -36,6 +39,7 @@
     "ioredis": "^6.0.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "^1.65.1",
     "dotenv": "^18.0.10",
     "eslint": "^8.57.1",
