@@ -348,3 +348,8 @@ p.govuk-list-label--content + ul {
   box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
   text-decoration: none;
 }
+
+// Fix modal dialog button margin issue
+.modal-dialog .dialog-button {
+  margin-top: 0;
+}
