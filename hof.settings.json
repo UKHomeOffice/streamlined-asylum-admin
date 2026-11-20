@@ -7,5 +7,6 @@
   "session": {
     "name": "saa.hof.sid"
   },
+  "views": ["./apps/common/views"],
   "getAccessibility": false
 }

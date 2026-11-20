@@ -42,6 +42,9 @@ const steps = {
   },
   '/team-email-invalid': {
     backLink: 'email-address'
+  },
+  '/session-ended': {
+    clearSession: true
   }
 };
 const pages = {
@@ -54,6 +57,7 @@ if (disallowIndexing) {
 module.exports = {
   name: 'common',
   baseUrl: '/',
+  exitStep: '/session-ended',
   fields: 'apps/common/fields',
   translations: 'apps/common/translations',
   steps: steps,

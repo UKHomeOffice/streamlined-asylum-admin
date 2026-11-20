@@ -766,7 +766,9 @@ const steps = {
     backLink: 'something-else'
   },
   '/service-unavailable': {},
-  '/session-ended': {},
+  '/session-ended': {
+    clearSession: true
+  },
   '/form-saved': {
     clearSession: true,
     backLink: false
@@ -779,6 +781,7 @@ configureMultiSelectFollowUps(steps, multiSelectFollowUpsConfig);
 module.exports = {
   name: 'saa',
   baseUrl,
+  exitStep: '/session-ended',
   params: '/:action?/:id?/:edit?',
   fields: 'apps/saa/fields',
   views: 'apps/saa/views',
