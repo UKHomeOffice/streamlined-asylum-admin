@@ -72,7 +72,7 @@ Then('I should be on {string} page', async ({ pages }, expectedPageHeaderText: s
 });
 
 Then('the contact us by email page should pass accessibility and title checks', async ({ pages }) => {
-  await pages.contactUsByEmailPage.assertContactUsByEmailPage();
+  await pages.contactUsByEmailPage.assertAccessibilityAndPageTitleForContactUsByEmailPage();
 });
 
 

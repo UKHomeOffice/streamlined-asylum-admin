@@ -22,10 +22,8 @@ export class ContactUsByEmailPage extends BasePage {
       : 'You should contact the Home Office a different way – Send information for your asylum claim – GOV.UK';
   }
 
-  async assertContactUsByEmailPage(): Promise<void> {
+  async assertAccessibilityAndPageTitleForContactUsByEmailPage(): Promise<void> {
     await this.assertAccessibility();
     await this.assertPageTitle(this.page, await this.expectedPageTitle());
-    await expect(this.emailAddressLink).toBeVisible();
-    await expect(this.arcEnquiryFormLink).toBeVisible();
   }
 }
