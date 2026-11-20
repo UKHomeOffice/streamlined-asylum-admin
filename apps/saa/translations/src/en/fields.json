@@ -60,11 +60,7 @@
     }
   },
   "declaration-check": {
-    "options": {
-      "agree": {
-        "label": "I understand and agree with the above statements"
-      }
-    }
+    "label": "I understand and agree with the above statements"
   },
   "change-personal-details": {
     "legend": "Do you need to update personal details?",

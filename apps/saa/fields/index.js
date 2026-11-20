@@ -43,8 +43,7 @@ module.exports = {
     isPageHeading: true
   },
   'declaration-check': {
-    mixin: 'checkbox-group',
-    options: ['agree'],
+    mixin: 'checkbox',
     validate: ['required'],
     legend: { className: 'govuk-visually-hidden' }
   },
