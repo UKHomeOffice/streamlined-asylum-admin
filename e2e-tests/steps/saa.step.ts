@@ -69,10 +69,10 @@ When('I complete the supporting evidence journey pertaining to {string}', async 
 Then('I should be on {string} page', async ({ pages }, expectedPageHeaderText: string) => {
   const actualPageHeaderTextLocator = pages.basePage.headerText;
   await expect(actualPageHeaderTextLocator).toHaveText(expectedPageHeaderText);
+});
 
-  if (expectedPageHeaderText === 'You should contact the Home Office a different way') {
-    await pages.contactUsByEmailPage.assertContactUsByEmailPage();
-  }
+Then('the contact us by email page should pass accessibility and title checks', async ({ pages }) => {
+  await pages.contactUsByEmailPage.assertContactUsByEmailPage();
 });
 
 
