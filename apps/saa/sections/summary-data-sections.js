@@ -269,7 +269,20 @@ module.exports = {
       {
         step: '/provide-photo-identity',
         field: 'documents-update-contact',
-        parse: formatUploadedDocuments
+        dependsOn: 'change-personal-details',
+        parse: (documents, req) => {
+          const changes = [].concat(
+            req.sessionModel.get('changes-to-contact-details') || []
+          );
+
+          if (!changes.some(change =>
+            ['address', 'email-address', 'phone-number'].includes(change)
+          )) {
+            return null;
+          }
+
+          return formatUploadedDocuments(documents, req);
+        }
       }
     ]
   },
