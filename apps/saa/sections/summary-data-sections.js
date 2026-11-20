@@ -271,10 +271,10 @@ module.exports = {
         field: 'documents-update-contact',
         dependsOn: 'change-personal-details',
         parse: (documents, req) => {
-          const changes = [].concat(
-            req.sessionModel.get('changes-to-contact-details') || []
-          );
-
+          const selection = req.sessionModel.get('changes-to-contact-details');
+          const changes = typeof selection === 'string'
+            ? selection.split(',').map(change => change.trim()).filter(Boolean)
+            : [].concat(selection || []);
           if (!changes.some(change =>
             ['address', 'email-address', 'phone-number'].includes(change)
           )) {
