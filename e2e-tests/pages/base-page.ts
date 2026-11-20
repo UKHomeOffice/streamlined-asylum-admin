@@ -172,6 +172,12 @@ export class BasePage {
         return await page.getByRole('link', { name: linkText }).isVisible();
     }
 
+    async assertLinkDisplayed(text: string, url: string): Promise<void> {
+        const link = this.page.getByRole('link', { name: text, exact: true });
+        await expect(link).toBeVisible();
+        await expect(link).toHaveAttribute('href', url);
+    }
+
     async getUrlForLinkText(page: Page, linkText: string): Promise<string | null> {
         return await page.getByRole('link', { name: linkText }).getAttribute('href');
     }
