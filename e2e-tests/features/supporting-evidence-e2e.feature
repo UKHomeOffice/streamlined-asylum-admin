@@ -14,3 +14,10 @@ Feature: Supporting evidence end-to-end journeys
       | T3: No evidence or other request | You should contact the Home Office a different way |
       | T4: No other request             | You have not selected any options                  |
                            
+  Scenario: Validate the contact us by email page
+    Given I visit the streamlined asylum admin page
+    When I complete the supporting evidence journey pertaining to "T3: No evidence or other request"
+    Then I should be on "You should contact the Home Office a different way" page
+    And the contact us by email page should pass accessibility and title checks
+    And I should see "ahrocentralcommunicationshub@contactus.homeoffice.gov.uk" link to "mailto:ahrocentralcommunicationshub@contactus.homeoffice.gov.uk"
+    And I should see "ARC enquiry form" link to "https://www.gov.uk/government/publications/application-registration-card-arc-enquiry"
