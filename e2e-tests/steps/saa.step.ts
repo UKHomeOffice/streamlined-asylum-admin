@@ -38,7 +38,7 @@ When('I complete the supporting evidence journey pertaining to {string}', async 
       break;
     }
     case "t2: no evidence required":
-    case "t3: no evidence or other request":
+    case c.SCENARIO_T3_NO_EVIDENCE_OR_OTHER_REQUEST:
     case "t4: no other request": {
       await pages.whatYouNeedBeforeYouStartPage.completeWhatYouNeedBeforeYouStartPage();
       const applicationNumber = pages.aboutThePersonWhoMadeTheClaimPage.getGeneratedUniqueApplicationNumber();
@@ -57,7 +57,7 @@ When('I complete the supporting evidence journey pertaining to {string}', async 
       await pages.doYouNeedToSendEvidenceToHelpYourClaimPage.completeDoYouNeedToSendEvidenceToHelpYourClaimPage(c.OPTION_NO); // different scenario
       await pages.doYouNeedToTellUsSomeoneOnYourClaimHasDiedPage.completeDoYouNeedToTellUsSomeoneOnYourClaimHasDiedPage(c.OPTION_NO);
       await pages.doYouNeedToDoSomethingElsePage.completeDoYouNeedToDoSomethingElsePage(
-        scenario.toLowerCase() === "t3: no evidence or other request" ? c.OPTION_YES : c.OPTION_NO
+        scenario.toLowerCase() === c.SCENARIO_T3_NO_EVIDENCE_OR_OTHER_REQUEST ? c.OPTION_YES : c.OPTION_NO
       );
       break;
     }
@@ -69,6 +69,10 @@ When('I complete the supporting evidence journey pertaining to {string}', async 
 Then('I should be on {string} page', async ({ pages }, expectedPageHeaderText: string) => {
   const actualPageHeaderTextLocator = pages.basePage.headerText;
   await expect(actualPageHeaderTextLocator).toHaveText(expectedPageHeaderText);
+
+  if (expectedPageHeaderText === 'You should contact the Home Office a different way') {
+    await pages.contactUsByEmailPage.assertContactUsByEmailPage();
+  }
 });
 
 
@@ -126,14 +130,6 @@ Then('I should see {string} error summary', async ({ pages }, expectedErrorMessa
   expect(actualErrorArray).toEqual(expectedErrorArray);
 });
 
-Then('I should see {string} text displayed', async ({ pages }, expectedText: string) => {
-  await pages.contactUsByEmailPage.assertTextDisplayed(expectedText);
-});
-
 Then('I should see {string} link to {string}', async ({ pages }, linkText: string, expectedUrl: string) => {
-  await pages.contactUsByEmailPage.assertLinkDisplayed(linkText, expectedUrl);
-});
-
-Then('I should not see the continue button', async ({ pages }) => {
-  await expect(pages.basePage.continueButton).not.toBeVisible();
+  await pages.basePage.assertLinkDisplayed(linkText, expectedUrl);
 });
