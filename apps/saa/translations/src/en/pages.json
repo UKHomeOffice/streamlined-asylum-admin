@@ -356,6 +356,9 @@
       "phone-number": {
         "header": "Change your phone number"
       },
+      "provide-photo-identity": {
+        "header": "Provide a photo identity document"
+      },
       "add-or-remove-dependants": {
         "header": "Add or remove dependants"
       },
@@ -380,6 +383,9 @@
         "label": "Files uploaded"
       },
       "documents-nationality": {
+        "label": "Files uploaded"
+      },
+      "documents-update-contact": {
         "label": "Files uploaded"
       }
     }

@@ -11,7 +11,7 @@ const phoneNumberSummary = require('./summary-data-phone-number');
 const addressSummary = require('./summary-data-address');
 const nationalitySummary = require('./summary-data-nationality');
 const nameSummary = require('./summary-data-name');
-const { formatDate, formatUanForDisplay } = require('../../../utils');
+const { formatDate, formatUanForDisplay, formatUploadedDocuments } = require('../../../utils');
 
 // Same rows as /check-your-answers-evidence; Change goes back to that page.
 const evidenceRows = evidenceSummary.evidence.steps.map(row => ({
@@ -263,6 +263,15 @@ module.exports = {
   },
   'phone-number': {
     steps: phoneNumberRows
+  },
+  'provide-photo-identity': {
+    steps: [
+      {
+        step: '/provide-photo-identity',
+        field: 'documents-update-contact',
+        parse: formatUploadedDocuments
+      }
+    ]
   },
   'add-or-remove-dependants': {
     steps: [
