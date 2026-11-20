@@ -458,7 +458,7 @@ const steps = {
     next: '/do-you-need-add-remove-dependant'
   },
   '/provide-photo-identity': {
-    // provisional document category: documents-update-contact
+    ...documentUploadStep('documents-update-contact'),
     next: '/do-you-need-add-remove-dependant'
   },
   '/no-changes-made': {
