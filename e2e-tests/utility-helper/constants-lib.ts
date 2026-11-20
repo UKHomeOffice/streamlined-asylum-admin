@@ -3,6 +3,7 @@ export class ConstantsLib {
     static readonly DOB_1990 = '01/01/1990';
     static readonly OPTION_NO = 'No';
     static readonly OPTION_YES = 'Yes';
+    static readonly SCENARIO_T3_NO_EVIDENCE_OR_OTHER_REQUEST = 't3: no evidence or other request';
     static readonly GIVEN_NAME = 'GivenHof';
     static readonly FAMILY_NAME = 'Test Family';
     static readonly OPTION_ENGLISH = 'English';

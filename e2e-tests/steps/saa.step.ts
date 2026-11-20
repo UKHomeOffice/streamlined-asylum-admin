@@ -37,7 +37,9 @@ When('I complete the supporting evidence journey pertaining to {string}', async 
       await pages.violentOrUpsettingImagesPage.completeViolentOrUpsettingImagesPage(c.OPTION_NO);
       break;
     }
-    case "t2: no evidence required": {
+    case "t2: no evidence required":
+    case c.SCENARIO_T3_NO_EVIDENCE_OR_OTHER_REQUEST:
+    case "t4: no other request": {
       await pages.whatYouNeedBeforeYouStartPage.completeWhatYouNeedBeforeYouStartPage();
       const applicationNumber = pages.aboutThePersonWhoMadeTheClaimPage.getGeneratedUniqueApplicationNumber();
       await pages.aboutThePersonWhoMadeTheClaimPage.completeAboutThePersonWhoMadeTheClaimPage(applicationNumber, c.DOB_1990);
@@ -54,11 +56,9 @@ When('I complete the supporting evidence journey pertaining to {string}', async 
       await pages.doYouNeedToAddOrRemoveAChildOrPartnerAsADependantPage.completeDoYouNeedToAddOrRemoveAChildOrPartnerAsADependantPage(c.OPTION_NO);
       await pages.doYouNeedToSendEvidenceToHelpYourClaimPage.completeDoYouNeedToSendEvidenceToHelpYourClaimPage(c.OPTION_NO); // different scenario
       await pages.doYouNeedToTellUsSomeoneOnYourClaimHasDiedPage.completeDoYouNeedToTellUsSomeoneOnYourClaimHasDiedPage(c.OPTION_NO);
-      await pages.doYouNeedToDoSomethingElsePage.completeDoYouNeedToDoSomethingElsePage(c.OPTION_NO);
-      break;
-    }
-    case "t3: no evidence or other request": {
-
+      await pages.doYouNeedToDoSomethingElsePage.completeDoYouNeedToDoSomethingElsePage(
+        scenario.toLowerCase() === c.SCENARIO_T3_NO_EVIDENCE_OR_OTHER_REQUEST ? c.OPTION_YES : c.OPTION_NO
+      );
       break;
     }
     default:
@@ -69,6 +69,10 @@ When('I complete the supporting evidence journey pertaining to {string}', async 
 Then('I should be on {string} page', async ({ pages }, expectedPageHeaderText: string) => {
   const actualPageHeaderTextLocator = pages.basePage.headerText;
   await expect(actualPageHeaderTextLocator).toHaveText(expectedPageHeaderText);
+});
+
+Then('the contact us by email page should pass accessibility and title checks', async ({ pages }) => {
+  await pages.contactUsByEmailPage.assertAccessibilityAndPageTitleForContactUsByEmailPage();
 });
 
 
@@ -124,4 +128,8 @@ Then('I should see {string} error summary', async ({ pages }, expectedErrorMessa
     .split(/\r?\n/);    // handle all newline types
 
   expect(actualErrorArray).toEqual(expectedErrorArray);
+});
+
+Then('I should see {string} link to {string}', async ({ pages }, linkText: string, expectedUrl: string) => {
+  await pages.basePage.assertLinkDisplayed(linkText, expectedUrl);
 });

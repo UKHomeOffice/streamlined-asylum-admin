@@ -23,6 +23,7 @@ import { DoYouNeedToUpdatePersonalDetailsPage } from '../pages/saa-do-you-need-t
 import { DoYouNeedToAddOrRemoveAChildOrPartnerAsADependantPage } from '../pages/saa-do-you-need-to-add-or-remove-a-child-or-partner-as-a-dependant-page';
 import { DoYouNeedToTellUsSomeoneOnYourClaimHasDiedPage } from '../pages/saa-do-you-need-to-tell-us-someone-on-your-claim-has-died-page';
 import { DoYouNeedToDoSomethingElsePage } from '../pages/saa-do-you-need-to-do-something-else-page';
+import { ContactUsByEmailPage } from '../pages/saa-contact-us-by-email-page';
 import { DoYouNeedToTellUsSomeoneOnYourClaimHasDiedRadPage } from '../pages/saa-do-you-need-to-tell-us-someone-on-your-claim-has-died-rad-page';
 import { TellUsAboutThePersonWhoHasDiedPage } from '../pages/saa-tell-us-about-the-person-who-has-died-page';
 import { DidTheyMakeTheClaimPage } from '../pages/saa-did-they-make-the-claim-page';
@@ -64,6 +65,7 @@ export type Pages = {
   doYouNeedToAddOrRemoveAChildOrPartnerAsADependantPage: DoYouNeedToAddOrRemoveAChildOrPartnerAsADependantPage;
   doYouNeedToTellUsSomeoneOnYourClaimHasDiedPage: DoYouNeedToTellUsSomeoneOnYourClaimHasDiedPage;
   doYouNeedToDoSomethingElsePage: DoYouNeedToDoSomethingElsePage;
+  contactUsByEmailPage: ContactUsByEmailPage;
   youHaveNotSelectedAnyOptionsPage: YouHaveNotSelectedAnyOptionsPage;
 };
 
@@ -101,6 +103,7 @@ export const test = base.extend<{ pages: Pages }>({
       doYouNeedToAddOrRemoveAChildOrPartnerAsADependantPage: new DoYouNeedToAddOrRemoveAChildOrPartnerAsADependantPage(page),
       doYouNeedToTellUsSomeoneOnYourClaimHasDiedPage: new DoYouNeedToTellUsSomeoneOnYourClaimHasDiedPage(page),
       doYouNeedToDoSomethingElsePage: new DoYouNeedToDoSomethingElsePage(page),
+      contactUsByEmailPage: new ContactUsByEmailPage(page),
       youHaveNotSelectedAnyOptionsPage: new YouHaveNotSelectedAnyOptionsPage(page),
     });
   },

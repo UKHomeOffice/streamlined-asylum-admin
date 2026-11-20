@@ -19,3 +19,4 @@ Feature: Supporting evidence validations
     Then I should see "There is a problem" error message displayed
     And I should see "Select if there has been a decision on the claim" error summary
     When I complete the "Has there been a decision on the asylum claim?" page
+
