@@ -14,6 +14,9 @@
   "changes-to-contact-details": {
     "required": "Select what details you need to change"
   },
+  "declaration-check": {
+    "required": "Select if you agree to the statements"
+  },
   "change-personal-details": {
     "required": "Select if you need to update personal details"
   },

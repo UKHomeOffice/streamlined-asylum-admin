@@ -744,9 +744,11 @@ const steps = {
   },
   '/confirm': {
     behaviours: [Summary, SummaryLabels, EditRouteStart],
-    sections: require('./sections/summary-data-sections')
+    sections: require('./sections/summary-data-sections'),
+    next: '/declaration'
   },
   '/declaration': {
+    fields: ['declaration-check'],
     next: '/submitted'
   },
   '/submitted': {},
