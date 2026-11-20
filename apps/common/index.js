@@ -43,7 +43,9 @@ const steps = {
   '/team-email-invalid': {
     backLink: 'email-address'
   },
-  '/session-ended': {}
+  '/session-ended': {
+    clearSession: true
+  }
 };
 const pages = {
   '/accessibility': 'static/accessibility'

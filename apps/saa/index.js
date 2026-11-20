@@ -764,7 +764,9 @@ const steps = {
     backLink: 'something-else'
   },
   '/service-unavailable': {},
-  '/session-ended': {},
+  '/session-ended': {
+    clearSession: true
+  },
   '/form-saved': {
     clearSession: true,
     backLink: false
