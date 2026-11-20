@@ -140,7 +140,8 @@
     "captionHeading": "Update personal details"
   },
   "provide-photo-identity": {
-    "header": "Provide a photo identity document to update your contact details"
+    "header": "Provide a photo identity document to update your contact details",
+    "captionHeading": "Update personal details"
   },
   "change-uk-address": {
     "captionHeading": "Update personal details"
