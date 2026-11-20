@@ -42,6 +42,11 @@ module.exports = {
     validate: ['required'],
     isPageHeading: true
   },
+  'declaration-check': {
+    mixin: 'checkbox',
+    validate: ['required'],
+    legend: { className: 'govuk-visually-hidden' }
+  },
   'change-personal-details': {
     mixin: 'radio-group',
     options: ['yes', 'no'],
