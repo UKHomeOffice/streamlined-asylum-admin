@@ -13,6 +13,8 @@ Feature: Supporting evidence end-to-end journeys
       | T2: No evidence required         | You have not selected any options                  |
       | T3: No evidence or other request | You should contact the Home Office a different way |
       | T4: No other request             | You have not selected any options                  |
+      | T5: Add a child as a dependant   | Check your answers                                 |
+      | T6: Remove a child as a dependant | Check your answers                                |
                            
   Scenario: Validate the contact us by email page
     Given I visit the streamlined asylum admin page
