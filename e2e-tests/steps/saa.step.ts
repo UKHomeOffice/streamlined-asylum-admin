@@ -12,7 +12,7 @@ Given('I visit the streamlined asylum admin page', async ({ pages }) => {
 });
 
 
-When('I complete the supporting evidence journey pertaining to {string}', async ({ pages }, scenario: string) => {
+When('I complete the SAA journey pertaining to {string}', async ({ pages }, scenario: string) => {
   await pages.sendInformationForYourAsylumClaimPage.completecompleteSendInformationForYourAsylumClaimPage();
 
   switch (scenario.toLowerCase()) {
