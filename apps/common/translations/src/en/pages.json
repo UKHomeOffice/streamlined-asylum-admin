@@ -19,5 +19,8 @@
   },
   "check-your-email": {
     "header": "Check your email"
+  },
+  "session-ended": {
+    "header": "Your session has ended"
   }
 }
