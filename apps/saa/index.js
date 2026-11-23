@@ -180,7 +180,7 @@ const steps = {
   },
   '/someone-else-new-name-evidence': {
     ...documentUploadStep('documents-someone-else-new-name'),
-    template: 'upload-new-name-evidence',
+    template: 'upload-someone-else-new-name-evidence',
     next: '/check-your-answers-someone-else-name'
   },
   '/check-your-answers-someone-else-name': {
@@ -271,7 +271,7 @@ const steps = {
   },
   '/someone-else-new-date-of-birth-evidence': {
     ...documentUploadStep('documents-someone-else-new-dob'),
-    template: 'upload-dob-evidence',
+    template: 'upload-someone-else-dob-evidence',
     next: '/check-your-answers-someone-else-date-of-birth'
   },
   '/check-your-answers-someone-else-date-of-birth': {
