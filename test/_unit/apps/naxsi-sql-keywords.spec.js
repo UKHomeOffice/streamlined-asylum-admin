@@ -11,6 +11,10 @@ jest.mock(
   '../../../apps/saa/behaviours/check-email-token',
   () => superclass => superclass
 );
+jest.mock(
+  '../../../apps/saa/behaviours/send-submission-emails',
+  () => superclass => superclass
+);
 
 const commonApp = require('../../../apps/common');
 const saaApp = require('../../../apps/saa');
