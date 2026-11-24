@@ -13,4 +13,20 @@ export class TheirDateOfBirthPage extends BasePage {
       ? "Error: Their date of birth – Send information for your asylum claim – GOV.UK"
       : "Their date of birth – Send information for your asylum claim – GOV.UK";
   }
+
+  async completeChildPartnerDateOfBirthPage(dateOfBirth: string): Promise<void> {
+    await this.assertAccessibility();
+    await this.assertPageTitle(this.page, await this.expectedPageTitle());
+
+    await this.enterDateOrDob(dateOfBirth);
+    await this.clickContinueButton();
+  }
+
+  async submitDayOnlyForChildPartnerDateOfBirthPage(day: string): Promise<void> {
+    await this.assertAccessibility();
+    await this.assertPageTitle(this.page, await this.expectedPageTitle());
+
+    await this.page.getByLabel('Day').fill(day);
+    await this.clickContinueButton();
+  }
 }

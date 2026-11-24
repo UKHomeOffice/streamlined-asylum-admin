@@ -32,8 +32,18 @@ import { TheirDateOfBirthPage } from '../pages/saa-their-date-of-birth-page';
 import { TheirCountryOfNationalityPage } from '../pages/saa-their-country-of-nationality-page';
 import { UploadTheDeathCertificatePage } from '../pages/saa-upload-the-death-certificate-page';
 import { CheckYourAnswersDeathPage } from '../pages/saa-check-your-answers-death-page';
+import { AddRemoveChildPartnerPage } from '../pages/saa-add-remove-child-partner-page';
+import { RelationshipToChildPartnerPage } from '../pages/saa-relationship-to-child-partner-page';
+import { EvidenceChildPartnerPage } from '../pages/saa-evidence-child-partner-page';
+import { CheckYourAnswersAddChildPartnerPage } from '../pages/saa-check-your-answers-add-child-partner-page';
+import { ReasonForRemovingChildPartnerPage } from '../pages/saa-reason-for-removing-child-partner-page';
 
 export type Pages = {
+  addRemoveChildPartnerPage: AddRemoveChildPartnerPage;
+  relationshipToChildPartnerPage: RelationshipToChildPartnerPage;
+  evidenceChildPartnerPage: EvidenceChildPartnerPage;
+  checkYourAnswersAddChildPartnerPage: CheckYourAnswersAddChildPartnerPage;
+  reasonForRemovingChildPartnerPage: ReasonForRemovingChildPartnerPage;
   doYouNeedToTellUsSomeoneOnYourClaimHasDiedRadPage: DoYouNeedToTellUsSomeoneOnYourClaimHasDiedRadPage;
   tellUsAboutThePersonWhoHasDiedPage: TellUsAboutThePersonWhoHasDiedPage;
   didTheyMakeTheClaimPage: DidTheyMakeTheClaimPage;
@@ -72,6 +82,11 @@ export type Pages = {
 export const test = base.extend<{ pages: Pages }>({
   pages: async ({ page }, use) => {
     await use({
+      addRemoveChildPartnerPage: new AddRemoveChildPartnerPage(page),
+      relationshipToChildPartnerPage: new RelationshipToChildPartnerPage(page),
+      evidenceChildPartnerPage: new EvidenceChildPartnerPage(page),
+      checkYourAnswersAddChildPartnerPage: new CheckYourAnswersAddChildPartnerPage(page),
+      reasonForRemovingChildPartnerPage: new ReasonForRemovingChildPartnerPage(page),
       doYouNeedToTellUsSomeoneOnYourClaimHasDiedRadPage: new DoYouNeedToTellUsSomeoneOnYourClaimHasDiedRadPage(page),
       tellUsAboutThePersonWhoHasDiedPage: new TellUsAboutThePersonWhoHasDiedPage(page),
       didTheyMakeTheClaimPage: new DidTheyMakeTheClaimPage(page),

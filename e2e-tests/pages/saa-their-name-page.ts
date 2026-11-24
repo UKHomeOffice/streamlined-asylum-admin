@@ -13,4 +13,13 @@ export class TheirNamePage extends BasePage {
       ? "Error: Their name – Send information for your asylum claim – GOV.UK"
       : "Their name – Send information for your asylum claim – GOV.UK";
   }
+
+  async completeChildPartnerNamePage(givenName: string, familyName: string): Promise<void> {
+    await this.assertAccessibility();
+    await this.assertPageTitle(this.page, await this.expectedPageTitle());
+
+    await this.type(this.page.locator('#child-partner-given-name'), givenName);
+    await this.type(this.page.locator('#child-partner-family-name'), familyName);
+    await this.clickContinueButton();
+  }
 }

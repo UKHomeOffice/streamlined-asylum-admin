@@ -5,6 +5,7 @@ import { get } from 'node:http';
 
 export class AboutThePersonWhoMadeTheClaimPage extends BasePage {
   readonly uniqueApplicationNo: Locator;
+  private generatedUniqueApplicationNumber?: string;
 
   constructor(page: Page) {
     super(page);
@@ -20,10 +21,8 @@ export class AboutThePersonWhoMadeTheClaimPage extends BasePage {
   }
 
   getGeneratedUniqueApplicationNumber(): string {
-    if (!this.randomUniqueApplicationNumber()) {
-      throw new Error('The unique application number has not been generated.');
-    }
-    return this.randomUniqueApplicationNumber();
+    this.generatedUniqueApplicationNumber ??= this.randomUniqueApplicationNumber();
+    return this.generatedUniqueApplicationNumber;
   }
 
   async completeAboutThePersonWhoMadeTheClaimPage(uniqueApplicationNumber: string, dob: string): Promise<void> {
