@@ -59,6 +59,9 @@
       }
     }
   },
+  "declaration-check": {
+    "label": "I understand and agree with the above statements"
+  },
   "change-personal-details": {
     "legend": "Do you need to update personal details?",
     "hint": "For example, a new address, phone number, email address or name",

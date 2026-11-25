@@ -1,0 +1,10 @@
+{{<error}}
+    {{$pageTitle}}
+        {{#t}}errors.404.title{{/t}} &ndash; {{#t}}journey.serviceName{{/t}} &ndash; GOV.UK
+    {{/pageTitle}}
+    {{$content}}
+        <h1 class="govuk-heading-l">{{#t}}errors.404.title{{/t}}</h1>
+        {{#markdown}}page-not-found{{/markdown}}
+        <a href="/" class="govuk-button">{{#t}}buttons.go-to-start-page{{/t}}</a>
+    {{/content}}
+{{/error}}

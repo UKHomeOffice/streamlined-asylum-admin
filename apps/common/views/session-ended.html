@@ -1,0 +1,18 @@
+{{<layout}}
+    {{$journeyHeader}}
+        {{#t}}journey.header{{/t}}
+    {{/journeyHeader}}
+
+    {{$propositionHeader}}
+        {{> partials-navigation}}
+    {{/propositionHeader}}
+
+    {{$header}}
+        {{header}}
+    {{/header}}
+
+    {{$content}}
+        {{#markdown}}session-ended{{/markdown}}
+        {{>partials-button-start-again}}
+    {{/content}}
+{{/layout}}

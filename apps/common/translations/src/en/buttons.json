@@ -6,5 +6,7 @@
   "send-secure-link": "Send secure link",
   "enter-form": "Enter form",
   "resend-link": "Resend link",
-  "remove": "Remove"
+  "remove": "Remove",
+  "start-again": "Start again",
+  "go-to-start-page": "Go to start page"
 }

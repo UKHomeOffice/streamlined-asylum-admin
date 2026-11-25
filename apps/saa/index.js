@@ -180,7 +180,7 @@ const steps = {
   },
   '/someone-else-new-name-evidence': {
     ...documentUploadStep('documents-someone-else-new-name'),
-    template: 'upload-new-name-evidence',
+    template: 'upload-someone-else-new-name-evidence',
     next: '/check-your-answers-someone-else-name'
   },
   '/check-your-answers-someone-else-name': {
@@ -271,7 +271,7 @@ const steps = {
   },
   '/someone-else-new-date-of-birth-evidence': {
     ...documentUploadStep('documents-someone-else-new-dob'),
-    template: 'upload-dob-evidence',
+    template: 'upload-someone-else-dob-evidence',
     next: '/check-your-answers-someone-else-date-of-birth'
   },
   '/check-your-answers-someone-else-date-of-birth': {
@@ -744,9 +744,11 @@ const steps = {
   },
   '/confirm': {
     behaviours: [Summary, SummaryLabels, EditRouteStart],
-    sections: require('./sections/summary-data-sections')
+    sections: require('./sections/summary-data-sections'),
+    next: '/declaration'
   },
   '/declaration': {
+    fields: ['declaration-check'],
     next: '/submitted'
   },
   '/submitted': {},
@@ -764,7 +766,9 @@ const steps = {
     backLink: 'something-else'
   },
   '/service-unavailable': {},
-  '/session-ended': {},
+  '/session-ended': {
+    clearSession: true
+  },
   '/form-saved': {
     clearSession: true,
     backLink: false
@@ -777,6 +781,7 @@ configureMultiSelectFollowUps(steps, multiSelectFollowUpsConfig);
 module.exports = {
   name: 'saa',
   baseUrl,
+  exitStep: '/session-ended',
   params: '/:action?/:id?/:edit?',
   fields: 'apps/saa/fields',
   views: 'apps/saa/views',
