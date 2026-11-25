@@ -94,8 +94,11 @@ module.exports = {
   govukNotify: {
     notifyApiKey: process.env.NOTIFY_KEY,
     emailTemplates: {
-      userVerifyEmailTemplateId: process.env.USER_VERIFY_EMAIL_TEMPLATE_ID
-    }
+      userVerifyEmailTemplateId: process.env.USER_VERIFY_EMAIL_TEMPLATE_ID,
+      submissionConfirmationTemplateId:
+        process.env.APPLICATION_SUBMISSION_CONFIRMATION_TEMPLATE_ID
+    },
+    caseworkerEmail: process.env.CASEWORKER_EMAIL
   },
   saveService: {
     protocol: process.env.DATASERVICE_USE_HTTPS === 'false' ? 'http' : 'https',
