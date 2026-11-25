@@ -4,6 +4,10 @@ jest.mock(
   '../../../apps/saa/behaviours/check-email-token',
   () => superclass => superclass
 );
+jest.mock(
+  '../../../apps/saa/behaviours/send-submission-emails',
+  () => superclass => superclass
+);
 
 jest.mock(
   '../../../apps/common/behaviours/send-verification-email',
