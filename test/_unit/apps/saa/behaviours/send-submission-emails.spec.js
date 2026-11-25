@@ -179,6 +179,15 @@ describe('send submission emails behaviour', () => {
     expect(output).toContain('[birthcert.pdf](https://example.com/file2)');
   });
 
+  test('formatSummaryForEmail keeps dollar-sign sequences in file names literal', () => {
+    const output = formatSummaryForEmail(
+      [{ section: 'Evidence', fields: [{ label: 'Files uploaded', value: 'evidence-$&.pdf' }] }],
+      { documents: [{ name: 'evidence-$&.pdf', url: 'https://example.com/file1' }] }
+    );
+
+    expect(output).toContain('Files uploaded: [evidence-$&.pdf](https://example.com/file1)');
+  });
+
   test('sends caseworker email with links and user email without links', async () => {
     session['documents-new-name'] = [
       { name: 'passport.pdf', url: 'https://example.com/file1' }

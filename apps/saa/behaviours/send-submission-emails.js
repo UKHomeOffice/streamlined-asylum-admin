@@ -24,7 +24,7 @@ const replaceFileNamesWithLinks = (text, documents) => {
 
   let result = text;
   documents.forEach(({ name, url }) => {
-    result = result.replace(name, `[${name}](${url})`);
+    result = result.replace(name, () => `[${name}](${url})`);
   });
 
   return result;
