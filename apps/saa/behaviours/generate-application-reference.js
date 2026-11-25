@@ -7,10 +7,10 @@ const generateApplicationReference = superclass =>
     async generateReference() {
       const crs = await import('crypto-random-string');
       const suffix = crs.default({
-        length: 7,
+        length: 10,
         characters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
       });
-      return `COC${suffix}`;
+      return `COC-${suffix}`;
     }
 
     async successHandler(req, res, next) {

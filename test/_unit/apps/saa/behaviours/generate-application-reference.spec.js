@@ -66,7 +66,7 @@ describe('generate application reference behaviour', () => {
     };
     res = {};
     next = jest.fn();
-    controller.generateReference = jest.fn().mockResolvedValue('COC1234ABC');
+    controller.generateReference = jest.fn().mockResolvedValue('COC-1234ABCDEF');
     baseSuccessHandler.mockReset();
   });
 
@@ -79,7 +79,7 @@ describe('generate application reference behaviour', () => {
 
   test('stores the reference before continuing on successful submission', async () => {
     baseSuccessHandler.mockImplementation(() => {
-      expect(session.get('application-reference')).toBe('COC1234ABC');
+      expect(session.get('application-reference')).toBe('COC-1234ABCDEF');
     });
 
     await controller.successHandler(req, res, next);
@@ -93,7 +93,7 @@ describe('generate application reference behaviour', () => {
     await controller.successHandler(req, res, next);
     await controller.successHandler(req, res, next);
 
-    expect(session.get('application-reference')).toBe('COC1234ABC');
+    expect(session.get('application-reference')).toBe('COC-1234ABCDEF');
     expect(controller.generateReference).toHaveBeenCalledTimes(1);
     expect(baseSuccessHandler).toHaveBeenCalledTimes(2);
   });
@@ -131,13 +131,13 @@ describe('generate application reference behaviour', () => {
     const { controller: routeController, request } = declarationRequest({
       'declaration-check': 'true'
     });
-    jest.spyOn(routeController, 'generateReference').mockResolvedValue('COC1234ABC');
+    jest.spyOn(routeController, 'generateReference').mockResolvedValue('COC-1234ABCDEF');
 
     const location = await new Promise((resolve, reject) => {
       routeController.post(request, { locals: {}, redirect: resolve }, reject);
     });
 
-    expect(request.sessionModel.get('application-reference')).toBe('COC1234ABC');
+    expect(request.sessionModel.get('application-reference')).toBe('COC-1234ABCDEF');
     expect(location).toBe(`${app.baseUrl}/submitted`);
   });
 
@@ -159,7 +159,7 @@ describe('generate application reference behaviour', () => {
 
     expect(references).toHaveLength(50);
     references.forEach(reference => {
-      expect(reference).toMatch(/^COC[A-Z0-9]{7}$/);
+      expect(reference).toMatch(/^COC-[A-Z0-9]{10}$/);
     });
   });
 });

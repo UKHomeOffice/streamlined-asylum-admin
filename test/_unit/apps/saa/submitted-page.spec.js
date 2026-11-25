@@ -33,7 +33,7 @@ describe('submitted page', () => {
     const controller = new Composed(options);
     const req = {
       form: {},
-      sessionModel: new Model({ 'application-reference': 'COC1234ABC' })
+      sessionModel: new Model({ 'application-reference': 'COC-1234ABCDEF' })
     };
 
     controller._getValues(req, {}, error => {
@@ -41,7 +41,7 @@ describe('submitted page', () => {
         expect(error).toBeNull();
         const html = render(req.form.values);
         expect(html).toContain('class="govuk-panel govuk-panel--confirmation"');
-        expect(html).toContain('<strong>COC1234ABC</strong>');
+        expect(html).toContain('<strong>COC-1234ABCDEF</strong>');
         expect(html).toContain('Your information has been submitted');
         expect(html).toContain('What happens next');
         expect(html).toContain(
