@@ -18,7 +18,7 @@ const SUBMITTED_INFORMATION_TYPES = [
   { field: 'someone-on-claim-died', label: 'Tell us someone has died (Webform-RAD101)' }
 ];
 
-// TODO: replace with the real reference once submissions generate one.
+// Temporary placeholder until the real reference number implementation is completed.
 const PLACEHOLDER_SUBMISSION_REF = 'HDJ2123FTW';
 
 const REQUEST_METHODS = Object.freeze({

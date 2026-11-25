@@ -38,7 +38,7 @@ const replaceFileNamesWithLinks = (text, documents) => {
  */
 const formatField = (field, documents) => {
   const { label, value } = field;
-  const text = [].concat(value).join('\n');
+  const text = [value].flat().join('\n');
   const formattedText = documents
     ? replaceFileNamesWithLinks(text, documents)
     : text;
@@ -80,7 +80,9 @@ const formatSummaryForEmail = (rows, options = {}) => {
         const firstAggregatorIndex = aggregatorTitles[0].index;
         for (let i = 0; i < firstAggregatorIndex; i++) {
           const field = fields[i];
-          if (shouldOmitField(field)) continue;
+          if (shouldOmitField(field)) {
+            continue;
+          }
           lines.push('', ...formatField(field, documents));
         }
 
@@ -95,7 +97,9 @@ const formatSummaryForEmail = (rows, options = {}) => {
 
           for (let i = startIndex + 1; i < endIndex; i++) {
             const field = fields[i];
-            if (shouldOmitField(field)) continue;
+            if (shouldOmitField(field)) {
+              continue;
+            }
             lines.push('', ...formatField(field, documents));
           }
         });
@@ -105,7 +109,9 @@ const formatSummaryForEmail = (rows, options = {}) => {
 
       // Non-aggregated section formatting
       fields.forEach(field => {
-        if (shouldOmitField(field)) return;
+        if (shouldOmitField(field)) {
+          return;
+        }
         if (field.isAggregatorTitle) {
           lines.push('', field.value);
           return;
@@ -170,26 +176,13 @@ const getAllDocuments = sessionModel => {
   });
 
   // Collect documents from aggregated items
-  aggregators.forEach(aggregatorKey => {
-    const aggregatorData = sessionModel.get(aggregatorKey);
-    if (aggregatorData?.aggregatedValues?.length) {
-      aggregatorData.aggregatedValues.forEach(item => {
-        if (item?.fields?.length) {
-          item.fields.forEach(field => {
-            if (Array.isArray(field.value)) {
-              field.value.forEach(doc => {
-                if (doc?.name && doc?.url) {
-                  allDocuments.push(doc);
-                }
-              });
-            }
-          });
-        }
-      });
-    }
-  });
+  const aggregatedDocuments = aggregators
+    .flatMap(aggregatorKey => sessionModel.get(aggregatorKey)?.aggregatedValues ?? [])
+    .flatMap(item => item?.fields ?? [])
+    .flatMap(field => (Array.isArray(field.value) ? field.value : []))
+    .filter(doc => doc?.name && doc?.url);
 
-  return allDocuments;
+  return [...allDocuments, ...aggregatedDocuments];
 };
 
 // Requires Summary and SummaryLabels earlier in the step's behaviours to build the /confirm rows.
