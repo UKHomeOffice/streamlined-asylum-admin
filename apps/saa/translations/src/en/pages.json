@@ -172,6 +172,9 @@
   "declaration": {
     "header": "Declaration"
   },
+  "submitted": {
+    "title": "Your information has been submitted"
+  },
   "helper-details": {
     "header": "Your details"
   },

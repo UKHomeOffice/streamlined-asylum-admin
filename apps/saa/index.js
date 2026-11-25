@@ -22,6 +22,7 @@ const ResetSectionSummary = require('./behaviours/reset-section-summary');
 const ResumeFormSession = require('./behaviours/resume-form-session');
 const SaveFormSession = require('./behaviours/save-form-session');
 const InformationGiven = require('./behaviours/information-given');
+const GenerateApplicationReference = require('./behaviours/generate-application-reference');
 
 const documentUploadStep = category => ({
   behaviours: [SaveDocument(category, 'file-upload'), RemoveDocument(category)],
@@ -748,6 +749,7 @@ const steps = {
     next: '/declaration'
   },
   '/declaration': {
+    behaviours: [GenerateApplicationReference],
     fields: ['declaration-check'],
     next: '/submitted'
   },
