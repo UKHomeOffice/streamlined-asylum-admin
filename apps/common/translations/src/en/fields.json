@@ -1,7 +1,7 @@
 {
   "claimant-unique-application-number": {
     "label": "Unique application number (UAN)",
-    "hint": "This is a 16 digit number that is unique to your claim. It will be on any letters sent to you from the Home Office. For example, 1234-5678-9101-1121"
+    "hint": "This is a 16 digit number that is on your letters from the Home office, for example 1234-5678-1234-5678"
   },
   "claimant-date-of-birth": {
     "legend": "Date of birth",
