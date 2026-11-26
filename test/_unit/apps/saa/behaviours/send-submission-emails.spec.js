@@ -99,6 +99,7 @@ describe('send submission emails behaviour', () => {
       'person@example.com',
       { ...common, show_information_types: 'no', information_types: '' }
     );
+    expect(req.sessionModel.get.mock.calls.filter(([key]) => key === 'application-reference')).toHaveLength(1);
     expect(next).toHaveBeenCalledWith();
   });
 

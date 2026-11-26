@@ -146,6 +146,20 @@ describe('submission reference', () => {
     expect(request.sessionModel.get('application-reference')).toBeUndefined();
   });
 
+  test('does not store a reference or send emails when generation returns no value', async () => {
+    const { controller: routeController, request } = declarationRequest({
+      'declaration-check': 'true'
+    });
+    generateApplicationReference.mockResolvedValue('');
+
+    await expect(new Promise((resolve, reject) => {
+      routeController.post(request, { locals: {}, redirect: resolve }, reject);
+    })).rejects.toThrow('Submission reference is missing');
+
+    expect(notifyClient.sendEmail).not.toHaveBeenCalled();
+    expect(request.sessionModel.get('application-reference')).toBeUndefined();
+  });
+
   test('uses an existing reference without regenerating it', async () => {
     const { controller: routeController, request } = declarationRequest({
       'declaration-check': 'true'

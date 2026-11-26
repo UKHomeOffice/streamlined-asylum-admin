@@ -189,24 +189,25 @@ const sendSubmissionEmails = superclass =>
     /**
      * Builds email personalisation data for GOV.UK Notify template.
      * @param {Object} req - Express request object (must contain sessionModel)
+     * @param {string} referenceNumber - Submission reference.
      * @param {boolean} [forCaseworker=false] - If true, includes document links; if false, plain file names only
      * @returns {Object} Personalisation object with submission_ref, claimant_full_name, and submission_summary
      * @returns {string} returns.submission_ref - Generated submission reference from the session
      * @returns {string} returns.claimant_full_name - Full name of the claimant from session
      * @returns {string} returns.submission_summary - Formatted markdown email body with form data
      */
-    getEmailPersonalisation(req, forCaseworker = false) {
+    getEmailPersonalisation(req, referenceNumber, forCaseworker = false) {
       const rows = this.getRowsForSummarySections(req);
       const documents = forCaseworker ? getAllDocuments(req.sessionModel) : undefined;
 
       return {
-        submission_ref: req.sessionModel.get(APPLICATION_REFERENCE_FIELD),
+        submission_ref: referenceNumber,
         claimant_full_name: getClaimantFullName(req.sessionModel),
         submission_summary: formatSummaryForEmail(rows, { documents })
       };
     }
 
-    async sendSubmissionEmails(req) {
+    async sendSubmissionEmails(req, referenceNumber) {
       const templateId = govukNotify.emailTemplates.submissionConfirmationTemplateId;
       const userEmail = normaliseEmail(req.sessionModel.get('user-email'));
       const caseworkerEmail = normaliseEmail(govukNotify.caseworkerEmail);
@@ -215,13 +216,13 @@ const sendSubmissionEmails = superclass =>
         throw new Error('Submission email template, user email or caseworker email is missing');
       }
 
-      if (!req.sessionModel.get(APPLICATION_REFERENCE_FIELD)) {
+      if (!referenceNumber) {
         throw new Error('Submission reference is missing');
       }
 
       const informationTypes = getSubmittedInformationTypes(req.sessionModel);
-      const caseworkerPersonalisation = this.getEmailPersonalisation(req, true);
-      const userPersonalisation = this.getEmailPersonalisation(req, false);
+      const caseworkerPersonalisation = this.getEmailPersonalisation(req, referenceNumber, true);
+      const userPersonalisation = this.getEmailPersonalisation(req, referenceNumber, false);
 
       await notifyClient.sendEmail(templateId, caseworkerEmail, {
         ...caseworkerPersonalisation,
@@ -244,10 +245,15 @@ const sendSubmissionEmails = superclass =>
           return next(err);
         }
         try {
-          if (!req.sessionModel.get(APPLICATION_REFERENCE_FIELD)) {
-            req.sessionModel.set(APPLICATION_REFERENCE_FIELD, await generateApplicationReference());
+          const existingReference = req.sessionModel.get(APPLICATION_REFERENCE_FIELD);
+          const referenceNumber = existingReference || await generateApplicationReference();
+          if (!referenceNumber) {
+            throw new Error('Submission reference is missing');
           }
-          await this.sendSubmissionEmails(req);
+          if (!existingReference) {
+            req.sessionModel.set(APPLICATION_REFERENCE_FIELD, referenceNumber);
+          }
+          await this.sendSubmissionEmails(req, referenceNumber);
           return next();
         } catch (error) {
           const errorMessage =
