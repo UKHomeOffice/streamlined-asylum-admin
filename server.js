@@ -3,7 +3,7 @@
 const hof = require('hof');
 const config = require('./config.js');
 const busboy = require('busboy');
-const bl = require('bl');
+const { buffer } = require('node:stream/consumers');
 const logger = require('hof/lib/logger')({ env: config.env });
 const { sanitiseFilename } = require('./utils');
 
@@ -29,6 +29,8 @@ app.use((req, res, next) => {
 
   req.files = req.files || {};
   req.body = req.body || {};
+  const pendingFiles = [];
+  let fileError;
 
   const bb = busboy({
     headers: req.headers,
@@ -53,24 +55,23 @@ app.use((req, res, next) => {
       return;
     }
 
-    file.pipe(
-      bl((err, data) => {
-        if (err) {
+    pendingFiles.push(
+      buffer(file)
+        .then(data => {
+          req.files[key] = {
+            data: file.truncated ? null : data,
+            name: fileInfo.filename || null,
+            encoding: fileInfo.encoding,
+            mimetype: fileInfo.mimeType,
+            truncated: file.truncated,
+            size: Buffer.byteLength(data, 'binary')
+          };
+        })
+        .catch(err => {
           const errorMessage = `Failed to process file during streaming operation: ${err}`;
           logger.error(errorMessage);
-          next(new Error(errorMessage));
-          return;
-        }
-
-        req.files[key] = {
-          data: file.truncated ? null : data,
-          name: fileInfo.filename || null,
-          encoding: fileInfo.encoding,
-          mimetype: fileInfo.mimeType,
-          truncated: file.truncated,
-          size: Buffer.byteLength(data, 'binary')
-        };
-      })
+          fileError = fileError || new Error(errorMessage);
+        })
     );
   });
 
@@ -81,7 +82,8 @@ app.use((req, res, next) => {
   });
 
   bb.on('finish', () => {
-    next();
+    // buffer() resolves asynchronously, so wait for every file before continuing
+    Promise.all(pendingFiles).then(() => next(fileError));
   });
 
   req.pipe(bb);
