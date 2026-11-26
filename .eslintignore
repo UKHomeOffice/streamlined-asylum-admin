@@ -5,6 +5,8 @@ LICENSE
 README.md
 CONTRIBUTING.md
 coverage
+allure-report
+.features-gen
 e2e-tests
 playwright-report
 bin/*
