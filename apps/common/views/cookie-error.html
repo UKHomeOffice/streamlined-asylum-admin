@@ -1,0 +1,12 @@
+{{<error}}
+    {{$header}}
+        {{content.title}}
+    {{/header}}
+    {{$content}}
+        <p>{{{content.message}}}</p>
+        <a href="" class="govuk-button">{{#t}}buttons.try-again{{/t}}</a>
+        {{#showStack}}
+            <pre>{{error.stack}}</pre>
+        {{/showStack}}
+    {{/content}}
+{{/error}}

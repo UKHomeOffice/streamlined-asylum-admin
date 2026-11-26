@@ -52,6 +52,7 @@ describe('typeahead initialization', () => {
     const handlers = {};
     global.document = {
       querySelectorAll: jest.fn().mockReturnValue([firstSelect, secondSelect]),
+      getElementById: jest.fn().mockReturnValue(null),
       addEventListener: jest.fn((event, handler) => {
         handlers[event] = handler;
       })

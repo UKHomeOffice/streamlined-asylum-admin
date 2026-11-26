@@ -1,0 +1,22 @@
+{{<layout}}
+    {{$journeyHeader}}
+        {{#t}}journey.header{{/t}}
+    {{/journeyHeader}}
+    {{$propositionHeader}}
+        {{> partials-navigation}}
+    {{/propositionHeader}}
+    {{$header}}
+        {{#t}}pages.problem-with-service.header{{/t}}
+    {{/header}}
+    {{$content}}
+        <h1 class="govuk-heading-l">{{#t}}pages.problem-with-service.header{{/t}}</h1>
+        {{#markdown}}error{{/markdown}}
+        <div class="govuk-button-group">
+            <button type="button" class="govuk-button" id="error-back-button" hidden>{{#t}}buttons.back{{/t}}</button>
+            {{>partials-button-start-again}}
+        </div>
+        {{#showStack}}
+            <pre>{{error.stack}}</pre>
+        {{/showStack}}
+    {{/content}}
+{{/layout}}
