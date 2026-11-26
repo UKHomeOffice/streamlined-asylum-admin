@@ -2,10 +2,7 @@
 
 const Notify = require('hof/components/notify/notify');
 const { normaliseEmail, getNotifyErrorMessage } = require('../../../utils');
-const {
-  SUBMITTED_INFORMATION_TYPES,
-  PLACEHOLDER_SUBMISSION_REF
-} = require('../../../utils/constants');
+const { SUBMITTED_INFORMATION_TYPES } = require('../../../utils/constants');
 const { govukNotify, env } = require('../../../config');
 const logger = require('hof/lib/logger')({ env });
 
@@ -193,7 +190,7 @@ const sendSubmissionEmails = superclass =>
      * @param {Object} req - Express request object (must contain sessionModel)
      * @param {boolean} [forCaseworker=false] - If true, includes document links; if false, plain file names only
      * @returns {Object} Personalisation object with submission_ref, claimant_full_name, and submission_summary
-     * @returns {string} returns.submission_ref - Placeholder submission reference number
+     * @returns {string} returns.submission_ref - Generated submission reference from the session
      * @returns {string} returns.claimant_full_name - Full name of the claimant from session
      * @returns {string} returns.submission_summary - Formatted markdown email body with form data
      */
@@ -202,7 +199,7 @@ const sendSubmissionEmails = superclass =>
       const documents = forCaseworker ? getAllDocuments(req.sessionModel) : undefined;
 
       return {
-        submission_ref: PLACEHOLDER_SUBMISSION_REF,
+        submission_ref: req.sessionModel.get('application-reference'),
         claimant_full_name: getClaimantFullName(req.sessionModel),
         submission_summary: formatSummaryForEmail(rows, { documents })
       };
@@ -215,6 +212,10 @@ const sendSubmissionEmails = superclass =>
 
       if (!templateId || !userEmail || !caseworkerEmail) {
         throw new Error('Submission email template, user email or caseworker email is missing');
+      }
+
+      if (!req.sessionModel.get('application-reference')) {
+        throw new Error('Submission reference is missing');
       }
 
       const informationTypes = getSubmittedInformationTypes(req.sessionModel);

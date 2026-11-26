@@ -5,6 +5,11 @@ jest.mock(
   () => superclass => superclass
 );
 
+jest.mock(
+  '../../../../apps/saa/behaviours/send-submission-emails',
+  () => superclass => superclass
+);
+
 const fs = require('node:fs');
 const path = require('node:path');
 const Hogan = require('hogan.js');

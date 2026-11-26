@@ -13,7 +13,7 @@ const generateApplicationReference = superclass =>
       return `COC-${suffix}`;
     }
 
-    async successHandler(req, res, next) {
+    async saveValues(req, res, next) {
       try {
         if (!req.sessionModel.get(REFERENCE_FIELD)) {
           req.sessionModel.set(REFERENCE_FIELD, await this.generateReference());
@@ -22,7 +22,7 @@ const generateApplicationReference = superclass =>
         return next(error);
       }
 
-      return super.successHandler(req, res, next);
+      return super.saveValues(req, res, next);
     }
   };
 

@@ -55,6 +55,7 @@ describe('send submission emails behaviour', () => {
     behaviour = new Behaviour();
     next = jest.fn();
     session = {
+      'application-reference': 'COC-HV12YT3344',
       'user-email': 'Person@Example.com',
       'claimants-given-name': 'Jane',
       'claimants-family-name': 'Doe',
@@ -75,7 +76,7 @@ describe('send submission emails behaviour', () => {
     await behaviour.saveValues(req, {}, next);
 
     const common = {
-      submission_ref: 'HDJ2123FTW',
+      submission_ref: 'COC-HV12YT3344',
       claimant_full_name: 'Jane Doe',
       submission_summary: '## Your details\n\nEmail: person@example.com'
     };
@@ -118,6 +119,16 @@ describe('send submission emails behaviour', () => {
 
     expect(notifyClient.sendEmail).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledWith(expect.any(Error));
+  });
+
+  test('does not send emails when the submission reference is missing', async () => {
+    delete session['application-reference'];
+
+    await behaviour.saveValues(req, {}, next);
+
+    expect(notifyClient.sendEmail).not.toHaveBeenCalled();
+    expect(log.error).toHaveBeenCalledWith('Submission email flow failed: Submission reference is missing');
+    expect(next).toHaveBeenCalledWith(new Error('Submission reference is missing'));
   });
 
   test('logs and propagates Notify errors without emailing the user', async () => {

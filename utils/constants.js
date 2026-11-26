@@ -18,9 +18,6 @@ const SUBMITTED_INFORMATION_TYPES = [
   { field: 'someone-on-claim-died', label: 'Tell us someone has died (Webform-RAD101)' }
 ];
 
-// Temporary placeholder until the real reference number implementation is completed.
-const PLACEHOLDER_SUBMISSION_REF = 'HDJ2123FTW';
-
 const REQUEST_METHODS = Object.freeze({
   GET: 'GET',
   POST: 'POST',
@@ -32,7 +29,6 @@ module.exports = {
   SAA_BASE_URL,
   SECTION_FIELDS,
   SUBMITTED_INFORMATION_TYPES,
-  PLACEHOLDER_SUBMISSION_REF,
   REQUEST_METHODS,
   CHANGE_EDIT_DELETE_REGEX
 };
