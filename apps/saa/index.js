@@ -754,7 +754,10 @@ const steps = {
     fields: ['declaration-check'],
     next: '/submitted'
   },
-  '/submitted': {},
+  '/submitted': {
+    backLink: false,
+    clearSession: true
+  },
   '/something-else': {
     behaviours: [somethingElseFork],
     fields: ['something-else'],
