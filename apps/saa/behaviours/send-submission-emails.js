@@ -2,6 +2,7 @@
 
 const Notify = require('hof/components/notify/notify');
 const { normaliseEmail, getNotifyErrorMessage } = require('../../../utils');
+const generateApplicationReference = require('../../../utils/generate-application-reference');
 const { SUBMITTED_INFORMATION_TYPES } = require('../../../utils/constants');
 const { govukNotify, env } = require('../../../config');
 const logger = require('hof/lib/logger')({ env });
@@ -243,6 +244,9 @@ const sendSubmissionEmails = superclass =>
           return next(err);
         }
         try {
+          if (!req.sessionModel.get('application-reference')) {
+            req.sessionModel.set('application-reference', await generateApplicationReference());
+          }
           await this.sendSubmissionEmails(req);
           return next();
         } catch (error) {

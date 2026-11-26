@@ -124,11 +124,9 @@ describe('send submission emails behaviour', () => {
   test('does not send emails when the submission reference is missing', async () => {
     delete session['application-reference'];
 
-    await behaviour.saveValues(req, {}, next);
+    await expect(behaviour.sendSubmissionEmails(req)).rejects.toThrow('Submission reference is missing');
 
     expect(notifyClient.sendEmail).not.toHaveBeenCalled();
-    expect(log.error).toHaveBeenCalledWith('Submission email flow failed: Submission reference is missing');
-    expect(next).toHaveBeenCalledWith(new Error('Submission reference is missing'));
   });
 
   test('logs and propagates Notify errors without emailing the user', async () => {
