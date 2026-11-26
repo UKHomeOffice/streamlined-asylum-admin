@@ -2,6 +2,7 @@ const NO_DIGITS_REGEX = /^\D*$/;
 const CHANGE_EDIT_DELETE_REGEX = /\/(change|edit|delete)(?:\/|$)/;
 
 const SAA_BASE_URL = '/changes';
+const APPLICATION_REFERENCE_FIELD = 'application-reference';
 
 // yes/no fields on SAA pages that start a follow-up journey.
 const SECTION_FIELDS = [
@@ -27,6 +28,7 @@ const REQUEST_METHODS = Object.freeze({
 module.exports = {
   NO_DIGITS_REGEX,
   SAA_BASE_URL,
+  APPLICATION_REFERENCE_FIELD,
   SECTION_FIELDS,
   SUBMITTED_INFORMATION_TYPES,
   REQUEST_METHODS,

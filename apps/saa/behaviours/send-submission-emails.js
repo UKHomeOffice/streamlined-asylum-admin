@@ -3,7 +3,7 @@
 const Notify = require('hof/components/notify/notify');
 const { normaliseEmail, getNotifyErrorMessage } = require('../../../utils');
 const generateApplicationReference = require('../../../utils/generate-application-reference');
-const { SUBMITTED_INFORMATION_TYPES } = require('../../../utils/constants');
+const { SUBMITTED_INFORMATION_TYPES, APPLICATION_REFERENCE_FIELD } = require('../../../utils/constants');
 const { govukNotify, env } = require('../../../config');
 const logger = require('hof/lib/logger')({ env });
 
@@ -200,7 +200,7 @@ const sendSubmissionEmails = superclass =>
       const documents = forCaseworker ? getAllDocuments(req.sessionModel) : undefined;
 
       return {
-        submission_ref: req.sessionModel.get('application-reference'),
+        submission_ref: req.sessionModel.get(APPLICATION_REFERENCE_FIELD),
         claimant_full_name: getClaimantFullName(req.sessionModel),
         submission_summary: formatSummaryForEmail(rows, { documents })
       };
@@ -215,7 +215,7 @@ const sendSubmissionEmails = superclass =>
         throw new Error('Submission email template, user email or caseworker email is missing');
       }
 
-      if (!req.sessionModel.get('application-reference')) {
+      if (!req.sessionModel.get(APPLICATION_REFERENCE_FIELD)) {
         throw new Error('Submission reference is missing');
       }
 
@@ -244,8 +244,8 @@ const sendSubmissionEmails = superclass =>
           return next(err);
         }
         try {
-          if (!req.sessionModel.get('application-reference')) {
-            req.sessionModel.set('application-reference', await generateApplicationReference());
+          if (!req.sessionModel.get(APPLICATION_REFERENCE_FIELD)) {
+            req.sessionModel.set(APPLICATION_REFERENCE_FIELD, await generateApplicationReference());
           }
           await this.sendSubmissionEmails(req);
           return next();
