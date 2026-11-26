@@ -94,3 +94,42 @@ Feature: Supporting evidence validations
     Then I should see "There is a problem" error message displayed
     And I should see "Select their country of nationality" error summary
 
+# Reporting a death scenario validations
+  Scenario: Validate required answers when reporting a death
+    Given I visit the streamlined asylum admin page
+    When I choose to navigate to "About the person who made the claim" page
+    And I complete the "About the person who made the claim" page
+    And I select continue
+    And I complete the "Has there been a decision on the asylum claim?" page
+    And I complete the "What is your email address?" page
+    And I complete the "Continue to your form" page
+    And I complete the "Which form do you need to continue?" page
+    And I complete the "Information you have given us" page
+    And I complete the "Claimant's name" page with "TEST" and "FamilyName"
+    And I complete the "Claimant's main language" page
+    And I complete the "Are you completing the form for you or someone else?" page
+    And I complete the "Who are you?" page
+    And I complete the "Do you need to update personal details?" page
+    And I choose not to add or remove a dependant
+    And I complete the "Do you need to send evidence to help your claim?" page
+    And I select continue
+    Then I should see "There is a problem" error message displayed
+    And I should see "Tell us if someone on your claim has died" error summary
+    When I complete the "Do you need to tell us someone on your claim has died?" page
+    And I complete the "Tell us about the person who has died" page
+    And I select continue
+    Then I should see "There is a problem" error message displayed
+    And I should see "Select if they made the claim" error summary
+    When I complete the "Did they make the claim?" page
+    And I complete the "Person who died's name" page with "" and ""
+    Then I should see "There is a problem" error message displayed
+    And I should see "Enter their given name¬Enter their family name" error summary
+    When I complete the "Person who died's name" page with "GivenHof" and "Test Family"
+    And I select continue
+    Then I should see "There is a problem" error message displayed
+    And I should see "Enter their date of birth" error summary
+    When I complete the "Person who died's date of birth" page
+    And I select continue
+    Then I should see "There is a problem" error message displayed
+    And I should see "Select a country of nationality" error summary
+

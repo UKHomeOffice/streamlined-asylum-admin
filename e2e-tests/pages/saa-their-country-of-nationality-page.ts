@@ -23,4 +23,14 @@ export class TheirCountryOfNationalityPage extends BasePage {
     await this.page.getByRole('option', { name: nationality, exact: true }).click();
     await this.clickContinueButton();
   }
+
+  async completePersonWhoDiedNationalityPage(nationality: string): Promise<void> {
+    await this.assertAccessibility();
+    await this.assertPageTitle(this.page, await this.expectedPageTitle());
+
+    const nationalityInput = this.page.getByRole('combobox', { name: 'Country of nationality' });
+    await nationalityInput.fill(nationality);
+    await this.page.getByRole('option', { name: nationality, exact: true }).click();
+    await this.clickContinueButton();
+  }
 }
