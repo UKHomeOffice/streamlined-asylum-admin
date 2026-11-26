@@ -1,4 +1,4 @@
-Feature: Supporting evidence end-to-end journeys
+Feature: SAA end-to-end journeys
 	As a user completing an asylum support application
 	I want to provide and review evidence for my claim
 	So that I can submit relevant information to support my application
@@ -15,6 +15,7 @@ Feature: Supporting evidence end-to-end journeys
       | T4: No other request             | You have not selected any options                  |
       | T5: Add a child as a dependant   | Check your answers                                 |
       | T6: Remove a child as a dependant | Check your answers                                |
+      | T7: Report a death                | Check your answers                                 |
                            
   Scenario: Validate the contact us by email page
     Given I visit the streamlined asylum admin page

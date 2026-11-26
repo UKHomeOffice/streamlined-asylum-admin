@@ -65,7 +65,9 @@ When('I complete the SAA journey pertaining to {string}', async ({ pages }, scen
     }
     case "t2: no evidence required":
     case c.SCENARIO_T3_NO_EVIDENCE_OR_OTHER_REQUEST:
-    case "t4: no other request": {
+    case "t4: no other request":
+    case "t7: report a death": {
+      const isReportDeath = scenario.toLowerCase() === "t7: report a death";
       await pages.whatYouNeedBeforeYouStartPage.completeWhatYouNeedBeforeYouStartPage();
       const applicationNumber = pages.aboutThePersonWhoMadeTheClaimPage.getGeneratedUniqueApplicationNumber();
       await pages.aboutThePersonWhoMadeTheClaimPage.completeAboutThePersonWhoMadeTheClaimPage(applicationNumber, c.DOB_1990);
@@ -81,6 +83,16 @@ When('I complete the SAA journey pertaining to {string}', async ({ pages }, scen
       await pages.doYouNeedToUpdatePersonalDetailsPage.completeDoYouNeedToUpdatePersonalDetailsPage(c.OPTION_NO);
       await pages.doYouNeedToAddOrRemoveAChildOrPartnerAsADependantPage.completeDoYouNeedToAddOrRemoveAChildOrPartnerAsADependantPage(c.OPTION_NO);
       await pages.doYouNeedToSendEvidenceToHelpYourClaimPage.completeDoYouNeedToSendEvidenceToHelpYourClaimPage(c.OPTION_NO); // different scenario
+      if (isReportDeath) {
+        await pages.doYouNeedToTellUsSomeoneOnYourClaimHasDiedPage.completeDoYouNeedToTellUsSomeoneOnYourClaimHasDiedPage(c.OPTION_YES);
+        await pages.tellUsAboutThePersonWhoHasDiedPage.completeTellUsAboutThePersonWhoHasDiedPage();
+        await pages.didTheyMakeTheClaimPage.completeDidTheyMakeTheClaimPage(c.OPTION_YES);
+        await pages.theirNamePage.completePersonWhoDiedNamePage(c.GIVEN_NAME, c.FAMILY_NAME);
+        await pages.theirDateOfBirthPage.completePersonWhoDiedDateOfBirthPage(c.DOB_1990);
+        await pages.theirCountryOfNationalityPage.completePersonWhoDiedNationalityPage(c.CHILD_NATIONALITY);
+        await pages.uploadTheDeathCertificatePage.completeUploadTheDeathCertificatePage(c.EVIDENCE_UPLOAD_FILE);
+        break;
+      }
       await pages.doYouNeedToTellUsSomeoneOnYourClaimHasDiedPage.completeDoYouNeedToTellUsSomeoneOnYourClaimHasDiedPage(c.OPTION_NO);
       await pages.doYouNeedToDoSomethingElsePage.completeDoYouNeedToDoSomethingElsePage(
         scenario.toLowerCase() === c.SCENARIO_T3_NO_EVIDENCE_OR_OTHER_REQUEST ? c.OPTION_YES : c.OPTION_NO
@@ -176,9 +188,28 @@ When('I complete the {string} page', async ({pages}, pageName: string) => {
     case "their date of birth":
       await pages.theirDateOfBirthPage.completeChildPartnerDateOfBirthPage(c.CHILD_DOB);
       break;
+    case "do you need to send evidence to help your claim?":
+      await pages.doYouNeedToSendEvidenceToHelpYourClaimPage.completeDoYouNeedToSendEvidenceToHelpYourClaimPage(c.OPTION_NO);
+      break;
+    case "do you need to tell us someone on your claim has died?":
+      await pages.doYouNeedToTellUsSomeoneOnYourClaimHasDiedPage.completeDoYouNeedToTellUsSomeoneOnYourClaimHasDiedPage(c.OPTION_YES);
+      break;
+    case "tell us about the person who has died":
+      await pages.tellUsAboutThePersonWhoHasDiedPage.completeTellUsAboutThePersonWhoHasDiedPage();
+      break;
+    case "did they make the claim?":
+      await pages.didTheyMakeTheClaimPage.completeDidTheyMakeTheClaimPage(c.OPTION_YES);
+      break;
+    case "person who died's date of birth":
+      await pages.theirDateOfBirthPage.completePersonWhoDiedDateOfBirthPage(c.DOB_1990);
+      break;
     default:
       throw new Error(`Invalid scenario: ${pageName}`);
   }
+});
+
+When('I choose not to add or remove a dependant', async ({ pages }) => {
+  await pages.doYouNeedToAddOrRemoveAChildOrPartnerAsADependantPage.completeDoYouNeedToAddOrRemoveAChildOrPartnerAsADependantPage(c.OPTION_NO);
 });
 
 When('I complete the {string} page with {string} and {string}', async ({ pages }, pageName: string, givenName: string, familyName: string) => {
@@ -188,6 +219,9 @@ When('I complete the {string} page with {string} and {string}', async ({ pages }
       break;
     case "their name":
       await pages.theirNamePage.completeChildPartnerNamePage(givenName, familyName);
+      break;
+    case "person who died's name":
+      await pages.theirNamePage.completePersonWhoDiedNamePage(givenName, familyName);
       break;
     default:
       throw new Error(`Invalid scenario: ${pageName}`);
