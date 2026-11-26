@@ -91,6 +91,9 @@ When('I complete the SAA journey pertaining to {string}', async ({ pages }, scen
         await pages.theirDateOfBirthPage.completePersonWhoDiedDateOfBirthPage(c.DOB_1990);
         await pages.theirCountryOfNationalityPage.completePersonWhoDiedNationalityPage(c.CHILD_NATIONALITY);
         await pages.uploadTheDeathCertificatePage.completeUploadTheDeathCertificatePage(c.EVIDENCE_UPLOAD_FILE);
+        await pages.checkYourAnswersDeathPage.assertDeathAnswers(
+          c.OPTION_YES, c.GIVEN_NAME, c.FAMILY_NAME, c.DOB_1990_DISPLAY, c.CHILD_NATIONALITY, c.EVIDENCE_UPLOAD_FILE
+        );
         break;
       }
       await pages.doYouNeedToTellUsSomeoneOnYourClaimHasDiedPage.completeDoYouNeedToTellUsSomeoneOnYourClaimHasDiedPage(c.OPTION_NO);
