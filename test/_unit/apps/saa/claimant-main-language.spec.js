@@ -4,6 +4,10 @@ jest.mock(
   '../../../../apps/saa/behaviours/check-email-token',
   () => superclass => superclass
 );
+jest.mock(
+  '../../../../apps/saa/behaviours/send-submission-emails',
+  () => superclass => superclass
+);
 
 const app = require('../../../../apps/saa');
 const fields = require('../../../../apps/saa/fields');

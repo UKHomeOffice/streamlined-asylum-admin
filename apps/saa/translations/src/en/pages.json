@@ -86,7 +86,7 @@
     "item-title": "Change someone else’s name",
     "header": "Check your answers",
     "captionHeading": "Update personal details",
-    "limit-exceeded": "You have changed the maximum number of {{maxItems}} names. You cannot add any more.",
+    "limit-exceeded": "You have changed the maximum number of {{maxItems}} someone else’s names. You cannot add any more.",
     "add-another-name": "Change another name"
   },
   "nationality-change": {
@@ -226,7 +226,7 @@
   "check-your-answers-add-child-partner": {
     "header": "Check your answers",
     "captionHeading": "Add or remove a child or partner",
-    "limit-exceeded": "You have added or removed the maximum number of {{maxItems}} partners or dependents. You cannot add or remove any more.",
+    "limit-exceeded": "You have added or removed the maximum number of {{maxItems}} partners or dependants. You cannot add or remove any more.",
     "add-remove-child-partner" : "Add or remove another child or partner"
   },
   "reason-for-removing-child-partner": {

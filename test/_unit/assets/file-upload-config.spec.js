@@ -9,6 +9,10 @@ jest.mock(
   '../../../apps/saa/behaviours/check-email-token',
   () => superclass => superclass
 );
+jest.mock(
+  '../../../apps/saa/behaviours/send-submission-emails',
+  () => superclass => superclass
+);
 jest.mock('../../../apps/saa/behaviours/save-document', () =>
   jest.fn((category, fieldName) => `save:${category}:${fieldName}`)
 );
