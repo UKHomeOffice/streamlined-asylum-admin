@@ -192,7 +192,7 @@ const sendSubmissionEmails = superclass =>
      * @param {string} referenceNumber - Submission reference.
      * @param {boolean} [forCaseworker=false] - If true, includes document links; if false, plain file names only
      * @returns {Object} Personalisation object with submission_ref, claimant_full_name, and submission_summary
-     * @returns {string} returns.submission_ref - Generated submission reference from the session
+     * @returns {string} returns.submission_ref - Submission reference
      * @returns {string} returns.claimant_full_name - Full name of the claimant from session
      * @returns {string} returns.submission_summary - Formatted markdown email body with form data
      */
@@ -249,9 +249,6 @@ const sendSubmissionEmails = superclass =>
           const referenceNumber = existingReference || await generateApplicationReference();
           if (!referenceNumber) {
             throw new Error('Submission reference is missing');
-          }
-          if (!existingReference) {
-            req.sessionModel.set(APPLICATION_REFERENCE_FIELD, referenceNumber);
           }
           await this.sendSubmissionEmails(req, referenceNumber);
           return next();

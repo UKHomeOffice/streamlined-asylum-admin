@@ -15,9 +15,10 @@ const generateApplicationReference = require('./utils/generate-application-refer
 const reference = await generateApplicationReference();
 ```
 
-The submission email behaviour stores the generated reference in the session
-before sending either email, reusing an existing reference on retries. Both
-emails and the confirmation page use that session value.
+The submission email behaviour uses an existing session reference if present;
+otherwise it generates a reference for both emails without storing it in the
+session. Consequently, the confirmation page will not show a newly generated
+reference, and retries can generate a different one.
 
 ## Dependabot auto-merge
 

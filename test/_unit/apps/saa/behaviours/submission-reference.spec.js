@@ -87,21 +87,21 @@ describe('submission reference', () => {
     });
   });
 
-  test('a valid declaration uses the session reference in both emails before advancing to submitted', async () => {
+  test('a valid declaration uses the generated reference in both emails without storing it', async () => {
     const { controller: routeController, request } = declarationRequest({
       'declaration-check': 'true'
     });
     jest.spyOn(routeController, 'getRowsForSummarySections').mockReturnValue([]);
     notifyClient.sendEmail.mockImplementation(async (templateId, email, personalisation) => {
-      expect(request.sessionModel.get('application-reference')).toBe('COC-1234ABCDEF');
-      expect(personalisation.submission_ref).toBe(request.sessionModel.get('application-reference'));
+      expect(request.sessionModel.get('application-reference')).toBeUndefined();
+      expect(personalisation.submission_ref).toBe('COC-1234ABCDEF');
     });
 
     const location = await new Promise((resolve, reject) => {
       routeController.post(request, { locals: {}, redirect: resolve }, reject);
     });
 
-    expect(request.sessionModel.get('application-reference')).toBe('COC-1234ABCDEF');
+    expect(request.sessionModel.get('application-reference')).toBeUndefined();
     expect(notifyClient.sendEmail).toHaveBeenCalledTimes(2);
     expect(notifyClient.sendEmail.mock.calls.map(call => call[1])).toEqual([
       'caseworker@example.com', 'person@example.com'
@@ -109,11 +109,14 @@ describe('submission reference', () => {
     expect(location).toBe(`${app.baseUrl}/submitted`);
   });
 
-  test('retains the generated reference when retrying after an email failure', async () => {
+  test('generates a new reference when retrying after an email failure', async () => {
     const { controller: routeController, request } = declarationRequest({
       'declaration-check': 'true'
     });
     jest.spyOn(routeController, 'getRowsForSummarySections').mockReturnValue([]);
+    generateApplicationReference
+      .mockResolvedValueOnce('COC-1234ABCDEF')
+      .mockResolvedValueOnce('COC-9876ABCDEF');
     notifyClient.sendEmail.mockRejectedValueOnce(new Error('Notify request failed'));
 
     await expect(new Promise((resolve, reject) => {
@@ -124,11 +127,11 @@ describe('submission reference', () => {
       routeController.post(request, { locals: {}, redirect: resolve }, reject);
     });
 
-    expect(generateApplicationReference).toHaveBeenCalledTimes(1);
+    expect(generateApplicationReference).toHaveBeenCalledTimes(2);
     expect(notifyClient.sendEmail).toHaveBeenCalledTimes(3);
-    notifyClient.sendEmail.mock.calls.forEach(([, , personalisation]) => {
-      expect(personalisation.submission_ref).toBe(request.sessionModel.get('application-reference'));
-    });
+    expect(notifyClient.sendEmail.mock.calls.map(([, , personalisation]) => personalisation.submission_ref))
+      .toEqual(['COC-1234ABCDEF', 'COC-9876ABCDEF', 'COC-9876ABCDEF']);
+    expect(request.sessionModel.get('application-reference')).toBeUndefined();
     expect(location).toBe(`${app.baseUrl}/submitted`);
   });
 
