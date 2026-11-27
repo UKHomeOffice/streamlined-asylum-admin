@@ -2,6 +2,7 @@ const NO_DIGITS_REGEX = /^\D*$/;
 const CHANGE_EDIT_DELETE_REGEX = /\/(change|edit|delete)(?:\/|$)/;
 
 const SAA_BASE_URL = '/changes';
+const APPLICATION_REFERENCE_FIELD = 'application-reference';
 
 // yes/no fields on SAA pages that start a follow-up journey.
 const SECTION_FIELDS = [
@@ -18,9 +19,6 @@ const SUBMITTED_INFORMATION_TYPES = [
   { field: 'someone-on-claim-died', label: 'Tell us someone has died (Webform-RAD101)' }
 ];
 
-// Temporary placeholder until the real reference number implementation is completed.
-const PLACEHOLDER_SUBMISSION_REF = 'HDJ2123FTW';
-
 const REQUEST_METHODS = Object.freeze({
   GET: 'GET',
   POST: 'POST',
@@ -30,9 +28,9 @@ const REQUEST_METHODS = Object.freeze({
 module.exports = {
   NO_DIGITS_REGEX,
   SAA_BASE_URL,
+  APPLICATION_REFERENCE_FIELD,
   SECTION_FIELDS,
   SUBMITTED_INFORMATION_TYPES,
-  PLACEHOLDER_SUBMISSION_REF,
   REQUEST_METHODS,
   CHANGE_EDIT_DELETE_REGEX
 };

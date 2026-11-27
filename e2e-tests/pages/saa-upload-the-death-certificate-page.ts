@@ -13,4 +13,13 @@ export class UploadTheDeathCertificatePage extends BasePage {
       ? "Error: Upload the death certificate – Send information for your asylum claim – GOV.UK"
       : "Upload the death certificate – Send information for your asylum claim – GOV.UK";
   }
+
+  async completeUploadTheDeathCertificatePage(uploadFile: string): Promise<void> {
+    await this.assertAccessibility();
+    await this.assertPageTitle(this.page, await this.expectedPageTitle());
+
+    await this.page.locator('input[type=file]').first().setInputFiles(this.getUploadFilePath(uploadFile));
+    await this.page.locator('#uploaded-documents a').first().waitFor({ state: 'visible' });
+    await this.page.locator("form[name='file-upload-form'] button[class='govuk-button']").click();
+  }
 }

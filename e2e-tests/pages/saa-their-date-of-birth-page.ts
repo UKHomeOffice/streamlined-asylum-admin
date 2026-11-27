@@ -22,6 +22,14 @@ export class TheirDateOfBirthPage extends BasePage {
     await this.clickContinueButton();
   }
 
+  async completePersonWhoDiedDateOfBirthPage(dateOfBirth: string): Promise<void> {
+    await this.assertAccessibility();
+    await this.assertPageTitle(this.page, await this.expectedPageTitle());
+
+    await this.enterDateOrDob(dateOfBirth);
+    await this.clickContinueButton();
+  }
+
   async submitDayOnlyForChildPartnerDateOfBirthPage(day: string): Promise<void> {
     await this.assertAccessibility();
     await this.assertPageTitle(this.page, await this.expectedPageTitle());
