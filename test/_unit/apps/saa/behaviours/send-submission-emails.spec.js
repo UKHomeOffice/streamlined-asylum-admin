@@ -55,6 +55,7 @@ describe('send submission emails behaviour', () => {
     behaviour = new Behaviour();
     next = jest.fn();
     session = {
+      'application-reference': 'COC-HV12YT3344',
       'user-email': 'Person@Example.com',
       'claimants-given-name': 'Jane',
       'claimants-family-name': 'Doe',
@@ -63,7 +64,12 @@ describe('send submission emails behaviour', () => {
       'add-remove-dependant': 'yes',
       'someone-on-claim-died': 'no'
     };
-    req = { sessionModel: { get: jest.fn(key => session[key]) } };
+    req = {
+      sessionModel: {
+        get: jest.fn(key => session[key]),
+        set: jest.fn((key, value) => { session[key] = value; })
+      }
+    };
     baseSaveValues.mockReset();
     baseSaveValues.mockImplementation((request, response, callback) => callback());
     notifyClient.sendEmail.mockReset();
@@ -75,7 +81,7 @@ describe('send submission emails behaviour', () => {
     await behaviour.saveValues(req, {}, next);
 
     const common = {
-      submission_ref: 'HDJ2123FTW',
+      submission_ref: 'COC-HV12YT3344',
       claimant_full_name: 'Jane Doe',
       submission_summary: '## Your details\n\nEmail: person@example.com'
     };
@@ -98,6 +104,8 @@ describe('send submission emails behaviour', () => {
       'person@example.com',
       { ...common, show_information_types: 'no', information_types: '' }
     );
+    expect(req.sessionModel.get.mock.calls.filter(([key]) => key === 'application-reference')).toHaveLength(1);
+    expect(req.sessionModel.set).toHaveBeenCalledWith('application-reference', 'COC-HV12YT3344');
     expect(next).toHaveBeenCalledWith();
   });
 
@@ -118,6 +126,14 @@ describe('send submission emails behaviour', () => {
 
     expect(notifyClient.sendEmail).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledWith(expect.any(Error));
+  });
+
+  test('does not send emails when the submission reference is missing', async () => {
+    delete session['application-reference'];
+
+    await expect(behaviour.sendSubmissionEmails(req)).rejects.toThrow('Submission reference is missing');
+
+    expect(notifyClient.sendEmail).not.toHaveBeenCalled();
   });
 
   test('logs and propagates Notify errors without emailing the user', async () => {

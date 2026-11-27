@@ -2,6 +2,23 @@
 
 HOF form for the Send information for your asylum claim
 
+## Application reference helper
+
+The standalone `utils/generate-application-reference.js` helper returns a promise
+resolving to `COC-` followed by ten cryptographically random uppercase letters or
+digits. It depends only on `crypto-random-string` and does not require HOF, a
+request, or a session:
+
+```js
+const generateApplicationReference = require('./utils/generate-application-reference');
+
+const reference = await generateApplicationReference();
+```
+
+The submission email behaviour stores the generated reference in the session
+before sending either email, reusing an existing reference on retries. Both
+emails and the confirmation page use that session value.
+
 ## Dependabot auto-merge
 
 Dependabot uses short, meaningful branch names such as `deps-hof-<hash>` and

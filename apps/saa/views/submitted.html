@@ -1,0 +1,26 @@
+{{<layout}}
+  {{$journeyHeader}}
+    {{#t}}journey.header{{/t}}
+  {{/journeyHeader}}
+
+  {{$propositionHeader}}
+    {{> partials-navigation}}
+  {{/propositionHeader}}
+
+  {{$content}}
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h1 class="govuk-panel__title">Your information has been submitted</h1>
+      <div class="govuk-panel__body">
+        Your reference number<br><strong>{{values.application-reference}}</strong>
+      </div>
+    </div>
+    <p class="govuk-body">We have sent you an email to confirm, which shows what you sent us.</p>
+    <h2 class="govuk-heading-m">What happens next</h2>
+    <p class="govuk-body">We will now check what you have sent and will tell you if we can make the changes.</p>
+    <p class="govuk-body">Use your reference number above if you need to contact us.</p>
+    <p class="govuk-body">
+      We aim to reply within 2 weeks to confirm what we will do. If you do not hear anything within 2 weeks, or if you need to submit a letter of authority, you can
+      <a class="govuk-link" href="https://www.gov.uk/guidance/how-to-email-the-asylum-central-communications-hub">contact us by email</a>.
+    </p>
+  {{/content}}
+{{/layout}}
