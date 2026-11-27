@@ -22,4 +22,13 @@ export class TheirNamePage extends BasePage {
     await this.type(this.page.locator('#child-partner-family-name'), familyName);
     await this.clickContinueButton();
   }
+
+  async completePersonWhoDiedNamePage(givenName: string, familyName: string): Promise<void> {
+    await this.assertAccessibility();
+    await this.assertPageTitle(this.page, await this.expectedPageTitle());
+
+    await this.type(this.page.locator('#given-name-person-who-died'), givenName);
+    await this.type(this.page.locator('#family-name-person-who-died'), familyName);
+    await this.clickContinueButton();
+  }
 }

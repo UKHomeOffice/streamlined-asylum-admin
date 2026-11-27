@@ -1,6 +1,7 @@
 export class ConstantsLib {
     static readonly SAS_HOF_EMAIL = requiredEnv('SAS_HOF_EMAIL');
     static readonly DOB_1990 = '01/01/1990';
+    static readonly DOB_1990_DISPLAY = formatDateForSummary(ConstantsLib.DOB_1990);
     static readonly CHILD_DOB = '27/03/2020';
     static readonly CHILD_DOB_DISPLAY = formatDateForSummary(ConstantsLib.CHILD_DOB);
     static readonly OPTION_NO = 'No';

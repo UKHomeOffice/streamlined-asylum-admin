@@ -13,4 +13,10 @@ export class TellUsAboutThePersonWhoHasDiedPage extends BasePage {
       ? "Error: Tell us about the person who has died – Send information for your asylum claim – GOV.UK"
       : "Tell us about the person who has died – Send information for your asylum claim – GOV.UK";
   }
+
+  async completeTellUsAboutThePersonWhoHasDiedPage(): Promise<void> {
+    await this.assertAccessibility();
+    await this.assertPageTitle(this.page, await this.expectedPageTitle());
+    await this.clickContinueButton();
+  }
 }
