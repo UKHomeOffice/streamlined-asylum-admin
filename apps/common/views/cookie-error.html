@@ -1,8 +1,9 @@
 {{<error}}
     {{$header}}
-        {{content.title}}
+        {{#t}}errors.cookies-required.title{{/t}}
     {{/header}}
     {{$content}}
+        <h1 class="govuk-heading-l">{{#t}}errors.cookies-required.title{{/t}}</h1>
         <p>{{{content.message}}}</p>
         <a href="" class="govuk-button">{{#t}}buttons.try-again{{/t}}</a>
         {{#showStack}}
