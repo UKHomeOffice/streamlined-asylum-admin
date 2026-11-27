@@ -250,6 +250,7 @@ const sendSubmissionEmails = superclass =>
           if (!referenceNumber) {
             throw new Error('Submission reference is missing');
           }
+          req.sessionModel.set(APPLICATION_REFERENCE_FIELD, referenceNumber);
           await this.sendSubmissionEmails(req, referenceNumber);
           return next();
         } catch (error) {

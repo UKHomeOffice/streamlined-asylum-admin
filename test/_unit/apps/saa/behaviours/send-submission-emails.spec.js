@@ -64,7 +64,12 @@ describe('send submission emails behaviour', () => {
       'add-remove-dependant': 'yes',
       'someone-on-claim-died': 'no'
     };
-    req = { sessionModel: { get: jest.fn(key => session[key]) } };
+    req = {
+      sessionModel: {
+        get: jest.fn(key => session[key]),
+        set: jest.fn((key, value) => { session[key] = value; })
+      }
+    };
     baseSaveValues.mockReset();
     baseSaveValues.mockImplementation((request, response, callback) => callback());
     notifyClient.sendEmail.mockReset();
@@ -100,6 +105,7 @@ describe('send submission emails behaviour', () => {
       { ...common, show_information_types: 'no', information_types: '' }
     );
     expect(req.sessionModel.get.mock.calls.filter(([key]) => key === 'application-reference')).toHaveLength(1);
+    expect(req.sessionModel.set).toHaveBeenCalledWith('application-reference', 'COC-HV12YT3344');
     expect(next).toHaveBeenCalledWith();
   });
 
