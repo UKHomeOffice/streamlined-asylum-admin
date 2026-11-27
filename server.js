@@ -16,6 +16,12 @@ settings = Object.assign({}, settings, {
 
 const app = hof(settings);
 
+// temporary route for testing error page
+// remove before merge
+app.use('/test-error', (req, res, next) => {
+  next(new Error('Local error-page test'));
+});
+
 app.use((req, res, next) => {
   res.locals.htmlLang = 'en';
   next();
